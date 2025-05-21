@@ -74,7 +74,7 @@ public class SmallOxygenTank extends Item implements ICurioItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> text, TooltipFlag flag) {
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
             text.add(Component.literal(formatTicksToTime(
-                    cap.getFluidInTank(0).getAmount() * 1 + getLeftTicks(stack.getTag()))
+                    cap.getFluidInTank(0).getAmount() + getLeftTicks(stack.getTag()))
             ).withStyle(ChatFormatting.AQUA));
         });
         text.add(Component.literal("Baby's first air tank!").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GREEN));

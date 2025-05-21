@@ -74,7 +74,7 @@ public class LargeOxygenTank extends Item implements ICurioItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> text, TooltipFlag flag) {
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
             text.add(Component.literal(formatTicksToTime(
-                    cap.getFluidInTank(0).getAmount() * 1 + getLeftTicks(stack.getTag()))
+                    cap.getFluidInTank(0).getAmount() + getLeftTicks(stack.getTag()))
             ).withStyle(ChatFormatting.AQUA));
         });
         text.add(Component.literal("Now completely meteoric iron-free!").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.RED));

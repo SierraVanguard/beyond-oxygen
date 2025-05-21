@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "gRg",
+    "sBs"
+  ],
+  "key": {
+    "C": {
+      "item": "mekanism:basic_control_circuit"
+    },
+    "g": {
+      "tag": "forge:ingots/osmium"
+    },
+    "R": {
+      "item": "mekanism:alloy_reinforced"
+    },
+    "s": {
+      "tag": "forge:ingots/steel"
+    },
+    "B": {
+      "item": "not_enough_oxygen:small_oxygen_tank"
+    }
+  },
+  "result": {
+    "item": "not_enough_oxygen:medium_oxygen_tank",
+    "count": 1
+  }
+}

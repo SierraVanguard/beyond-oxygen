@@ -41,11 +41,7 @@ public class MediumTankCurioRenderer implements ICurioRenderer {
             float headPitch
     ) {
         poseStack.pushPose();
-
-        // Adjust positioning on the back (tweak values to fit)
         poseStack.translate(0.0F, -1.0F, 0.1F);
-
-        // Adjust if crouching
         if (slotContext.entity().isCrouching()) {
             ICurioRenderer.translateIfSneaking(poseStack, slotContext.entity());
         }

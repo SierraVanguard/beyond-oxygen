@@ -13,17 +13,14 @@ public class OxygenHelper {
     public static boolean isInBreathableEnvironment(Player player) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return true;
 
-        // Still need oxygen if underwater
         if (player.isUnderWater()) {
             return false;
         }
 
-        // Dimension is marked as breathable → oxygen not required
         if (!NEOConfig.unbreathableDimensions.contains(serverLevel.dimension().location())) {
             return true;
         }
 
-        // Inside a sealed, vented area
         return isPlayerInSealedVentArea(serverLevel, player.blockPosition());
     }
     private static boolean isPlayerInSealedVentArea(ServerLevel level, BlockPos playerPos) {

@@ -11,21 +11,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
 public class AtmosphericTankModel<T extends LivingEntity> extends EntityModel<T> {
-    // Only change the resource location name
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
             new ResourceLocation("not_enough_oxygen", "atmospheric_tank"), "main");
 
     private final ModelPart tank_medium;
     private final ModelPart tank_medium2;
-
     public AtmosphericTankModel(ModelPart root) {
-        // Keep everything identical
         this.tank_medium = root.getChild("tank_medium");
         this.tank_medium2 = this.tank_medium.getChild("tank_medium2");
     }
 
     public static LayerDefinition createBodyLayer() {
-        // Exact same model definition
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 

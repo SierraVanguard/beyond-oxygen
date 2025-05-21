@@ -15,10 +15,8 @@ public class NEOCreativeTabs {
     public static final RegistryObject<CreativeModeTab> MAIN_TAB = TABS.register("main",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.not_enough_oxygen.main"))
-                    // Use the custom icon item
                     .icon(() -> {
                         ItemStack stack = new ItemStack(NEOItems.TAB_ICON.get());
-                        // Hide durability bar
                         stack.getOrCreateTag().putBoolean("HideFlags", true);
                         return stack;
                     })

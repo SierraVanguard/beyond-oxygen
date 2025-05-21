@@ -41,8 +41,6 @@ public class SmallTankCurioRenderer implements ICurioRenderer {
             float headPitch
     ) {
         poseStack.pushPose();
-
-        // Positioning: adjust as needed for best visual fit
         poseStack.translate(0.0F, -1.0F, 0.1F);
 
         if (slotContext.entity().isCrouching()) {

@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "not_enough_oxygen:oxygen_tank",
+    "item": "not_enough_oxygen:small_oxygen_tank",
     "count": 1
   }
 }

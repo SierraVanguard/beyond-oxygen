@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class VentTracker {
 
-    // Maps level -> vent positions
     private static final Map<ServerLevel, Set<BlockPos>> VENT_POSITIONS = new ConcurrentHashMap<>();
 
     public static void registerVent(ServerLevel level, BlockPos pos) {

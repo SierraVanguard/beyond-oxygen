@@ -24,8 +24,6 @@ public class MediumTankModel<T extends LivingEntity> extends EntityModel<T> {
     public static LayerDefinition createBodyLayer() {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
-
-        // Rebuild exactly from Blockbench export but adapted to your mod's ResourceLocation
         partdefinition.addOrReplaceChild("tank_medium", CubeListBuilder.create()
                         .texOffs(0, 0).addBox(6.5F, 0.0F, -8.0F, 3, 8, 3, new CubeDeformation(0.0F))
                         .texOffs(0, 11).addBox(7.0F, -1.0F, -7.5F, 2, 1, 2, new CubeDeformation(0.0F)),
@@ -36,7 +34,6 @@ public class MediumTankModel<T extends LivingEntity> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        // No animation needed for this static tank model
     }
 
     @Override

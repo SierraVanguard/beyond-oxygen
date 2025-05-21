@@ -49,8 +49,6 @@ public class OxygenTankOverlay {
         Minecraft mc = Minecraft.getInstance();
         int x = screenWidth / 2 - mc.font.width(text) / 2;
         int y = 10;
-
-        // Shadow
         guiGraphics.drawString(
                 mc.font,
                 text,
@@ -59,8 +57,6 @@ public class OxygenTankOverlay {
                 0xFF000000,
                 false
         );
-
-        // Main text
         guiGraphics.drawString(
                 mc.font,
                 text,
@@ -99,7 +95,6 @@ public class OxygenTankOverlay {
                 }
             }
         } catch (Exception e) {
-            // Curios not installed or failed to get items
         }
         return ItemStack.EMPTY;
     }

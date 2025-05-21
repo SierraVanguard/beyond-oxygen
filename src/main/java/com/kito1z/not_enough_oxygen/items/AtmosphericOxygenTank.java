@@ -50,13 +50,10 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
         tag.putBoolean(REFILLING_TAG, isBreathable);
 
         if (isBreathable) {
-            // First ensure fluid handler exists
             stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
-                // Initialize if empty
                 if (handler.getFluidInTank(0).isEmpty()) {
                     handler.fill(new FluidStack(MekanismFluids.OXYGEN.getFluid(), 0), IFluidHandler.FluidAction.EXECUTE);
                 }
-                // Then refill
                 refillTank(stack);
             });
         } else {
@@ -68,7 +65,6 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
             FluidStack fluid = handler.getFluidInTank(0);
             if (fluid.isEmpty()) {
-                // Initialize with oxygen type if completely empty
                 fluid = new FluidStack(MekanismFluids.OXYGEN.getFluid(), 0);
             }
 
@@ -134,20 +130,15 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         CompoundTag tag = stack.getOrCreateTag();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
-            // Oxygen remaining
             int totalTicks = handler.getFluidInTank(0).getAmount() + getLeftTicks(tag);
             tooltip.add(Component.literal("Oxygen: " + formatTicksToTime(totalTicks))
                     .withStyle(ChatFormatting.AQUA));
-
-            // Refill status with visual indicators
             if (tag.getBoolean(REFILLING_TAG)) {
                 tooltip.add(Component.literal("Siphon Active").withStyle(ChatFormatting.GREEN));
                 tooltip.add(Component.literal("Refilling: " + REFILL_RATE + " units/sec").withStyle(ChatFormatting.DARK_GREEN));
             } else {
                 tooltip.add(Component.literal("Needs Breathable Air").withStyle(ChatFormatting.RED));
             }
-
-            // Capacity info
             tooltip.add(Component.literal("Warranty void if used on Tier 3+ Planets").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.DARK_PURPLE));
         });
     }

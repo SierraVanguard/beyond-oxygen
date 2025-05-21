@@ -41,11 +41,7 @@ public class LargeTankCurioRenderer implements ICurioRenderer {
             float headPitch
     ) {
         poseStack.pushPose();
-
-        // Adjust position for large tank (tweak these to fit nicely on the player)
         poseStack.translate(0.0F, -1.0F, 0.1F);
-
-        // Handle crouching offset
         if (slotContext.entity().isCrouching()) {
             ICurioRenderer.translateIfSneaking(poseStack, slotContext.entity());
         }

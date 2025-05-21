@@ -36,7 +36,6 @@ public class SmallTankModel<T extends LivingEntity> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        // No animation needed for static tank model
     }
 
     @Override

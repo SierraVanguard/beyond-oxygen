@@ -30,8 +30,6 @@ public abstract class NEOServerPlayerMixin {
     public void tick(CallbackInfo ci) {
         ServerPlayer player = (ServerPlayer) (Object) this;
         ServerLevel level = this.serverLevel();
-
-        // Original oxygen check (unchanged)
         if (NEOConfig.unbreathableDimensions.contains(level.dimension().location()) &&
                 !player.hasEffect(NEOEffects.OXYGEN_SATURATION.get())) {
             if (not_enough_oxygen$vacuumDamageTicks <= 0) {
