@@ -1,5 +1,10 @@
 {
   "item.not_enough_oxygen.oxygen_tank": "Oxygen Tank",
   "effect.not_enough_oxygen.oxygen_saturation": "Oxygen Saturation",
-  "block.not_enough_oxygen.vent": "Air Vent"
+  "block.not_enough_oxygen.vent": "Air Vent",
+  "item.not_enough_oxygen.atmospheric_oxygen_tank": "Atmospheric Oxygen Tank",
+  "item.not_enough_oxygen.small_oxygen_tank": "Small Oxygen Tank",
+  "item.not_enough_oxygen.medium_oxygen_tank": "Medium Oxygen Tank",
+  "item.not_enough_oxygen.large_oxygen_tank": "Large Oxygen Tank",
+  "item_group.not_enough_oxygen.main": "Not Enough Oxygen"
 }

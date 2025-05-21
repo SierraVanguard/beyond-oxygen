@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-    "not_enough_oxygen:oxygen_tank"
+    "not_enough_oxygen:oxygen_tank",
+    "not_enough_oxygen:medium_oxygen_tank",
+    "not_enough_oxygen:small_oxygen_tank",
+    "not_enough_oxygen:large_oxygen_tank",
+    "not_enough_oxygen:atmospheric_oxygen_tank"
   ]
 }

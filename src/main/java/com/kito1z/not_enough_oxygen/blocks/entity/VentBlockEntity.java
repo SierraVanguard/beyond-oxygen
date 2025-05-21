@@ -7,6 +7,7 @@ import com.kito1z.not_enough_oxygen.registry.NEOBlockEntities;
 import com.kito1z.not_enough_oxygen.registry.NEOEffects;
 import com.kito1z.not_enough_oxygen.utils.HermeticArea;
 import com.kito1z.not_enough_oxygen.utils.VSCompat;
+import com.kito1z.not_enough_oxygen.utils.VentTracker;
 import mekanism.common.registries.MekanismFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,7 +32,7 @@ public class VentBlockEntity extends BlockEntity {
 
     private int leftTicks = 0;
     private int checkTick = 0;
-    private final HermeticArea hermeticArea = new HermeticArea();
+    public final HermeticArea hermeticArea = new HermeticArea();
 
     public VentBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
         super(NEOBlockEntities.VENT_BLOCK_ENTITY.get(), p_155229_, p_155230_);
@@ -67,7 +68,7 @@ public class VentBlockEntity extends BlockEntity {
         List<ServerPlayer> players = ((ServerLevel)level).players();
         if(entity.hermeticArea.isHermetic()&& entity.consumeOxygen(entity.hermeticArea.getArea().size()/NEOConfig.ventConsumption)) {
             for (ServerPlayer player : players) {
-                boolean vsLogicSuccess = NotEnoughOxygen.ModsLoaded.VS && VSCompat.applyOxygenToVSPlayer(player, pos, entity.hermeticArea);
+                boolean vsLogicSuccess = NotEnoughOxygen.ModsLoaded.VS && VSCompat.applySealedEffects(player, pos, entity.hermeticArea);
                 if(!vsLogicSuccess){
                     Vec3 eyePos = player.getEyePosition();
                     BlockPos eyeBlockPos = new BlockPos((int)Math.floor(eyePos.x),(int)Math.floor(eyePos.y),(int)Math.floor(eyePos.z));
@@ -102,4 +103,28 @@ public class VentBlockEntity extends BlockEntity {
         tank.readFromNBT((CompoundTag) tag.get("tank"));
         leftTicks = tag.getInt("ticks");
     }
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
+            VentTracker.registerVent(serverLevel, this.getBlockPos());
+        }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
+            VentTracker.unregisterVent(serverLevel, this.getBlockPos());
+        }
+    }
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
+            VentTracker.unregisterVent(serverLevel, this.getBlockPos());
+        }
+    }
+
+
 }

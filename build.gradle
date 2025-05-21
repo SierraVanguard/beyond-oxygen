@@ -20,6 +20,7 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'kotlin'
 
+
 group = mod_group_id
 version = mod_version
 
@@ -185,11 +186,6 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-
-
-
-
     implementation fg.deobf("curse.maven:mekanism-268560:6258796")
     implementation fg.deobf("curse.maven:mekanism-generators-268566:6258799")
     implementation fg.deobf("curse.maven:mekanism-tools-268567:6258800")
@@ -202,7 +198,7 @@ dependencies {
 
     implementation fg.deobf("curse.maven:kotlin-for-forge-351264:5402061")
     implementation fg.deobf("curse.maven:curios-309927:6238756")
-
+    implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
@@ -219,8 +215,11 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {
+        jarJar.ranged(it, "[0.4.1,)")
+    }
 }
-
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.

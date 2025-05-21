@@ -1,0 +1,58 @@
+package com.kito1z.not_enough_oxygen.client.renderer;
+
+import com.kito1z.not_enough_oxygen.NotEnoughOxygen;
+import com.kito1z.not_enough_oxygen.client.model.LargeTankModel;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.client.ICurioRenderer;
+
+public class AtmosphericTankCurioRenderer implements ICurioRenderer {
+
+    private static final ResourceLocation TEXTURE = new ResourceLocation(NotEnoughOxygen.MODID, "textures/item/atmospheric_tank.png");
+
+    private final LargeTankModel<LivingEntity> model;
+
+    public AtmosphericTankCurioRenderer(EntityModelSet modelSet) {
+        this.model = new LargeTankModel<>(modelSet.bakeLayer(LargeTankModel.LAYER_LOCATION));
+    }
+
+    @Override
+    public <T extends LivingEntity, M extends net.minecraft.client.model.EntityModel<T>> void render(
+            ItemStack stack,
+            SlotContext slotContext,
+            PoseStack poseStack,
+            RenderLayerParent<T, M> renderLayerParent,
+            MultiBufferSource buffer,
+            int light,
+            float limbSwing,
+            float limbSwingAmount,
+            float partialTicks,
+            float ageInTicks,
+            float netHeadYaw,
+            float headPitch
+    ) {
+        poseStack.pushPose();
+
+        // Adjust position for large tank (tweak these to fit nicely on the player)
+        poseStack.translate(0.0F, -1.0F, 0.1F);
+
+        // Handle crouching offset
+        if (slotContext.entity().isCrouching()) {
+            ICurioRenderer.translateIfSneaking(poseStack, slotContext.entity());
+        }
+
+        VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutout(TEXTURE));
+        model.renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+
+        poseStack.popPose();
+    }
+}
