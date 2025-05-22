@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#B#",
+    "RSR",
+    "#I#"
+  ],
+  "key": {
+    "#": {"item":  "mekanism:alloy_infused"},
+    "B": {"item":  "beyond_oxygen:oxygen_tank"},
+    "R": {"item":  "mekanism:advanced_control_circuit"},
+    "S": {"item":  "mekanism:steel_casing"},
+    "I": {"item":  "minecraft:iron_bars"}
+  },
+  "result": {
+    "item":  "beyond_oxygen:vent",
+    "count": 1
+  }
+}

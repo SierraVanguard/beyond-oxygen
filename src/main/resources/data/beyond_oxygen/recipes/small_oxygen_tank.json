@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gRg",
+    "iBi",
+    "iii"
+  ],
+  "key": {
+    "g": {
+      "item": "mekanism:ingot_osmium"
+    },
+    "R": {
+      "item": "mekanism:alloy_infused"
+    },
+    "i": {
+      "item": "mekanism:ingot_steel"
+    },
+    "B": {
+      "item": "mekanism:basic_fluid_tank"
+    }
+  },
+  "result": {
+    "item": "beyond_oxygen:small_oxygen_tank",
+    "count": 1
+  }
+}

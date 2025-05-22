@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "gAg",
+    "bBb"
+  ],
+  "key": {
+    "C": {
+      "item": "mekanism:advanced_control_circuit"
+    },
+    "g": {
+      "tag": "forge:ingots/osmium"
+    },
+    "A": {
+      "item": "mekanism:alloy_atomic"
+    },
+    "b": {
+      "tag": "forge:storage_blocks/steel"
+    },
+    "B": {
+      "item": "beyond_oxygen:medium_oxygen_tank"
+    }
+  },
+  "result": {
+    "item": "beyond_oxygen:large_oxygen_tank",
+    "count": 1
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "beyond_oxygen:block/vent",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "beyond_oxygen:block/vent"
+    },
+    "facing=south": {
+      "model": "beyond_oxygen:block/vent",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "beyond_oxygen:block/vent",
+      "y": 270
+    },"facing=up": {
+      "model": "beyond_oxygen:block/vent",
+      "x": 270
+    },"facing=down": {
+      "model": "beyond_oxygen:block/vent",
+      "x": 90
+    }
+  }
+}

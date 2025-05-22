@@ -1,0 +1,38 @@
+package com.sierravanguard.beyond_oxygen.utils;
+
+import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
+import com.sierravanguard.beyond_oxygen.BOConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+
+public class OxygenHelper {
+
+    public static boolean isInBreathableEnvironment(Player player) {
+        if (!(player.level() instanceof ServerLevel serverLevel)) return true;
+
+        if (player.isUnderWater()) {
+            return false;
+        }
+
+        if (!BOConfig.unbreathableDimensions.contains(serverLevel.dimension().location())) {
+            return true;
+        }
+
+        return isPlayerInSealedVentArea(serverLevel, player.blockPosition());
+    }
+    private static boolean isPlayerInSealedVentArea(ServerLevel level, BlockPos playerPos) {
+        for (BlockPos ventPos : VentTracker.getVentsIn(level)) {
+            BlockEntity be = level.getBlockEntity(ventPos);
+            if (!(be instanceof VentBlockEntity vent)) continue;
+
+            if (vent.hermeticArea != null && vent.hermeticArea.isHermetic()) {
+                if (vent.hermeticArea.getArea().contains(playerPos)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}

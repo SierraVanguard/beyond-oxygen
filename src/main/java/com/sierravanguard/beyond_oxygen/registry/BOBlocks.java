@@ -1,0 +1,15 @@
+package com.sierravanguard.beyond_oxygen.registry;
+
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
+public class BOBlocks {
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, BeyondOxygen.MODID);
+
+    public static final RegistryObject<Block> VENT = BLOCKS.register("vent",()->new VentBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().explosionResistance(6f).strength(30f)));
+}
