@@ -2,6 +2,7 @@
   "item.beyond_oxygen.oxygen_tank": "Oxygen Tank",
   "effect.beyond_oxygen.oxygen_saturation": "Oxygen Saturation",
   "block.beyond_oxygen.vent": "Air Vent",
+  "block.beyond_oxygen.bubble_generator" : "Oxygen Bubble Generator",
   "item.beyond_oxygen.atmospheric_oxygen_tank": "Atmospheric Oxygen Tank",
   "item.beyond_oxygen.small_oxygen_tank": "Small Oxygen Tank",
   "item.beyond_oxygen.medium_oxygen_tank": "Medium Oxygen Tank",
