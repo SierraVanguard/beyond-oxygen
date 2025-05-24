@@ -3,7 +3,6 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
-import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
@@ -38,11 +37,7 @@ public class VentBlockEntity extends BlockEntity {
 
     private int leftTicks = 0;
     private int checkTick = 0;
-    public int temperatureRegulatorCooldown = 0;
     public final HermeticArea hermeticArea = new HermeticArea();
-
-    // New boolean flag for thermal regulator
-    public boolean temperatureRegulatorApplied = false;
 
     public VentBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
         super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), p_155229_, p_155230_);
@@ -62,57 +57,40 @@ public class VentBlockEntity extends BlockEntity {
 
     private final FluidTank tank = new FluidTank(1000, fluidStack -> acceptedFluids.contains(fluidStack.getFluid()));
 
-    private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(() -> tank);
-
+    private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(()->tank);
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.FLUID_HANDLER) return tankLazyOptional.cast();
+        if(cap == ForgeCapabilities.FLUID_HANDLER) return tankLazyOptional.cast();
         return super.getCapability(cap, side);
     }
 
-    private boolean consumeOxygen(int amount) {
-        int total = tank.getFluidAmount() * BOConfig.oxygenConsumption + leftTicks;
-        if (total < amount) return false;
-        total = total - amount;
-        tank.getFluid().setAmount(total / 10);
+    private boolean consumeOxygen(int amount){
+        int total = tank.getFluidAmount()* BOConfig.oxygenConsumption + leftTicks;
+        if(total < amount) return false;
+        total = total-amount;
+        tank.getFluid().setAmount(total/10);
         leftTicks = total % 10;
         return true;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity t) {
-        if (level.isClientSide) return;
+        if(level.isClientSide) return;
         VentBlockEntity entity = (VentBlockEntity) t;
-        if (entity.temperatureRegulatorCooldown > 0) {
-            entity.temperatureRegulatorCooldown--;
-        }
         Direction dir = state.getValue(VentBlock.FACING);
-
-        if (entity.checkTick <= 0) {
-            entity.hermeticArea.bakeArea((ServerLevel) level, pos.offset(dir.getNormal()), dir.getOpposite());
+        if(entity.checkTick <= 0){
+            entity.hermeticArea.bakeArea((ServerLevel) level, pos.offset(dir.getNormal()),dir.getOpposite());
             entity.checkTick = 60;
         }
         entity.checkTick--;
-
-        if (entity.tank.isEmpty()) return;
-
-        List<ServerPlayer> players = ((ServerLevel) level).players();
-        int oxygenNeeded = entity.hermeticArea.getArea().size() / BOConfig.ventConsumption;
-
-        // Adjust oxygen needed if thermal regulator is applied (example: halve oxygen consumption)
-        if (entity.temperatureRegulatorApplied) {
-            oxygenNeeded /= 2;
-        }
-
-        if (entity.hermeticArea.isHermetic() && entity.consumeOxygen(oxygenNeeded)) {
+        if(entity.tank.isEmpty()) return;
+        List<ServerPlayer> players = ((ServerLevel)level).players();
+        if(entity.hermeticArea.isHermetic()&& entity.consumeOxygen(entity.hermeticArea.getArea().size()/ BOConfig.ventConsumption)) {
             for (ServerPlayer player : players) {
-                boolean vsLogicSuccess = BeyondOxygen.ModsLoaded.VS && VSCompat.applySealedEffects(player, pos, entity.hermeticArea, entity);
-                if (!vsLogicSuccess) {
+                boolean vsLogicSuccess = BeyondOxygen.ModsLoaded.VS && VSCompat.applySealedEffects(player, pos, entity.hermeticArea);
+                if(!vsLogicSuccess){
                     Vec3 eyePos = player.getEyePosition();
-                    BlockPos eyeBlockPos = new BlockPos((int) Math.floor(eyePos.x), (int) Math.floor(eyePos.y), (int) Math.floor(eyePos.z));
-                    if (entity.hermeticArea.getArea().contains(eyeBlockPos)) {
-                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
-                        if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
-                    }
+                    BlockPos eyeBlockPos = new BlockPos((int)Math.floor(eyePos.x),(int)Math.floor(eyePos.y),(int)Math.floor(eyePos.z));
+                    if(entity.hermeticArea.getArea().contains(eyeBlockPos)) player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
                 }
             }
         }
@@ -127,7 +105,7 @@ public class VentBlockEntity extends BlockEntity {
     @Override
     public void reviveCaps() {
         super.reviveCaps();
-        tankLazyOptional = LazyOptional.of(() -> tank);
+        tankLazyOptional = LazyOptional.of(()->tank);
     }
 
     @Override
@@ -135,19 +113,14 @@ public class VentBlockEntity extends BlockEntity {
         super.saveAdditional(tag);
         tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.putInt("ticks", leftTicks);
-        tag.putBoolean("temperatureRegulatorApplied", temperatureRegulatorApplied);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        tank.readFromNBT(tag.getCompound("tank"));
+        tank.readFromNBT((CompoundTag) tag.get("tank"));
         leftTicks = tag.getInt("ticks");
-        if (tag.contains("temperatureRegulatorApplied")) {
-            temperatureRegulatorApplied = tag.getBoolean("temperatureRegulatorApplied");
-        }
     }
-
     @Override
     public void onLoad() {
         super.onLoad();
@@ -163,7 +136,6 @@ public class VentBlockEntity extends BlockEntity {
             VentTracker.unregisterVent(serverLevel, this.getBlockPos());
         }
     }
-
     @Override
     public void setRemoved() {
         super.setRemoved();
@@ -172,12 +144,5 @@ public class VentBlockEntity extends BlockEntity {
         }
     }
 
-    public float getCurrentOxygenRate() {
-        int areaSize = hermeticArea.getArea().size();
-        return areaSize / (float) BOConfig.ventConsumption;
-    }
-    public boolean GetRegulator(){
-        return temperatureRegulatorApplied;
-    }
 
 }

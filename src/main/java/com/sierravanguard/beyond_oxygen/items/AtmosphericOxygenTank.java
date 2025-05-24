@@ -1,10 +1,8 @@
 package com.sierravanguard.beyond_oxygen.items;
 
 import com.sierravanguard.beyond_oxygen.cap.OxygenTankCap;
-import com.sierravanguard.beyond_oxygen.client.ClientHelper;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
-import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,8 +12,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
@@ -23,14 +19,16 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
+
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AtmosphericOxygenTank extends Item implements ICurioItem {
 
-    private static final int CAPACITY = 24000;
-    private static final int REFILL_RATE = 1;
+    private static final int CAPACITY = 24000; // Larger capacity for passive refill
+    private static final int REFILL_RATE = 1; // Refill 1 unit per second (20 ticks)
     private static final String REFILLING_TAG = "Refilling";
     private static final String TICKS_TAG = "ticks";
 
@@ -129,31 +127,29 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
         });
         return result.get();
     }
-//THIS [REDACTED] IS WHAT CAUSED THE CRASH!
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         CompoundTag tag = stack.getOrCreateTag();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
             int totalTicks = handler.getFluidInTank(0).getAmount() + getLeftTicks(tag);
-            tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen", formatTicksToTime(totalTicks))
+            tooltip.add(Component.literal("Oxygen: " + formatTicksToTime(totalTicks))
                     .withStyle(ChatFormatting.AQUA));
             if (tag.getBoolean(REFILLING_TAG)) {
-                tooltip.add(Component.translatable("tooltip.beyond_oxygen.siphon_active")
-                        .withStyle(ChatFormatting.GREEN));
-                tooltip.add(Component.translatable("tooltip.beyond_oxygen.refilling", REFILL_RATE)
-                        .withStyle(ChatFormatting.DARK_GREEN));
+                tooltip.add(Component.literal("Siphon Active").withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.literal("Refilling: " + REFILL_RATE + " units/sec").withStyle(ChatFormatting.DARK_GREEN));
             } else {
-                tooltip.add(Component.translatable("tooltip.beyond_oxygen.needs_air")
-                        .withStyle(ChatFormatting.RED));
+                tooltip.add(Component.literal("Needs Breathable Air").withStyle(ChatFormatting.RED));
             }
             if (level != null && level.isClientSide) {
-                if (ClientHelper.isPlayerNotWearingFullSuit()) {
-                    tooltip.add(Component.translatable("tooltip.beyond_oxygen.full_suit_required")
+                if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                        !SpaceSuitHandler.isWearingFullSuit(net.minecraft.client.Minecraft.getInstance().player)) {
+                    tooltip.add(Component.literal("Full pressure suit required!")
                             .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
                 }
             }
-            tooltip.add(Component.translatable("tooltip.beyond_oxygen.warranty_warning")
-                    .withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_PURPLE));
+
+            tooltip.add(Component.literal("Warranty void if used on Tier 3+ Planets").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.DARK_PURPLE));
         });
     }
 
