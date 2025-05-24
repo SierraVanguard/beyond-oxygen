@@ -4,3 +4,6 @@ build/
 lib/
 run/
 run-data/
+.settings/
+.project
+.classpath

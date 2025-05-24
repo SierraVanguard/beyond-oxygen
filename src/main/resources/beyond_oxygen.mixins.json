@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "beyond_oxygen.refmap.json",
   "mixins": [
+    "CameraMixin",
     "EntityMixin",
     "BOServerPlayerMixin"
   ],
