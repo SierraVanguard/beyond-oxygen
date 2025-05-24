@@ -3,7 +3,6 @@ package com.sierravanguard.beyond_oxygen.items;
 import com.sierravanguard.beyond_oxygen.cap.OxygenTankCap;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
-import mekanism.common.registries.MekanismFluids;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -53,7 +52,7 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
         if (isBreathable) {
             stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
                 if (handler.getFluidInTank(0).isEmpty()) {
-                    handler.fill(new FluidStack(MekanismFluids.OXYGEN.getFluid(), 0), IFluidHandler.FluidAction.EXECUTE);
+                    handler.fill(new FluidStack(handler.getFluidInTank(0), 0), IFluidHandler.FluidAction.EXECUTE);
                 }
                 refillTank(stack);
             });
@@ -66,7 +65,7 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
             FluidStack fluid = handler.getFluidInTank(0);
             if (fluid.isEmpty()) {
-                fluid = new FluidStack(MekanismFluids.OXYGEN.getFluid(), 0);
+                fluid = new FluidStack(handler.getFluidInTank(0), 0);
             }
 
             if (fluid.getAmount() < CAPACITY) {

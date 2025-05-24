@@ -8,25 +8,30 @@ import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import com.sierravanguard.beyond_oxygen.utils.VentTracker;
-import mekanism.common.registries.MekanismFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.registries.ForgeRegistries;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class VentBlockEntity extends BlockEntity {
 
@@ -36,9 +41,22 @@ public class VentBlockEntity extends BlockEntity {
 
     public VentBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
         super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), p_155229_, p_155230_);
+        loadAcceptedFluidsFromConfig(BOConfig.oxygenFluids);
     }
 
-    private final FluidTank tank = new FluidTank(1000, fluid-> fluid.getFluid() == MekanismFluids.OXYGEN.getFluid());
+    private final Set<Fluid> acceptedFluids = new HashSet<>();
+
+    public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
+        for (ResourceLocation fluidId : fluidIds) {
+            Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
+            if (fluid != null) {
+                acceptedFluids.add(fluid);
+            }
+        }
+    }
+
+    private final FluidTank tank = new FluidTank(1000, fluidStack -> acceptedFluids.contains(fluidStack.getFluid()));
+
     private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(()->tank);
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {

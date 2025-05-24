@@ -56,13 +56,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
-modId="mekanism"
-mandatory=true
-versionRange="[10.0.0,)"
-ordering="NONE"
-side="BOTH"
-
-[[dependencies."${mod_id}"]]
 modId="curios"
 mandatory=true
 versionRange="[5.0.0,)"

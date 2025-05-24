@@ -1,17 +1,19 @@
 package com.sierravanguard.beyond_oxygen.items.armor;
 
+import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
-import mekanism.common.registries.MekanismItems;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
 
 public enum SpaceSuitArmorMaterial implements ArmorMaterial {
-    SPACESUIT("spacesuit", 10, new int[]{4, 6, 4, 3}, 22, SoundEvents.ARMOR_EQUIP_LEATHER, 0f, 0f, () -> Ingredient.of(MekanismItems.STEEL_INGOT.get()));
+    SPACESUIT("spacesuit", 10, new int[] { 4, 6, 4, 3 }, 22, SoundEvents.ARMOR_EQUIP_LEATHER, 0f, 0f,
+            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.spaceRepairMaterial)));
 
     private final String name;
     private final int durabilityMultiplier;
@@ -22,8 +24,8 @@ public enum SpaceSuitArmorMaterial implements ArmorMaterial {
     private final float knockbackResistance;
     private final Supplier<Ingredient> repairIngredient;
 
-
-    SpaceSuitArmorMaterial(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue, SoundEvent equipSound, float toughness, float knockbackResistance, Supplier<Ingredient> repairIngredient){
+    SpaceSuitArmorMaterial(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue,
+            SoundEvent equipSound, float toughness, float knockbackResistance, Supplier<Ingredient> repairIngredient) {
         this.name = name;
         this.durabilityMultiplier = durabilityMultiplier;
         this.protectionAmounts = protectionAmounts;
@@ -33,8 +35,9 @@ public enum SpaceSuitArmorMaterial implements ArmorMaterial {
         this.knockbackResistance = knockbackResistance;
         this.repairIngredient = repairIngredient;
     }
-    private static final int[] DURABILITY = {13, 15, 16, 11};
-    private static final int[] DEFENSE = {1, 3, 4, 2};
+
+    private static final int[] DURABILITY = { 13, 15, 16, 11 };
+    private static final int[] DEFENSE = { 1, 3, 4, 2 };
 
     @Override
     public int getDurabilityForType(ArmorItem.Type type) {
@@ -45,7 +48,6 @@ public enum SpaceSuitArmorMaterial implements ArmorMaterial {
     public int getDefenseForType(ArmorItem.Type type) {
         return DEFENSE[type.ordinal()];
     }
-
 
     @Override
     public int getEnchantmentValue() {
