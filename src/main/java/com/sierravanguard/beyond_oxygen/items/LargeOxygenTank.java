@@ -3,6 +3,7 @@ package com.sierravanguard.beyond_oxygen.items;
 import com.sierravanguard.beyond_oxygen.cap.OxygenTankCap;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
+import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class LargeOxygenTank extends Item implements ICurioItem {
 
-    private static final int CAPACITY = 16800; // Custom capacity for large tank
+    private static final int CAPACITY = 16800;
+    private static final String TICKS_TAG = "ticks";
 
     public LargeOxygenTank(Properties properties) {
         super(properties);
@@ -36,66 +38,24 @@ public class LargeOxygenTank extends Item implements ICurioItem {
     }
 
     @Override
-    public boolean isBarVisible(ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public int getBarColor(ItemStack stack) {
-        return 8900331;
-    }
-
-    @Override
-    public int getBarWidth(ItemStack stack) {
-        AtomicInteger result = new AtomicInteger();
-        stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
-            result.set(Math.round((float) handler.getFluidInTank(0).getAmount() * 13.0F / (float) CAPACITY));
-        });
-        return result.get();
-    }
-
-    private int getLeftTicks(CompoundTag tag) {
-        if (tag == null) return 0;
-        return tag.getInt("ticks");
-    }
-
-    private void setLeftTicks(CompoundTag tag, int value) {
-        if (tag == null) return;
-        tag.putInt("ticks", value);
-    }
-
-    public static String formatTicksToTime(int ticks) {
-        int totalSeconds = ticks / 20;
-        return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> text, TooltipFlag flag) {
-        stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
-            text.add(Component.literal(formatTicksToTime(
-                    cap.getFluidInTank(0).getAmount() + getLeftTicks(stack.getTag()))
-            ).withStyle(ChatFormatting.AQUA));
-        });
-        text.add(Component.literal("Now completely meteoric iron-free!").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.RED));
-        super.appendHoverText(stack, level, text, flag);
-    }
-
-    @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         if (!(slotContext.entity() instanceof ServerPlayer player)) return;
+
+        if (!SpaceSuitHandler.isWearingFullSuit(player)) return;
         if (OxygenHelper.isInBreathableEnvironment(player)) return;
+
+        consumeOxygen(player, stack);
+    }
+
+    private void consumeOxygen(ServerPlayer player, ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         AtomicInteger ticks = new AtomicInteger(getLeftTicks(tag));
-        if (player.getEffect(BOEffects.OXYGEN_SATURATION.get()) != null &&
-                player.getEffect(BOEffects.OXYGEN_SATURATION.get()).getDuration() >= 2) {
-            return;
-        }
 
         if (ticks.get() <= 0) {
-            stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
-                if (!cap.getFluidInTank(0).isEmpty()) {
-                    ticks.set(1); // 1 tick per unit
-                    cap.drain(1, IFluidHandler.FluidAction.EXECUTE);
+            stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
+                if (!handler.getFluidInTank(0).isEmpty()) {
+                    ticks.set(1);
+                    handler.drain(1, IFluidHandler.FluidAction.EXECUTE);
                 }
             });
         }
@@ -107,5 +67,60 @@ public class LargeOxygenTank extends Item implements ICurioItem {
 
         setLeftTicks(tag, ticks.get());
         stack.setTag(tag);
+    }
+
+    private int getLeftTicks(CompoundTag tag) {
+        return tag != null ? tag.getInt(TICKS_TAG) : 0;
+    }
+
+    private void setLeftTicks(CompoundTag tag, int ticks) {
+        if (tag != null) {
+            tag.putInt(TICKS_TAG, ticks);
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> text, TooltipFlag flag) {
+        CompoundTag tag = stack.getOrCreateTag();
+        stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
+            int totalTicks = cap.getFluidInTank(0).getAmount() + getLeftTicks(tag);
+            text.add(Component.literal(formatTicksToTime(totalTicks)).withStyle(ChatFormatting.AQUA));
+        });
+
+        if (level != null && level.isClientSide) {
+            if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                    !SpaceSuitHandler.isWearingFullSuit(net.minecraft.client.Minecraft.getInstance().player)) {
+                text.add(Component.literal("Full pressure suit required!")
+                        .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+            }
+        }
+
+        text.add(Component.literal("Now completely meteoric iron-free!")
+                .withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.RED));
+        super.appendHoverText(stack, level, text, flag);
+    }
+
+    public static String formatTicksToTime(int ticks) {
+        int totalSeconds = ticks / 20;
+        return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        return 0x87D0E6;
+    }
+
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        AtomicInteger result = new AtomicInteger();
+        stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
+            result.set(Math.round((float) handler.getFluidInTank(0).getAmount() * 13.0F / CAPACITY));
+        });
+        return result.get();
     }
 }

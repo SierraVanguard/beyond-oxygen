@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:bread" },
+    { "item": "beyond_oxygen:can" }
+  ],
+  "result": {
+    "item": "beyond_oxygen:canned_baguette",
+    "count": 1
+  }
+}

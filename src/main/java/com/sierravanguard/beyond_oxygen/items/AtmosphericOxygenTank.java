@@ -20,6 +20,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
+
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,7 +79,9 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
     private void consumeOxygen(ServerPlayer player, ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         AtomicInteger ticks = new AtomicInteger(getLeftTicks(tag));
-
+        if (!SpaceSuitHandler.isWearingFullSuit(player)) {
+            return;
+        }
         if (ticks.get() <= 0) {
             stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
                 if (!handler.getFluidInTank(0).isEmpty()) {
@@ -113,7 +117,7 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
 
     @Override
     public int getBarColor(ItemStack stack) {
-        return 0x00DDDD; // Cyan color for atmospheric tank
+        return 0x87D0E6;
     }
 
     @Override
@@ -138,6 +142,14 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
             } else {
                 tooltip.add(Component.literal("Needs Breathable Air").withStyle(ChatFormatting.RED));
             }
+            if (level != null && level.isClientSide) {
+                if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                        !SpaceSuitHandler.isWearingFullSuit(net.minecraft.client.Minecraft.getInstance().player)) {
+                    tooltip.add(Component.literal("Full pressure suit required!")
+                            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                }
+            }
+
             tooltip.add(Component.literal("Warranty void if used on Tier 3+ Planets").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.DARK_PURPLE));
         });
     }

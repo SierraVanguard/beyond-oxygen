@@ -6,5 +6,13 @@
   "item.beyond_oxygen.small_oxygen_tank": "Small Oxygen Tank",
   "item.beyond_oxygen.medium_oxygen_tank": "Medium Oxygen Tank",
   "item.beyond_oxygen.large_oxygen_tank": "Large Oxygen Tank",
-  "item_group.beyond_oxygen.main": "Beyond Oxygen"
+  "item_group.beyond_oxygen.main": "Beyond Oxygen",
+  "item.beyond_oxygen.bubble_generator" : "Oxygen Bubble Generator",
+  "item.beyond_oxygen.spacesuit_chestplate" : "Space Suit Chestplate",
+  "item.beyond_oxygen.spacesuit_leggings" : "Space Suit Leggings",
+  "item.beyond_oxygen.spacesuit_boots" : "Space Suit Boots",
+  "item.beyond_oxygen.spacesuit_helmet" : "Space Suit Helmet",
+  "item.beyond_oxygen.empty_can" : "Empty Can",
+  "item.beyond_oxygen.canned_potatoes" : "Canned Potatoes",
+  "item.beyond_oxygen.canned_apple" : "Canned Apple"
 }

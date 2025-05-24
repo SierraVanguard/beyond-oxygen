@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -21,7 +22,13 @@ public class BOConfig {
     private static final ForgeConfigSpec.ConfigValue<Integer> OXYGEN_CONSUMPTION = BUILDER.comment("How many oxygen units in 1 mb").define("oxygenConsumption", 10);
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> UNBREATHABLE_DIMENSIONS = BUILDER.comment("List of unbreathable dimensions").defineListAllowEmpty("unbreathableDimensions",List.of("minecraft:the_end"),s->s instanceof String);
     private static final ForgeConfigSpec.ConfigValue<Integer> VENT_CONSUMPTION = BUILDER.comment("How many blocks vent can fill with 1 oxygen unit").define("ventConsumption", 20);
-
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_HELMETS = BUILDER.comment("List of item IDs that count as spacesuit helmets").defineListAllowEmpty("space_helmets", List.of("beyond_oxygen:spacesuit_helmet"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_CHESTPLATES = BUILDER.comment("List of item IDs that count as spacesuit chestplates").defineListAllowEmpty("space_chestplates", List.of("beyond_oxygen:spacesuit_chestplate"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_LEGGINGS = BUILDER.comment("List of item IDs that count as spacesuit leggings").defineListAllowEmpty("space_leggings", List.of("beyond_oxygen:spacesuit_leggings"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_BOOTS = BUILDER.comment("List of item IDs that count as spacesuit boots").defineListAllowEmpty("space_boots", List.of("beyond_oxygen:spacesuit_boots"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<Integer> BUBBLE_MAX_RADIUS = BUILDER
+            .comment("Maximum radius of bubble generators")
+            .defineInRange("bubbleMaxRadius", 5, 5, 20); // Default 5, min 1, max 20
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
 
@@ -30,7 +37,11 @@ public class BOConfig {
     public static int oxygenTankCapacity;
     public static int ventConsumption;
     public static List<ResourceLocation> unbreathableDimensions;
-
+    public static List<String> spaceHelmets;
+    public static List<String> spaceChestplates;
+    public static List<String> spaceLeggings;
+    public static List<String> spaceBoots;
+    public static float bubbleMaxRadius;
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         ventRange = VENT_RANGE.get();
@@ -43,5 +54,22 @@ public class BOConfig {
         }
         oxygenConsumption = OXYGEN_CONSUMPTION.get();
         ventConsumption = VENT_CONSUMPTION.get();
+        spaceHelmets = new ArrayList<>(SPACE_HELMETS.get());
+        spaceChestplates = new ArrayList<>(SPACE_CHESTPLATES.get());
+        spaceLeggings = new ArrayList<>(SPACE_LEGGINGS.get());
+        spaceBoots = new ArrayList<>(SPACE_BOOTS.get());
+        bubbleMaxRadius = BUBBLE_MAX_RADIUS.get();
+
     }
+    public static boolean isItemValidForSlot(ResourceLocation itemId, EquipmentSlot slot) {
+        String id = itemId.toString();
+        return switch (slot) {
+            case HEAD -> spaceHelmets.contains(id);
+            case CHEST -> spaceChestplates.contains(id);
+            case LEGS -> spaceLeggings.contains(id);
+            case FEET -> spaceBoots.contains(id);
+            default -> false;
+        };
+    }
+
 }

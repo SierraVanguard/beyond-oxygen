@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -13,6 +14,8 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.core.api.ships.Ship;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,4 +65,26 @@ public class VSCompat {
             });
         }
     }
+    public static boolean applyBubbleEffects(ServerPlayer player, BlockPos origin, float radius) {
+        Level level = player.level();
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
+        if (ship == null) {
+            return false;
+        }
+
+        Vec3 eyePos = player.getEyePosition();
+        Vector3d shipPos = ship.getTransform().getWorldToShip().transformPosition(
+                new Vector3d(eyePos.x, eyePos.y, eyePos.z));
+        Vector3d localBubbleCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
+        double distanceSquared = shipPos.distanceSquared(localBubbleCenter);
+        if (distanceSquared <= radius * radius) {
+            player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+            player.setAirSupply(player.getMaxAirSupply());
+            updateSealedStatus(player, true);
+            return true;
+        }
+
+        return false;
+    }
+
 }

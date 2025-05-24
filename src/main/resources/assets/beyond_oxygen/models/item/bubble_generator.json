@@ -1,0 +1,12 @@
+{
+	"parent": "block/cube_directional",
+	"textures": {
+		"particle": "beyond_oxygen:block/bubble_generator",
+		"down": "beyond_oxygen:block/bubble_generator_side",
+		"up": "beyond_oxygen:block/bubble_generator_side",
+		"north": "beyond_oxygen:block/bubble_generator",
+		"south": "beyond_oxygen:block/bubble_generator_side",
+		"west": "beyond_oxygen:block/bubble_generator_side",
+		"east": "beyond_oxygen:block/bubble_generator_side"
+	}
+}
