@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,10 +49,21 @@ public class VSCompat {
         return false;
     }
     public static void updateSealedStatus(ServerPlayer player, boolean isSealed) {
+        boolean currentlySealed = playersInSealedShips.containsKey(player);
+
         if (isSealed) {
+            if (!currentlySealed) {
+                NetworkHandler.sendSealedAreaStatusToClient(player, true);
+            }
             playersInSealedShips.put(player, 5);
+        } else {
+            if (currentlySealed) {
+                playersInSealedShips.remove(player);
+                NetworkHandler.sendSealedAreaStatusToClient(player, false);
+            }
         }
     }
+
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {

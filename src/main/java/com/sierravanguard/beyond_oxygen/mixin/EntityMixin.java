@@ -1,5 +1,7 @@
 package com.sierravanguard.beyond_oxygen.mixin;
 
+import com.sierravanguard.beyond_oxygen.client.ClientSealedAreaState;
+import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -33,25 +35,33 @@ public abstract class EntityMixin {
     @Shadow public abstract void setSwimming(boolean swimming);
     @Shadow protected boolean wasEyeInWater;
     @Shadow protected boolean wasTouchingWater;
-    @Unique
-    private static EntityPolygonCollider beyond_oxygen$collider = null;
     @Shadow @Final private Set<TagKey<Fluid>> fluidOnEyes;
     @Shadow(remap = false) private FluidType forgeFluidTypeOnEyes;
-
     @Shadow public abstract boolean isInWater();
 
-    @Unique private boolean neo$isInSealedArea = false;
+    @Unique
+    private static EntityPolygonCollider beyond_oxygen$collider = null;
+
+    @Unique
+    private boolean neo$isInSealedArea = false;
 
     @Inject(method = "baseTick", at = @At("HEAD"))
     private void onBaseTick(CallbackInfo ci) {
-        if ((Object) this instanceof Player player && this.level != null) {
+        if ((Object) this instanceof Player player && !level.isClientSide) {
             neo$isInSealedArea = VSCompat.playersInSealedShips.containsKey(player);
+            NetworkHandler.sendSealedAreaStatusToClient(player, neo$isInSealedArea);
         }
     }
-
+    @Unique
+    private boolean beyond_oxygen$isInSealedArea() {
+        if (level.isClientSide && (Object) this instanceof Player player) {
+            return ClientSealedAreaState.isInSealedArea(player.getUUID());
+        }
+        return neo$isInSealedArea;
+    }
     @WrapMethod(method = "updateFluidHeightAndDoFluidPushing()V", remap = false)
     private void onUpdateFluidHeightAndDoFluidPushing(Operation<Void> original) {
-        if (neo$isInSealedArea) {
+        if (beyond_oxygen$isInSealedArea()) {
             this.wasTouchingWater = false;
             return;
         }
@@ -60,7 +70,7 @@ public abstract class EntityMixin {
 
     @WrapMethod(method = "updateFluidOnEyes")
     private void onUpdateFluidOnEyes(Operation<Void> original) {
-        if (neo$isInSealedArea) {
+        if (beyond_oxygen$isInSealedArea()) {
             this.wasEyeInWater = false;
             this.fluidOnEyes.clear();
             this.forgeFluidTypeOnEyes = ForgeMod.EMPTY_TYPE.get();
@@ -71,7 +81,7 @@ public abstract class EntityMixin {
 
     @WrapMethod(method = "updateSwimming")
     private void onUpdateSwimming(Operation<Void> original) {
-        if (neo$isInSealedArea) {
+        if (beyond_oxygen$isInSealedArea()) {
             this.setSwimming(false);
             return;
         }
@@ -80,9 +90,10 @@ public abstract class EntityMixin {
 
     @WrapMethod(method = "isInBubbleColumn")
     private boolean onIsInBubbleColumn(Operation<Boolean> original) {
-        if (neo$isInSealedArea) return false;
+        if (beyond_oxygen$isInSealedArea()) return false;
         return original.call();
     }
+
     @Unique
     private static EntityPolygonCollider getCollider() {
         if (beyond_oxygen$collider == null) {
