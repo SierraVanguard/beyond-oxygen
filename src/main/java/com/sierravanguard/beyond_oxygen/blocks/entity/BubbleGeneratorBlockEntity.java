@@ -24,6 +24,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -40,7 +42,7 @@ import java.util.Set;
 
 public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvider{
     private float lastSentRadius = -1f;
-
+    private int clientOxygenLevel = 0;
     private final Set<Fluid> acceptedFluids = new HashSet<>();
 
     public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
@@ -166,8 +168,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         super.handleUpdateTag(tag);
         if (tag.contains("radius")) currentRadius = tag.getFloat("radius");
         if (tag.contains("tankAmount")) {
-            int tankAmount = tag.getInt("tankAmount");
-            //TODO: Tank client-side logic implementation for GUI rendering.
+            clientOxygenLevel = tag.getInt("tankAmount");
         }
     }
 
@@ -191,7 +192,9 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         return new BubbleGeneratorMenu(id, inventory, this.getBlockPos());
     }
     public double getOxygenRatio() {
-        if (this.tank.getFluidAmount() == 0) return 0.0;
-        return (double) this.tank.getFluidAmount() / 1000;
+        if (level != null && level.isClientSide) {
+            return clientOxygenLevel / 1000.0;
+        }
+        return tank.getFluidAmount() / 1000.0;
     }
 }

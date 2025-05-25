@@ -1,7 +1,9 @@
 package com.sierravanguard.beyond_oxygen.client.menu;
 
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
 import com.sierravanguard.beyond_oxygen.registry.BOMenus;
+import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,8 +37,16 @@ public class BubbleGeneratorMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return player.blockPosition().closerThan(blockPos, 8);
+        if (player.blockPosition().closerThan(blockPos, 8)) {
+            return true;
+        }
+        if (BeyondOxygen.ModsLoaded.VS) {
+            return VSCompat.isWithinShipRadius(level, player, blockPos, 8);
+        }
+
+        return false;
     }
+
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
