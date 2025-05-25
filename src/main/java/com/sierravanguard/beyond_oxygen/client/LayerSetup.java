@@ -4,11 +4,12 @@ import com.sierravanguard.beyond_oxygen.client.model.AtmosphericTankModel;
 import com.sierravanguard.beyond_oxygen.client.model.LargeTankModel;
 import com.sierravanguard.beyond_oxygen.client.model.MediumTankModel;
 import com.sierravanguard.beyond_oxygen.client.model.SmallTankModel;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = "beyond_oxygen", bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = "beyond_oxygen", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class LayerSetup {
 
     @SubscribeEvent

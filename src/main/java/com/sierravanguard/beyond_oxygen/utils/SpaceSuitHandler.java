@@ -1,6 +1,8 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
+import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
+import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +14,8 @@ public class SpaceSuitHandler {
         return isSlotValid(player, EquipmentSlot.HEAD) &&
                 isSlotValid(player, EquipmentSlot.CHEST) &&
                 isSlotValid(player, EquipmentSlot.LEGS) &&
-                isSlotValid(player, EquipmentSlot.FEET);
+                isSlotValid(player, EquipmentSlot.FEET) &&
+                isHelmetClosed(player);
     }
     private static boolean isSlotValid(Player player, EquipmentSlot slot) {
         ItemStack stack = player.getItemBySlot(slot);
@@ -22,5 +25,13 @@ public class SpaceSuitHandler {
         if (itemId == null) return false;
 
         return BOConfig.isItemValidForSlot(itemId, slot);
+    }
+    public static boolean isHelmetClosed(Player player) {
+        ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
+        if (helmet.isEmpty()) return false;
+        if (!(helmet.getItem() instanceof OpenableSpacesuitHelmetItem spacesuit)) return true;
+        return player.getCapability(BOCapabilities.HELMET_STATE)
+                .map(state -> !state.isOpen())
+                .orElse(false);
     }
 }

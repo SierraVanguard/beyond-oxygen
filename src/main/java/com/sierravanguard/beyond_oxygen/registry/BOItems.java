@@ -2,7 +2,9 @@ package com.sierravanguard.beyond_oxygen.registry;
 
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.items.*;
+import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.items.armor.SpaceSuitArmorMaterial;
+import com.sierravanguard.beyond_oxygen.items.armor.SpacesuitArmorItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -40,13 +42,13 @@ public class BOItems {
                 }});
     public static final RegistryObject<Item> BUBBLE_GENERATOR = ITEMS.register("bubble_generator", () -> new BlockItem(BOBlocks.BUBBLE_GENERATOR.get(), new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_HELMET = ITEMS.register("spacesuit_helmet",
-            () -> new ArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.HELMET, new Item.Properties()));
+            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.HELMET, new Item.Properties(), "spacesuit_helmet"));
     public static final RegistryObject<Item> SPACESUIT_CHESTPLATE = ITEMS.register("spacesuit_chestplate",
-            () -> new ArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+            () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_LEGGINGS = ITEMS.register("spacesuit_leggings",
-            () -> new ArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+            () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_BOOTS = ITEMS.register("spacesuit_boots",
-            () -> new ArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
+            () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
     public static final RegistryObject<Item> CANNED_POTATOES = ITEMS.register("canned_potatoes",
             () -> new CannedFoodItem(new Item.Properties()
                     .food(new FoodProperties.Builder().nutrition(6).saturationMod(0.8F).build())
@@ -69,4 +71,12 @@ public class BOItems {
                     tooltip.add(Component.literal("Mathie B.'s Favorite Food").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
                 }
             });
+    public static final RegistryObject<Item> CANNED_BEEF = ITEMS.register("canned_beef",
+            () -> new CannedFoodItem(new Item.Properties()
+                    .food(new FoodProperties.Builder().nutrition(7).saturationMod(2.0F).build())
+                    .stacksTo(16), EMPTY_CAN.get()));
+    public static final RegistryObject<Item> CANNED_PORK = ITEMS.register("canned_pork",
+            () -> new CannedFoodItem(new Item.Properties()
+                    .food(new FoodProperties.Builder().nutrition(5).saturationMod(1.5F).build())
+                    .stacksTo(16), EMPTY_CAN.get()));
 }

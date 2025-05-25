@@ -1,7 +1,6 @@
 package com.sierravanguard.beyond_oxygen.items;
 
-import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
-import net.minecraft.network.chat.Component;
+
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,23 +20,19 @@ public class CannedFoodItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+
         if (!world.isClientSide) {
-            // Check if player is wearing full spacesuit
-            if (SpaceSuitHandler.isWearingFullSuit(player)) {
-                // Allow eating canned food
-                player.startUsingItem(hand);
-                return InteractionResultHolder.success(stack);
-            } else {
-                player.displayClientMessage(Component.literal("You need to wear a full spacesuit to eat this!"), true);
-                return InteractionResultHolder.fail(stack);
-            }
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(stack);
         }
+
         return InteractionResultHolder.pass(stack);
     }
 
+
     @Override
     public int getUseDuration(ItemStack stack) {
-        return 32; // normal eating time
+        return 32;
     }
 
     @Override
