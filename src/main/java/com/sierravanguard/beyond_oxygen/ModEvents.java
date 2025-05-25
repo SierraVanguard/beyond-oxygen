@@ -1,6 +1,5 @@
-package com.sierravanguard.beyond_oxygen.client;
+package com.sierravanguard.beyond_oxygen;
 
-import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
 import com.sierravanguard.beyond_oxygen.items.CannedFoodItem;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
@@ -26,7 +25,7 @@ public class ModEvents {
                 SpaceSuitHandler.isWearingFullSuit(player)) {
 
             if (!player.level().isClientSide) {
-                player.displayClientMessage(Component.literal("Can't eat that in a spacesuit!"), true);
+                player.sendSystemMessage(Component.literal("Can't eat that in a spacesuit!"));
             }
             event.setCanceled(true);
         }

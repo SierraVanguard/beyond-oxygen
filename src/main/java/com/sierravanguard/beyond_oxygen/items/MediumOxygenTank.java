@@ -23,6 +23,8 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.sierravanguard.beyond_oxygen.client.ClientHelper.isPlayerNotWearingFullSuit;
+
 public class MediumOxygenTank extends Item implements ICurioItem {
 
     private static final int CAPACITY = 8400;
@@ -79,12 +81,12 @@ public class MediumOxygenTank extends Item implements ICurioItem {
         });
 
         if (level != null && level.isClientSide) {
-            if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                    !SpaceSuitHandler.isWearingFullSuit(net.minecraft.client.Minecraft.getInstance().player)) {
+            if (isPlayerNotWearingFullSuit()) {
                 tooltip.add(Component.literal("Full pressure suit required!")
                         .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
             }
         }
+
 
         tooltip.add(Component.literal("Rated to withstand a decompression event. But only once.")
                 .withStyle(ChatFormatting.ITALIC, ChatFormatting.YELLOW));

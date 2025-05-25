@@ -22,14 +22,21 @@ public class SyncHelmetStatePacket {
     }
 
     public static void handle(SyncHelmetStatePacket pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
+        NetworkEvent.Context context = ctx.get();
+
+        if (!context.getDirection().getReceptionSide().isClient()) {
+            context.setPacketHandled(true);
+            return;
+        }
+
+        context.enqueueWork(() -> {
             var player = net.minecraft.client.Minecraft.getInstance().player;
             if (player == null) return;
-
             player.getCapability(com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities.HELMET_STATE).ifPresent(state -> {
                 state.setOpen(pkt.open);
             });
         });
-        ctx.get().setPacketHandled(true);
+
+        context.setPacketHandled(true);
     }
 }

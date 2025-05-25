@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.cap.OxygenTankCap;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
 import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
+import com.sierravanguard.beyond_oxygen.client.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -88,15 +89,14 @@ public class LargeOxygenTank extends Item implements ICurioItem {
         });
 
         if (level != null && level.isClientSide) {
-            if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                    !SpaceSuitHandler.isWearingFullSuit(net.minecraft.client.Minecraft.getInstance().player)) {
+            if (ClientHelper.isPlayerNotWearingFullSuit()) {
                 text.add(Component.literal("Full pressure suit required!")
                         .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
             }
         }
 
         text.add(Component.literal("Now completely meteoric iron-free!")
-                .withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.RED));
+                .withStyle(ChatFormatting.ITALIC, ChatFormatting.RED));
         super.appendHoverText(stack, level, text, flag);
     }
 
