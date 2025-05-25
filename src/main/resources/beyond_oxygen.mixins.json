@@ -9,6 +9,7 @@
     "BOServerPlayerMixin"
   ],
   "client": [
+    "CameraMixin"
   ],
   "injectors": {
     "defaultRequire": 1
