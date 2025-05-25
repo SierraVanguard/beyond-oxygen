@@ -85,10 +85,13 @@ public class VSCompat {
         }
 
         Vec3 eyePos = player.getEyePosition();
-        Vector3d shipPos = ship.getTransform().getWorldToShip().transformPosition(
+        Vector3d shipEyePos = ship.getTransform().getWorldToShip().transformPosition(
                 new Vector3d(eyePos.x, eyePos.y, eyePos.z));
-        Vector3d localBubbleCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
-        double distanceSquared = shipPos.distanceSquared(localBubbleCenter);
+
+        Vector3d worldBubbleCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
+        Vector3d shipBubbleCenter = ship.getTransform().getWorldToShip().transformPosition(worldBubbleCenter);
+
+        double distanceSquared = shipEyePos.distanceSquared(shipBubbleCenter);
         if (distanceSquared <= radius * radius) {
             player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
             player.setAirSupply(player.getMaxAirSupply());
@@ -98,5 +101,19 @@ public class VSCompat {
 
         return false;
     }
+    public static boolean isWithinShipRadius(Level level, Player player, BlockPos origin, double radius) {
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
+        if (ship == null) return false;
+
+        Vec3 eyePos = player.getEyePosition();
+        Vector3d shipPos = ship.getTransform().getWorldToShip().transformPosition(
+                new Vector3d(eyePos.x, eyePos.y, eyePos.z)
+        );
+
+        Vector3d localOrigin = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
+
+        return shipPos.distanceSquared(localOrigin) <= radius * radius;
+    }
+
 
 }
