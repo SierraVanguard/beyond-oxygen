@@ -1,0 +1,10 @@
+{
+  "item.not_enough_oxygen.oxygen_tank": "氧气罐",
+  "effect.not_enough_oxygen.oxygen_saturation": "氧气饱和度", 
+  "block.not_enough_oxygen.vent": "通风口",
+  "item.not_enough_oxygen.atmospheric_oxygen_tank": "大气氧气罐",
+  "item.not_enough_oxygen.small_oxygen_tank": "小型氧气罐",
+  "item.not_enough_oxygen.medium_oxygen_tank": "中型氧气罐",
+  "item.not_enough_oxygen.large_oxygen_tank": "大型氧气罐",
+  "item_group.not_enough_oxygen.main": "氧气不足"
+}
