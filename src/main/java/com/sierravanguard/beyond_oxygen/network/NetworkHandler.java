@@ -1,7 +1,10 @@
 package com.sierravanguard.beyond_oxygen.network;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 
@@ -29,9 +32,17 @@ public class NetworkHandler {
                 SyncHelmetStatePacket::encode,
                 SyncHelmetStatePacket::decode,
                 SyncHelmetStatePacket::handle);
+        CHANNEL.registerMessage(nextID(), SyncSealedAreaStatusPacket.class,
+                SyncSealedAreaStatusPacket::encode,
+                SyncSealedAreaStatusPacket::decode,
+                SyncSealedAreaStatusPacket::handle);
     }
 
     public static void sendToggleHelmetPacket() {
         CHANNEL.sendToServer(new ToggleHelmetPacket());
+    }
+    public static void sendSealedAreaStatusToClient(Player player, boolean isInSealedArea) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                new SyncSealedAreaStatusPacket(player.getUUID(), isInSealedArea));
     }
 }
