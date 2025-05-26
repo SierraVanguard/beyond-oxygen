@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "half=upper,facing=north":  { "model": "beyond_oxygen:block/cryo_bed_top", "y": 0 },
+    "half=upper,facing=east":   { "model": "beyond_oxygen:block/cryo_bed_top", "y": 90 },
+    "half=upper,facing=south":  { "model": "beyond_oxygen:block/cryo_bed_top", "y": 180 },
+    "half=upper,facing=west":   { "model": "beyond_oxygen:block/cryo_bed_top", "y": 270 },
+
+    "half=lower,facing=north":  { "model": "beyond_oxygen:block/cryo_bed_bottom", "y": 0 },
+    "half=lower,facing=east":   { "model": "beyond_oxygen:block/cryo_bed_bottom", "y": 90 },
+    "half=lower,facing=south":  { "model": "beyond_oxygen:block/cryo_bed_bottom", "y": 180 },
+    "half=lower,facing=west":   { "model": "beyond_oxygen:block/cryo_bed_bottom", "y": 270 }
+  }
+}

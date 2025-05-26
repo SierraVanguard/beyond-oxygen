@@ -13,9 +13,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -26,10 +28,12 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class CryoBedBlock extends BaseEntityBlock {
-
+public class CryoBedBlock extends Block implements EntityBlock {
+    public static final VoxelShape SHAPE = Block.box(0, 1, 0, 15, 16, 15);
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -48,7 +52,10 @@ public class CryoBedBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide || state.getValue(HALF) != DoubleBlockHalf.LOWER ? null : (lvl, pos, st, be) -> {
+        if (level.isClientSide || state.getValue(HALF) != DoubleBlockHalf.LOWER) {
+            return null;
+        }
+        return (lvl, pos, st, be) -> {
             if (be instanceof CryoBedBlockEntity cryoBedBE) {
                 CryoBedBlockEntity.tick((ServerLevel) lvl, pos, st, cryoBedBE);
             }
@@ -65,9 +72,8 @@ public class CryoBedBlock extends BaseEntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
-
-        if (pos.getY() < level.getMaxBuildHeight() - 1 &&
-                level.getBlockState(pos.above()).canBeReplaced(context)) {
+        if (pos.getY() < level.getMaxBuildHeight() - 1
+                && level.getBlockState(pos.above()).canBeReplaced(context)) {
             Direction playerFacing = context.getHorizontalDirection().getOpposite();
             return this.defaultBlockState()
                     .setValue(HALF, DoubleBlockHalf.LOWER)
@@ -98,7 +104,6 @@ public class CryoBedBlock extends BaseEntityBlock {
             DoubleBlockHalf half = state.getValue(HALF);
             BlockPos otherPos = (half == DoubleBlockHalf.LOWER) ? pos.above() : pos.below();
             BlockState otherState = level.getBlockState(otherPos);
-
             if (otherState.getBlock() == this && otherState.getValue(HALF) != half) {
                 level.setBlock(otherPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 35);
             }
@@ -131,4 +136,13 @@ public class CryoBedBlock extends BaseEntityBlock {
 
         return InteractionResult.SUCCESS;
     }
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return SHAPE;
+    }
+
 }
