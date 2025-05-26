@@ -79,4 +79,6 @@ public class BOItems {
             () -> new CannedFoodItem(new Item.Properties()
                     .food(new FoodProperties.Builder().nutrition(5).saturationMod(1.5F).build())
                     .stacksTo(16), EMPTY_CAN.get()));
+    public static final RegistryObject<Item> CRYO_BED = ITEMS.register("cryo_bed",
+            () -> new BlockItem(BOBlocks.CRYO_BED.get(), new Item.Properties()));
 }

@@ -8,7 +8,6 @@
   "item.beyond_oxygen.medium_oxygen_tank": "Medium Oxygen Tank",
   "item.beyond_oxygen.large_oxygen_tank": "Large Oxygen Tank",
   "item_group.beyond_oxygen.main": "Beyond Oxygen",
-  "block.beyond_oxygen.bubble_generator" : "Oxygen Bubble Generator",
   "item.beyond_oxygen.spacesuit_chestplate" : "Space Suit Chestplate",
   "item.beyond_oxygen.spacesuit_leggings" : "Space Suit Leggings",
   "item.beyond_oxygen.spacesuit_boots" : "Space Suit Boots",
@@ -16,6 +15,8 @@
   "item.beyond_oxygen.empty_can" : "Empty Can",
   "item.beyond_oxygen.canned_potatoes" : "Canned Potatoes",
   "item.beyond_oxygen.canned_apple" : "Canned Apple",
+  "item.beyond_oxygen.canned_beef" : "Canned Steak",
+  "item.beyond_oxygen.canned_pork" : "Canned Porkchop",
   "message.vent.oxygen_flow": "Vent O₂ Flow: %s mB/t",
   "message.vent.not_sealed": "Area not sealed!",
   "message.helmet.status": "Helmet: %s",
@@ -33,5 +34,7 @@
   "tooltip.beyond_oxygen.warranty_warning": "Warranty void if used on Tier 3+ Planets",
   "tooltip.beyond_oxygen.decompression_warning": "Rated to withstand a decompression event. But only once.",
   "tooltip.beyond_oxygen.meteoric_iron_free": "Now completely meteoric iron-free!",
-  "tooltip.beyond_oxygen.babys_first_air_tank": "Baby's first air tank!"
+  "tooltip.beyond_oxygen.babys_first_air_tank": "Baby's first air tank!",
+  "message.cryo_bed.unassigned": "Cryo-bed assignment removed.",
+  "message.cryo_bed.assigned" : "Cryo-bed assigned!"
 }

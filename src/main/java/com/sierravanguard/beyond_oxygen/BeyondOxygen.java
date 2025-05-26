@@ -1,8 +1,6 @@
 package com.sierravanguard.beyond_oxygen;
 
-import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
-import com.sierravanguard.beyond_oxygen.capabilities.HelmetStateProvider;
-import com.sierravanguard.beyond_oxygen.capabilities.IHelmetState;
+import com.sierravanguard.beyond_oxygen.capabilities.*;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.*;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
@@ -52,7 +50,6 @@ public class BeyondOxygen {
         event.register(IHelmetState.class);
     }
 
-    // in CommonEvents.java
     @SubscribeEvent
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
