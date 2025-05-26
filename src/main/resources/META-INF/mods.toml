@@ -69,3 +69,11 @@ versionRange="[2.0.0,)"
 ordering="NONE"
 side="BOTH"
 
+[[dependencies."${mod_id}"]]
+modId="vsch"
+mandatory=false
+versionRange="[1.0,)"
+ordering="AFTER"
+side="BOTH"
+comment="Optional compatibility with Starlance!"
+

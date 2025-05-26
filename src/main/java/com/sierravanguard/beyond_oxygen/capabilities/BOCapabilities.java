@@ -8,10 +8,12 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class BOCapabilities {
     public static Capability<IHelmetState> HELMET_STATE;
+
     public static void init() {
         HELMET_STATE = CapabilityManager.get(new CapabilityToken<>(){});
     }
     public static LazyOptional<IHelmetState> getHelmetState(Player player) {
         return player.getCapability(HELMET_STATE);
     }
+
 }
