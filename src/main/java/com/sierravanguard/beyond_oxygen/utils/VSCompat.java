@@ -81,26 +81,26 @@ public class VSCompat {
         Level level = player.level();
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
         if (ship == null) {
+            updateSealedStatus(player, false);
             return false;
         }
-
         Vec3 eyePos = player.getEyePosition();
         Vector3d shipEyePos = ship.getTransform().getWorldToShip().transformPosition(
                 new Vector3d(eyePos.x, eyePos.y, eyePos.z));
-
-        Vector3d worldBubbleCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
-        Vector3d shipBubbleCenter = ship.getTransform().getWorldToShip().transformPosition(worldBubbleCenter);
+        Vector3d shipBubbleCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
 
         double distanceSquared = shipEyePos.distanceSquared(shipBubbleCenter);
-        if (distanceSquared <= radius * radius) {
+        if (distanceSquared <= radius * radius * 2) {
             player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
             player.setAirSupply(player.getMaxAirSupply());
             updateSealedStatus(player, true);
             return true;
+        } else {
+            updateSealedStatus(player, false);
+            return false;
         }
-
-        return false;
     }
+
     public static boolean isWithinShipRadius(Level level, Player player, BlockPos origin, double radius) {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
         if (ship == null) return false;

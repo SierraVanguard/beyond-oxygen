@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "minecraft:steak" },
+    { "item": "minecraft:cooked_beef" },
     { "item": "beyond_oxygen:empty_can" }
   ],
   "result": {

@@ -31,7 +31,7 @@ public class BubbleGeneratorMenu extends AbstractContainerMenu {
         if (be instanceof BubbleGeneratorBlockEntity generator) {
             this.blockEntity = generator;
         } else {
-            this.blockEntity = null; // Prevent crashes, but you should log this
+            this.blockEntity = null;
         }
     }
 
@@ -72,4 +72,5 @@ public class BubbleGeneratorMenu extends AbstractContainerMenu {
     public double getOxygenRatio() {
     return this.blockEntity.getOxygenRatio();
     }
+
 }

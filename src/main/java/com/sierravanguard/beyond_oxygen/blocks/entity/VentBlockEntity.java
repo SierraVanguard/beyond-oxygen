@@ -143,6 +143,9 @@ public class VentBlockEntity extends BlockEntity {
             VentTracker.unregisterVent(serverLevel, this.getBlockPos());
         }
     }
-
+    public float getCurrentOxygenRate() {
+        int areaSize = hermeticArea.getArea().size();
+        return areaSize / (float) BOConfig.ventConsumption;
+    }
 
 }

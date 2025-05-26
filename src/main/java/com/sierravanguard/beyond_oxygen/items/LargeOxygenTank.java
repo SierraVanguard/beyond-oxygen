@@ -81,24 +81,26 @@ public class LargeOxygenTank extends Item implements ICurioItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> text, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         CompoundTag tag = stack.getOrCreateTag();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
             int totalTicks = cap.getFluidInTank(0).getAmount() + getLeftTicks(tag);
-            text.add(Component.literal(formatTicksToTime(totalTicks)).withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen_amount", formatTicksToTime(totalTicks))
+                    .withStyle(ChatFormatting.AQUA));
         });
 
         if (level != null && level.isClientSide) {
             if (ClientHelper.isPlayerNotWearingFullSuit()) {
-                text.add(Component.literal("Full pressure suit required!")
+                tooltip.add(Component.translatable("tooltip.beyond_oxygen.full_suit_required")
                         .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
             }
         }
-
-        text.add(Component.literal("Now completely meteoric iron-free!")
+        tooltip.add(Component.translatable("tooltip.beyond_oxygen.meteoric_iron_free")
                 .withStyle(ChatFormatting.ITALIC, ChatFormatting.RED));
-        super.appendHoverText(stack, level, text, flag);
+
+        super.appendHoverText(stack, level, tooltip, flag);
     }
+
 
     public static String formatTicksToTime(int ticks) {
         int totalSeconds = ticks / 20;

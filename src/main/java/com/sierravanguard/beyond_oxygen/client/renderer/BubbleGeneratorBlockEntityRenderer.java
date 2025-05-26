@@ -54,7 +54,7 @@ public class BubbleGeneratorBlockEntityRenderer implements net.minecraft.client.
                 poseStack.last().pose().mul(shipToWorldMojang);
             }
         }
-        float scale = entity.getCurrentRadius();
+        float scale = entity.getCurrentRadius() / 1.5f;
         poseStack.scale(scale, scale, scale);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RENDER_TYPE);
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
