@@ -2,11 +2,14 @@ package com.sierravanguard.beyond_oxygen.client;
 
 import com.sierravanguard.beyond_oxygen.client.renderer.armor.SpacesuitHelmetLayer;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
+import com.sierravanguard.beyond_oxygen.registry.BOBlocks;
 import com.sierravanguard.beyond_oxygen.registry.BOCurioRenderers;
 import com.sierravanguard.beyond_oxygen.registry.BOMenus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,6 +33,7 @@ public class ClientSetup {
                     BubbleGeneratorBlockEntityRenderer::new
             );
         });
+        ItemBlockRenderTypes.setRenderLayer(BOBlocks.CRYO_BED.get(), RenderType.translucent());
         MenuScreens.register(BOMenus.BUBBLE_GENERATOR.get(), BubbleGeneratorScreen::new);
     }
     @SubscribeEvent
