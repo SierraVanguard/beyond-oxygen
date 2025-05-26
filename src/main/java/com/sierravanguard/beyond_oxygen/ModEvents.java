@@ -29,7 +29,7 @@ public class ModEvents {
                 SpaceSuitHandler.isWearingFullSuit(player)) {
 
             if (!player.level().isClientSide) {
-                player.sendSystemMessage(Component.literal("Can't eat that in a spacesuit!"));
+                player.sendSystemMessage(Component.translatable("message.spacefood"));
             }
             event.setCanceled(true);
         }

@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AtmosphericOxygenTank extends Item implements ICurioItem {
 
-    private static final int CAPACITY = 24000; // Larger capacity for passive refill
-    private static final int REFILL_RATE = 1; // Refill 1 unit per second (20 ticks)
+    private static final int CAPACITY = 24000;
+    private static final int REFILL_RATE = 1;
     private static final String REFILLING_TAG = "Refilling";
     private static final String TICKS_TAG = "ticks";
 
@@ -135,21 +135,24 @@ public class AtmosphericOxygenTank extends Item implements ICurioItem {
         CompoundTag tag = stack.getOrCreateTag();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
             int totalTicks = handler.getFluidInTank(0).getAmount() + getLeftTicks(tag);
-            tooltip.add(Component.literal("Oxygen: " + formatTicksToTime(totalTicks))
+            tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen", formatTicksToTime(totalTicks))
                     .withStyle(ChatFormatting.AQUA));
             if (tag.getBoolean(REFILLING_TAG)) {
-                tooltip.add(Component.literal("Siphon Active").withStyle(ChatFormatting.GREEN));
-                tooltip.add(Component.literal("Refilling: " + REFILL_RATE + " units/sec").withStyle(ChatFormatting.DARK_GREEN));
+                tooltip.add(Component.translatable("tooltip.beyond_oxygen.siphon_active")
+                        .withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.translatable("tooltip.beyond_oxygen.refilling", REFILL_RATE)
+                        .withStyle(ChatFormatting.DARK_GREEN));
             } else {
-                tooltip.add(Component.literal("Needs Breathable Air").withStyle(ChatFormatting.RED));
+                tooltip.add(Component.translatable("tooltip.beyond_oxygen.needs_air")
+                        .withStyle(ChatFormatting.RED));
             }
             if (level != null && level.isClientSide) {
                 if (ClientHelper.isPlayerNotWearingFullSuit()) {
-                    tooltip.add(Component.literal("Full pressure suit required!")
+                    tooltip.add(Component.translatable("tooltip.beyond_oxygen.full_suit_required")
                             .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
                 }
             }
-            tooltip.add(Component.literal("Warranty void if used on Tier 3+ Planets")
+            tooltip.add(Component.translatable("tooltip.beyond_oxygen.warranty_warning")
                     .withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_PURPLE));
         });
     }

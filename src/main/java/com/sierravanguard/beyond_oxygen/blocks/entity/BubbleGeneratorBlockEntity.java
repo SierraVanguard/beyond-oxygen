@@ -24,8 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -43,7 +41,11 @@ import java.util.Set;
 public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvider{
     private float lastSentRadius = -1f;
     private int clientOxygenLevel = 0;
+    private int clientEnergyLevel = 0;
+    private int lastSentEnergy = -1;
+    private int lastSentOxygen = -1;
     private final Set<Fluid> acceptedFluids = new HashSet<>();
+    public float controlledMaxRadius = BOConfig.bubbleMaxRadius;
 
     public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
         for (ResourceLocation fluidId : fluidIds) {
@@ -75,13 +77,19 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
 
         int energyRequired = 20;
         float oxygenNeeded = BOConfig.ventConsumption * 2.0f;
-        boolean hasEnergy = entity.energyStorage.extractEnergy(energyRequired, true) == energyRequired;
+        boolean hasEnergy = entity.energyStorage.extractEnergy(energyRequired, false) == energyRequired;
         boolean hasOxygen = entity.tank.getFluidAmount() >= oxygenNeeded;
 
         if (hasEnergy && hasOxygen) {
             entity.energyStorage.extractEnergy(energyRequired, false);
             entity.consumeOxygen((int) oxygenNeeded);
-            if (entity.currentRadius < entity.maxRadius) entity.currentRadius += 0.01f;
+            if (entity.currentRadius < entity.controlledMaxRadius) {
+                entity.currentRadius = Math.min(entity.currentRadius + 0.01f, entity.controlledMaxRadius);
+            } else if (entity.currentRadius > entity.controlledMaxRadius) {
+                entity.currentRadius = Math.max(entity.controlledMaxRadius, entity.currentRadius - 0.01f);
+            } else {
+                entity.currentRadius = entity.controlledMaxRadius;
+            }
 
             for (ServerPlayer player : ((ServerLevel) level).players()) {
                 boolean success = BeyondOxygen.ModsLoaded.VS && VSCompat.applyBubbleEffects(player, pos, entity.currentRadius);
@@ -94,9 +102,18 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         } else {
             entity.currentRadius = Math.max(0, entity.currentRadius - 0.1f);
         }
+        boolean radiusChanged = Math.abs(entity.currentRadius - entity.lastSentRadius) > 0.01f;
+        boolean energyChanged = Math.abs(entity.energyStorage.getEnergyStored() - entity.lastSentEnergy) > 40;
+        boolean oxygenChanged = Math.abs(entity.tank.getFluidAmount() - entity.lastSentOxygen) > 50;
 
-        if (Math.abs(entity.currentRadius - entity.lastSentRadius) > 0.01f) {
-            entity.lastSentRadius = entity.currentRadius;
+        if (radiusChanged || energyChanged || oxygenChanged) {
+            if (radiusChanged) entity.lastSentRadius = entity.currentRadius;
+            if (energyChanged) entity.lastSentEnergy = entity.energyStorage.getEnergyStored();
+            if (oxygenChanged) entity.lastSentOxygen = entity.tank.getFluidAmount();
+
+            entity.clientEnergyLevel = entity.lastSentEnergy;
+            entity.clientOxygenLevel = entity.lastSentOxygen;
+
             entity.setChanged();
             level.sendBlockUpdated(pos, state, state, 3);
         }
@@ -113,7 +130,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     }
 
     public int getPowerLevel() {
-        return energyStorage.getEnergyStored() * 100 / energyStorage.getMaxEnergyStored();
+        return (int) ((clientEnergyLevel / (float) energyStorage.getMaxEnergyStored()) * 100);
     }
 
     @Override
@@ -130,6 +147,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         tag.putInt("ticks", leftTicks);
         tag.putFloat("radius", currentRadius);
         tag.putInt("energy", energyStorage.getEnergyStored());
+        tag.putFloat("controlledMaxRadius", controlledMaxRadius);
     }
 
     @Override
@@ -139,6 +157,9 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         leftTicks = tag.getInt("ticks");
         currentRadius = tag.getFloat("radius");
         energyStorage.receiveEnergy(tag.getInt("energy"), false);
+        if (tag.contains("controlledMaxRadius")) {
+            controlledMaxRadius = tag.getFloat("controlledMaxRadius");
+        }
     }
 
     @Override
@@ -160,6 +181,8 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         CompoundTag tag = super.getUpdateTag();
         tag.putFloat("radius", currentRadius);
         tag.putInt("tankAmount", tank.getFluidAmount());
+        tag.putInt("energy", energyStorage.getEnergyStored());
+        tag.putFloat("controlledMaxRadius", controlledMaxRadius);
         return tag;
     }
 
@@ -169,6 +192,10 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         if (tag.contains("radius")) currentRadius = tag.getFloat("radius");
         if (tag.contains("tankAmount")) {
             clientOxygenLevel = tag.getInt("tankAmount");
+        }
+        if (tag.contains("energy")) clientEnergyLevel = tag.getInt("energy");
+        if (tag.contains("controlledMaxRadius")) {
+            controlledMaxRadius = tag.getFloat("controlledMaxRadius");
         }
     }
 
@@ -197,4 +224,5 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         }
         return tank.getFluidAmount() / 1000.0;
     }
+
 }

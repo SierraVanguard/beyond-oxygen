@@ -77,21 +77,23 @@ public class MediumOxygenTank extends Item implements ICurioItem {
         CompoundTag tag = stack.getOrCreateTag();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
             int totalTicks = cap.getFluidInTank(0).getAmount() + getLeftTicks(tag);
-            tooltip.add(Component.literal(formatTicksToTime(totalTicks)).withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen", formatTicksToTime(totalTicks))
+                    .withStyle(ChatFormatting.AQUA));
         });
 
         if (level != null && level.isClientSide) {
             if (isPlayerNotWearingFullSuit()) {
-                tooltip.add(Component.literal("Full pressure suit required!")
+                tooltip.add(Component.translatable("tooltip.beyond_oxygen.full_suit_required")
                         .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
             }
         }
 
-
-        tooltip.add(Component.literal("Rated to withstand a decompression event. But only once.")
+        tooltip.add(Component.translatable("tooltip.beyond_oxygen.decompression_warning")
                 .withStyle(ChatFormatting.ITALIC, ChatFormatting.YELLOW));
+
         super.appendHoverText(stack, level, tooltip, flag);
     }
+
 
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {

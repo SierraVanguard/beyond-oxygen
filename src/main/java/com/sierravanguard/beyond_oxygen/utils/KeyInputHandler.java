@@ -28,15 +28,19 @@ public class KeyInputHandler {
             if (!(helmet.getItem() instanceof OpenableSpacesuitHelmetItem)) {
                 return;
             }
-            Minecraft.getInstance().player.displayClientMessage(Component.literal("Helmet " + getHelmetStateString(Minecraft.getInstance().player)), true);
+            Minecraft.getInstance().player.displayClientMessage(
+                    Component.translatable("message.helmet.status", getHelmetStateString(Minecraft.getInstance().player)),
+                    true);
 
 
             NetworkHandler.sendToggleHelmetPacket();
         }
     }
-    public static String getHelmetStateString(Player player) {
+    public static Component getHelmetStateString(Player player) {
         return player.getCapability(HELMET_STATE)
-                .map(state -> state.isOpen() ? "Closed" : "Open")
-                .orElse("Unknown");
+                .map(state -> state.isOpen()
+                        ? Component.translatable("message.helmet.closed")
+                        : Component.translatable("message.helmet.open"))
+                .orElse(Component.translatable("message.helmet.unknown"));
     }
 }

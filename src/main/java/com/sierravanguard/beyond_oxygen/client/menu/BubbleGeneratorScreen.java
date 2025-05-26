@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.client.menu;
 
+import com.sierravanguard.beyond_oxygen.network.BubbleRadiusPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -10,6 +11,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.math.Axis;
+import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 
 public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGeneratorMenu> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("beyond_oxygen", "textures/gui/bubble_generator.png");
@@ -19,7 +21,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
     private static final int GUI_HEIGHT = 166;
 
     // Gauge
-    private static final int GAUGE_X = 10;
+    private static final int GAUGE_X = 30;
     private static final int GAUGE_Y = 20;
     private static final int GAUGE_SIZE = 50;
     private static final int GAUGE_TEX_U = 0;
@@ -27,11 +29,11 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
 
     private static final int NEEDLE_TEX_U = 60;
     private static final int NEEDLE_TEX_V = 170;
-    private static final int NEEDLE_WIDTH = 6;
+    private static final int NEEDLE_WIDTH = 8;
     private static final int NEEDLE_HEIGHT = 20;
 
     // Power Bar
-    private static final int POWER_BAR_X = 140;
+    private static final int POWER_BAR_X = 151;
     private static final int POWER_BAR_Y = 20;
     private static final int POWER_BAR_WIDTH = 16;
     private static final int POWER_BAR_HEIGHT = 50;
@@ -87,6 +89,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
                 TEXTURE,
                 Component.literal("+"),
                 btn -> {
+                    NetworkHandler.CHANNEL.sendToServer(new BubbleRadiusPacket(menu.getBlockPos(), true));
                     this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
         );
@@ -100,6 +103,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
                 TEXTURE,
                 Component.literal("-"),
                 btn -> {
+                    NetworkHandler.CHANNEL.sendToServer(new BubbleRadiusPacket(menu.getBlockPos(), false));
                     this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
         );
@@ -115,7 +119,9 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
 
         graphics.blit(TEXTURE, leftPos + GAUGE_X, topPos + GAUGE_Y, GAUGE_TEX_U, GAUGE_TEX_V, GAUGE_SIZE, GAUGE_SIZE);
         float oxygenRatio = Math.min((float) menu.getOxygenRatio(), 1.0f);
-        float angle = -150f + oxygenRatio * 120f;
+        float startAngle = 185f;
+        float sweepAngle = 340f;
+        float angle = (startAngle + oxygenRatio * sweepAngle) % 360f;
 
         graphics.pose().pushPose();
         int pivotX = leftPos + GAUGE_X + GAUGE_SIZE / 2;
@@ -123,7 +129,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
         graphics.pose().translate(pivotX, pivotY, 0);
         graphics.pose().mulPose(Axis.ZP.rotationDegrees(angle));
 
-        int needleOffsetX = -NEEDLE_WIDTH / 2;
+        int needleOffsetX = -NEEDLE_WIDTH / 2 + 1;
         int needleOffsetY = -NEEDLE_HEIGHT + 2;
         graphics.blit(TEXTURE, needleOffsetX, needleOffsetY, NEEDLE_TEX_U, NEEDLE_TEX_V, NEEDLE_WIDTH, NEEDLE_HEIGHT);
         graphics.pose().popPose();
@@ -139,7 +145,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
         graphics.blit(TEXTURE, leftPos + BUTTON_MINUS_X, topPos + BUTTON_MINUS_Y, BUTTON_MINUS_TEX_U, BUTTON_MINUS_TEX_V, BUTTON_SIZE, BUTTON_SIZE);
         graphics.blit(TEXTURE, leftPos + STATUS_X, topPos + STATUS_Y, STATUS_TEX_U, STATUS_TEX_V, STATUS_WIDTH, STATUS_HEIGHT);
 
-        String radiusText = String.format("Radius: %.2f", menu.getCurrentRadius());
+        String radiusText = String.format("Radius: %.2f", menu.getCurrentRadius()*1.5);
         int textX = leftPos + STATUS_X + STATUS_WIDTH / 2 - font.width(radiusText) / 2;
         int textY = topPos + STATUS_Y + STATUS_HEIGHT / 2 - font.lineHeight / 2;
         graphics.drawString(font, radiusText, textX, textY, 0x00FF00, false);

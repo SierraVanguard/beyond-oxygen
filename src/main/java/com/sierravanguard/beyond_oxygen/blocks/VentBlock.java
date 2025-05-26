@@ -1,9 +1,15 @@
 package com.sierravanguard.beyond_oxygen.blocks;
 
 import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
+import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
+import com.sierravanguard.beyond_oxygen.network.VentInfoMessage;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -15,6 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,4 +52,22 @@ public class VentBlock extends Block implements EntityBlock {
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return type == BOBlockEntities.VENT_BLOCK_ENTITY.get() ? VentBlockEntity::tick : null;
     }
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof VentBlockEntity vent) {
+                boolean sealed = vent.hermeticArea.isHermetic();
+                float oxygenRate = sealed ? vent.getCurrentOxygenRate() : 0f;
+
+                NetworkHandler.CHANNEL.send(
+                        PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                        new VentInfoMessage(sealed, oxygenRate)
+                );
+            }
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
 }

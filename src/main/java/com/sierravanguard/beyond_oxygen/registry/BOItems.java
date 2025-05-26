@@ -64,11 +64,11 @@ public class BOItems {
                     .stacksTo(16), EMPTY_CAN.get()) {
                 @Override
                 public Component getName(ItemStack stack) {
-                    return Component.literal("Canned Baguette").withStyle(ChatFormatting.DARK_PURPLE);
+                    return Component.translatable("special.item.cannedbaguette").withStyle(ChatFormatting.DARK_PURPLE);
                 }
                 @Override
                 public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-                    tooltip.add(Component.literal("Mathie B.'s Favorite Food").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+                    tooltip.add(Component.translatable("special.message.matt").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
                 }
             });
     public static final RegistryObject<Item> CANNED_BEEF = ITEMS.register("canned_beef",

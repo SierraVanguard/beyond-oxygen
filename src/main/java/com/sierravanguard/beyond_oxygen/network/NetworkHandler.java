@@ -1,5 +1,8 @@
 package com.sierravanguard.beyond_oxygen.network;
 
+import com.sierravanguard.beyond_oxygen.blocks.BubbleGeneratorBlock;
+import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
+import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -36,6 +39,14 @@ public class NetworkHandler {
                 SyncSealedAreaStatusPacket::encode,
                 SyncSealedAreaStatusPacket::decode,
                 SyncSealedAreaStatusPacket::handle);
+        CHANNEL.registerMessage(nextID(), BubbleRadiusPacket.class,
+                BubbleRadiusPacket::encode,
+                BubbleRadiusPacket::decode,
+                BubbleRadiusPacket::handle);
+        CHANNEL.registerMessage(nextID(), VentInfoMessage.class,
+                VentInfoMessage::encode,
+                VentInfoMessage::decode,
+                VentInfoMessage::handle);
     }
 
     public static void sendToggleHelmetPacket() {
