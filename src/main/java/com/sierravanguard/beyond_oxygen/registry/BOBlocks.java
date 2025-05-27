@@ -1,6 +1,6 @@
 package com.sierravanguard.beyond_oxygen.registry;
 
-import ca.weblite.objc.Proxy;
+
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.BubbleGeneratorBlock;
 import com.sierravanguard.beyond_oxygen.blocks.CryoBedBlock;

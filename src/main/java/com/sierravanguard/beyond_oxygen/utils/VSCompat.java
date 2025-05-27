@@ -3,7 +3,6 @@ package com.sierravanguard.beyond_oxygen.utils;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
 import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
-import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
@@ -20,7 +19,6 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.QueryableShipData;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.impl.game.ships.ShipData;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.api.ships.Ship;
 

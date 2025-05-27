@@ -77,3 +77,11 @@ ordering="AFTER"
 side="BOTH"
 comment="Optional compatibility with Starlance!"
 
+[[dependencies."${mod_id}"]]
+modId="col_sweat"
+mandatory=false
+versionRange="[1.0,)"
+ordering="AFTER"
+side="BOTH"
+comment="Optional compatibility with Cold Sweat!"
+

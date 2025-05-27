@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "COC",
+    "L L",
+    "   "
+  ],
+  "key": {
+    "O": {
+      "item": "mekanism:ingot_refined_obsidian"
+    },
+    "C": {
+      "item": "mekanism:advanced_control_circuit"
+    },
+    "L": {
+      "item": "beyond_oxygen:spacesuit_leggings"
+    }
+  },
+  "result": {
+    "item": "beyond_oxygen:cryo_suit_leggings"
+  }
+}

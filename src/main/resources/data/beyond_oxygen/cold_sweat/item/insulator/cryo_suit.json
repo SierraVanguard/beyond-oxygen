@@ -1,0 +1,59 @@
+{
+  "type": "armor",
+  "required_mods": [
+    "beyond_oxygen"
+  ],
+  "item": {
+    "items": [
+      "beyond_oxygen:cryo_suit_chestplate"
+    ]
+  },
+  "insulation": {
+    "heat": -0.5,
+    "cold": 2.0
+  },
+  "entity": {
+    "equipment": {
+      "head": {
+        "items": [
+          "beyond_oxygen:cryo_suit_helmet"
+        ]
+      },
+      "chest": {
+        "items": [
+          "beyond_oxygen:cryo_suit_chestplate"
+        ]
+      },
+      "legs": {
+        "items": [
+          "beyond_oxygen:cryo_suit_leggings"
+        ]
+      },
+      "feet": {
+        "items": [
+          "beyond_oxygen:cryo_suit_boots"
+        ]
+      }
+    }
+  },
+  "attributes": {
+    "cold_sweat:cold_dampening": [
+      {
+        "name": "cs:cryo_suit_bonus",
+        "amount": 2.0,
+        "operation": "addition"
+      }
+    ],
+    "cold_sweat:heat_dampening": [
+      {
+        "name": "cs:cryo_suit_heat_resistance",
+        "amount": 0.5,
+        "operation": "addition"
+      }
+    ]
+  },
+  "immune_temp_modifiers": {
+    "cold_sweat:freezing": 2.0,
+    "cold_sweat:water": 2.0
+  }
+}

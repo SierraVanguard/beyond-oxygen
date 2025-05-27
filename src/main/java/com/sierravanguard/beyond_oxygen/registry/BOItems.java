@@ -49,6 +49,14 @@ public class BOItems {
             () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_BOOTS = ITEMS.register("spacesuit_boots",
             () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
+    public static final RegistryObject<Item> CRYO_SUIT_HELMET = ITEMS.register("cryo_suit_helmet",
+            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.HELMET, new Item.Properties(), "cryo_suit_helmet"));
+    public static final RegistryObject<Item> CRYO_SUIT_CHESTPLATE = ITEMS.register("cryo_suit_chestplate",
+            () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+    public static final RegistryObject<Item> CRYO_SUIT_LEGGINGS = ITEMS.register("cryo_suit_leggings",
+            () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+    public static final RegistryObject<Item> CRYO_SUIT_BOOTS = ITEMS.register("cryo_suit_boots",
+            () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
     public static final RegistryObject<Item> CANNED_POTATOES = ITEMS.register("canned_potatoes",
             () -> new CannedFoodItem(new Item.Properties()
                     .food(new FoodProperties.Builder().nutrition(6).saturationMod(0.8F).build())
