@@ -107,19 +107,22 @@ public class CryoBedBlock extends Block implements EntityBlock {
             if (otherState.getBlock() == this && otherState.getValue(HALF) != half) {
                 level.setBlock(otherPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 35);
             }
+            if (!level.isClientSide) {
+                BlockPos dropPos = (half == DoubleBlockHalf.LOWER) ? pos : pos.below();
+                BlockEntity blockEntity = level.getBlockEntity(dropPos);
 
-            if (!level.isClientSide && half == DoubleBlockHalf.LOWER) {
-                BlockEntity blockEntity = level.getBlockEntity(pos);
                 if (blockEntity instanceof CryoBedBlockEntity) {
-                    ResourceKey<Level> dimKey = level.dimension();
-                    CryoBedManager.removeCryoBed(dimKey, pos);
+                    dropResources(state, level, dropPos, blockEntity);
+                    CryoBedManager.removeCryoBed(level.dimension(), dropPos);
+                    level.removeBlockEntity(dropPos);
                 }
-                level.removeBlockEntity(pos);
             }
         }
 
         super.onRemove(state, level, pos, newState, isMoving);
     }
+
+
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {

@@ -3,6 +3,7 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.client.menu.BubbleGeneratorMenu;
+import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
@@ -44,6 +45,8 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     private int clientEnergyLevel = 0;
     private int lastSentEnergy = -1;
     private int lastSentOxygen = -1;
+    public int temperatureRegulatorCooldown = 0;
+    public boolean temperatureRegulatorApplied = false;
     private final Set<Fluid> acceptedFluids = new HashSet<>();
     public float controlledMaxRadius = BOConfig.bubbleMaxRadius;
 
@@ -74,6 +77,9 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
         if (level.isClientSide) return;
         BubbleGeneratorBlockEntity entity = (BubbleGeneratorBlockEntity) be;
+        if (entity.temperatureRegulatorCooldown > 0) {
+            entity.temperatureRegulatorCooldown--;
+        }
 
         int energyRequired = 20;
         float oxygenNeeded = BOConfig.ventConsumption * 2.0f;
@@ -92,11 +98,13 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
             }
 
             for (ServerPlayer player : ((ServerLevel) level).players()) {
-                boolean success = BeyondOxygen.ModsLoaded.VS && VSCompat.applyBubbleEffects(player, pos, entity.currentRadius);
+                boolean success = BeyondOxygen.ModsLoaded.VS && VSCompat.applyBubbleEffects(player, pos, entity.currentRadius, entity);
                 if (!success) {
                     Vec3 eyePos = player.getEyePosition();
-                    if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2)
+                    if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2){
                         player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+                        if (entity.GetRegulator()) ColdSweatCompat.setComfortableTemp(player);
+                    }
                 }
             }
         } else {
@@ -143,6 +151,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
+        tag.putBoolean("TemperatureRegulatorApplied", temperatureRegulatorApplied);
         tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.putInt("ticks", leftTicks);
         tag.putFloat("radius", currentRadius);
@@ -154,6 +163,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     public void load(CompoundTag tag) {
         super.load(tag);
         tank.readFromNBT(tag.getCompound("tank"));
+        temperatureRegulatorApplied = tag.getBoolean("TemperatureRegulatorApplied");
         leftTicks = tag.getInt("ticks");
         currentRadius = tag.getFloat("radius");
         energyStorage.receiveEnergy(tag.getInt("energy"), false);
@@ -224,5 +234,9 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         }
         return tank.getFluidAmount() / 1000.0;
     }
+    public boolean GetRegulator(){
+        return temperatureRegulatorApplied;
+    }
+
 
 }

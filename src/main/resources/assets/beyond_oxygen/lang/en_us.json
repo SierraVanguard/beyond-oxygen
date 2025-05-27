@@ -36,5 +36,8 @@
   "tooltip.beyond_oxygen.meteoric_iron_free": "Now completely meteoric iron-free!",
   "tooltip.beyond_oxygen.babys_first_air_tank": "Baby's first air tank!",
   "message.cryo_bed.unassigned": "Cryo-bed assignment removed.",
-  "message.cryo_bed.assigned" : "Cryo-bed assigned!"
+  "message.cryo_bed.assigned" : "Cryo-bed assigned!",
+  "item.beyond_oxygen.thermal_regulator": "Thermal Regulator",
+  "item.beyond_oxygen.cryo_bed": "Cryo Bed",
+  "message.cryobed.assigned": "Cryo-Bed Assigned"
 }
