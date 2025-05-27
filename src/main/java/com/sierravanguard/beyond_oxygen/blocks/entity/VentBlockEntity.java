@@ -3,7 +3,6 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
-import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
