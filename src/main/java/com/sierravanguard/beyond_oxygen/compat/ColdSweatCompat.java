@@ -14,10 +14,11 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.function.Function;
-@Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+
+
 public class ColdSweatCompat
 {
-    private static final String MODID = "cold_sweat";
+    private static final String MODID = BeyondOxygen.MODID;
     private static final ResourceLocation MODIFIER_ID = new ResourceLocation("beyond_oxygen", "comfort_adjust");
 
     public static void init()
@@ -45,7 +46,6 @@ public class ColdSweatCompat
     public static void onModifiersRegister(TempModifierRegisterEvent event)
     {
         event.register(MODIFIER_ID, ComfortTempModifier::new);
-        System.out.println("Cold Sweat loaded- Registered comfy modifier!");
     }
 
     public static class ComfortTempModifier extends TempModifier

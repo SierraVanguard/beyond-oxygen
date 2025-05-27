@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
 import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import net.minecraft.core.BlockPos;
@@ -50,7 +51,7 @@ public class VSCompat {
                     BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false
             ));
             player.setAirSupply(player.getMaxAirSupply());
-            if (entity.temperatureRegulatorApplied) ColdSweatCompat.setComfortableTemp(player);
+            if (entity.temperatureRegulatorApplied) CompatLoader.setComfortableTemperature(player);
             updateSealedStatus(player, true);
             player.setAirSupply(player.getMaxAirSupply());
         }
@@ -103,7 +104,7 @@ public class VSCompat {
         if (distanceSquared <= radius * radius * 2) {
             player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
             player.setAirSupply(player.getMaxAirSupply());
-            if (entity.temperatureRegulatorApplied) ColdSweatCompat.setComfortableTemp(player);
+            if (entity.temperatureRegulatorApplied) CompatLoader.setComfortableTemperature(player);
             updateSealedStatus(player, true);
             return true;
         } else {

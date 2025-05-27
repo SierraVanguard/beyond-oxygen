@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
@@ -111,7 +112,7 @@ public class VentBlockEntity extends BlockEntity {
                     BlockPos eyeBlockPos = new BlockPos((int) Math.floor(eyePos.x), (int) Math.floor(eyePos.y), (int) Math.floor(eyePos.z));
                     if (entity.hermeticArea.getArea().contains(eyeBlockPos)) {
                         player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
-                        if (entity.GetRegulator()) ColdSweatCompat.setComfortableTemp(player);
+                        if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
                     }
                 }
             }

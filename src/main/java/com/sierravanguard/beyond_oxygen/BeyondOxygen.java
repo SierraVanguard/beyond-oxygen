@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.capabilities.*;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.*;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
@@ -40,7 +41,7 @@ public class BeyondOxygen {
         BOCapabilities.init();
         NetworkHandler.register();
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
-        if (ModsLoaded.CS) ColdSweatCompat.init();
+        CompatLoader.init();
     }
 
     public static class ModsLoaded{
