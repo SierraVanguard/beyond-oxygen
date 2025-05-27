@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.client.menu.BubbleGeneratorMenu;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
@@ -103,7 +104,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
                     Vec3 eyePos = player.getEyePosition();
                     if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2){
                         player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
-                        if (entity.GetRegulator()) ColdSweatCompat.setComfortableTemp(player);
+                        if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
                     }
                 }
             }
