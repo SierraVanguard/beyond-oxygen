@@ -1,6 +1,9 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
+import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
+import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import net.minecraft.core.BlockPos;
@@ -28,7 +31,7 @@ import java.util.Map;
 public class VSCompat {
     public static final Map<Player, Integer> playersInSealedShips = new HashMap<>();
 
-    public static boolean applySealedEffects(ServerPlayer player, BlockPos pos, HermeticArea hermeticArea) {
+    public static boolean applySealedEffects(ServerPlayer player, BlockPos pos, HermeticArea hermeticArea, VentBlockEntity entity) {
         ServerShip ship = (ServerShip) VSGameUtilsKt.getShipManagingPos(player.level(), pos);
         if (ship == null) {
             return false;
@@ -46,7 +49,8 @@ public class VSCompat {
             player.addEffect(new MobEffectInstance(
                     BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false
             ));
-            player.setAirSupply(player.getMaxAirSupply());// Prevent drowning
+            player.setAirSupply(player.getMaxAirSupply());
+            if (entity.temperatureRegulatorApplied) ColdSweatCompat.setComfortableTemp(player);
             updateSealedStatus(player, true);
             player.setAirSupply(player.getMaxAirSupply());
         }
@@ -83,7 +87,7 @@ public class VSCompat {
         }
     }
 
-    public static boolean applyBubbleEffects(ServerPlayer player, BlockPos origin, float radius) {
+    public static boolean applyBubbleEffects(ServerPlayer player, BlockPos origin, float radius, BubbleGeneratorBlockEntity entity) {
         Level level = player.level();
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
         if (ship == null) {
@@ -99,6 +103,7 @@ public class VSCompat {
         if (distanceSquared <= radius * radius * 2) {
             player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
             player.setAirSupply(player.getMaxAirSupply());
+            if (entity.temperatureRegulatorApplied) ColdSweatCompat.setComfortableTemp(player);
             updateSealedStatus(player, true);
             return true;
         } else {

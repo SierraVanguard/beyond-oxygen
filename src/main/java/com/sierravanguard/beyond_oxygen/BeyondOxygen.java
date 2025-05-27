@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-
+import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 
 @Mod(BeyondOxygen.MODID)
 @Mod.EventBusSubscriber(modid = "beyond_oxygen", bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -40,11 +40,14 @@ public class BeyondOxygen {
         BOCapabilities.init();
         NetworkHandler.register();
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
+        if (ModsLoaded.CS) ColdSweatCompat.init();
     }
 
     public static class ModsLoaded{
         public static final boolean VS = ModList.get().isLoaded("valkyrienskies");
+        public static final boolean CS = ModList.get().isLoaded("coldsweat");
     }
+
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.register(IHelmetState.class);

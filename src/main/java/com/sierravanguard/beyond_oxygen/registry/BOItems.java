@@ -81,4 +81,6 @@ public class BOItems {
                     .stacksTo(16), EMPTY_CAN.get()));
     public static final RegistryObject<Item> CRYO_BED = ITEMS.register("cryo_bed",
             () -> new BlockItem(BOBlocks.CRYO_BED.get(), new Item.Properties()));
+    public static final RegistryObject<Item> THERMAL_REGULATOR = ITEMS.register("thermal_regulator",
+            () -> new ThermalRegulatorItem(new Item.Properties().stacksTo(1)));
 }
