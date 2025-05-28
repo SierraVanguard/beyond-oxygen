@@ -38,6 +38,15 @@
   "message.cryo_bed.unassigned": "Вам больше не назначена криокапсула.",
   "message.cryobed.assigned": "Криокапсула назначена",
   "item.beyond_oxygen.thermal_regulator": "Термо-Регулятор",
-  "item.beyond_oxygen.cryo_bed": "Криокапсула"
+  "item.beyond_oxygen.cryo_bed": "Криокапсула",
+  "message.cryo_bed.assigned": "Cryo-bed assigned!",
+  "item.beyond_oxygen.cryo_suit_helmet": "Шлем Криокостюма",
+  "item.beyond_oxygen.cryo_suit_chestplate": "Нагрудник Криокостюма",
+  "item.beyond_oxygen.cryo_suit_leggings": "Штаны Криокостюма",
+  "item.beyond_oxygen.cryo_suit_boots": "Ботинки Криокостюма",
+  "item.beyond_oxygen.thermal_suit_helmet": "Шлем Термокостюма",
+  "item.beyond_oxygen.thermal_suit_chestplate": "Нагрудник Термокостюма",
+  "item.beyond_oxygen.thermal_suit_leggings": "Штаны Термокостюма",
+  "item.beyond_oxygen.thermal_suit_boots": "Ботинки Термокостюма"
 
 }

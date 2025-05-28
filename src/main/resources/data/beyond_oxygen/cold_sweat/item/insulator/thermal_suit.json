@@ -1,0 +1,59 @@
+{
+  "type": "armor",
+  "required_mods": [
+    "beyond_oxygen"
+  ],
+  "item": {
+    "items": [
+      "beyond_oxygen:thermal_suit_chestplate"
+    ]
+  },
+  "insulation": {
+    "heat": 2.0,
+    "cold": -0.5
+  },
+  "entity": {
+    "equipment": {
+      "head": {
+        "items": [
+          "beyond_oxygen:thermal_suit_helmet"
+        ]
+      },
+      "chest": {
+        "items": [
+          "beyond_oxygen:thermal_suit_chestplate"
+        ]
+      },
+      "legs": {
+        "items": [
+          "beyond_oxygen:thermal_suit_leggings"
+        ]
+      },
+      "feet": {
+        "items": [
+          "beyond_oxygen:thermal_suit_boots"
+        ]
+      }
+    }
+  },
+  "attributes": {
+    "cold_sweat:heat_dampening": [
+      {
+        "name": "cs:thermal_suit_bonus",
+        "amount": 2.0,
+        "operation": "addition"
+      }
+    ],
+    "cold_sweat:cold_dampening": [
+      {
+        "name": "cs:thermal_suit_cold_penalty",
+        "amount": -0.5,
+        "operation": "addition"
+      }
+    ]
+  },
+  "immune_temp_modifiers": {
+    "cold_sweat:nether": 1.0,
+    "cold_sweat:fire": 1.0
+  }
+}
