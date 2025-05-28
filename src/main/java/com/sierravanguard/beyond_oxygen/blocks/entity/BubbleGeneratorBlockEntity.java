@@ -3,6 +3,7 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.client.menu.BubbleGeneratorMenu;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
@@ -40,8 +41,14 @@ import java.util.Set;
 
 public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvider{
     private float lastSentRadius = -1f;
-
+    private int clientOxygenLevel = 0;
+    private int clientEnergyLevel = 0;
+    private int lastSentEnergy = -1;
+    private int lastSentOxygen = -1;
+    public int temperatureRegulatorCooldown = 0;
+    public boolean temperatureRegulatorApplied = false;
     private final Set<Fluid> acceptedFluids = new HashSet<>();
+    public float controlledMaxRadius = BOConfig.bubbleMaxRadius;
 
     public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
         for (ResourceLocation fluidId : fluidIds) {
@@ -70,31 +77,51 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
         if (level.isClientSide) return;
         BubbleGeneratorBlockEntity entity = (BubbleGeneratorBlockEntity) be;
+        if (entity.temperatureRegulatorCooldown > 0) {
+            entity.temperatureRegulatorCooldown--;
+        }
 
         int energyRequired = 20;
         float oxygenNeeded = BOConfig.ventConsumption * 2.0f;
-        boolean hasEnergy = entity.energyStorage.extractEnergy(energyRequired, true) == energyRequired;
+        boolean hasEnergy = entity.energyStorage.extractEnergy(energyRequired, false) == energyRequired;
         boolean hasOxygen = entity.tank.getFluidAmount() >= oxygenNeeded;
 
         if (hasEnergy && hasOxygen) {
             entity.energyStorage.extractEnergy(energyRequired, false);
             entity.consumeOxygen((int) oxygenNeeded);
-            if (entity.currentRadius < entity.maxRadius) entity.currentRadius += 0.01f;
+            if (entity.currentRadius < entity.controlledMaxRadius) {
+                entity.currentRadius = Math.min(entity.currentRadius + 0.01f, entity.controlledMaxRadius);
+            } else if (entity.currentRadius > entity.controlledMaxRadius) {
+                entity.currentRadius = Math.max(entity.controlledMaxRadius, entity.currentRadius - 0.01f);
+            } else {
+                entity.currentRadius = entity.controlledMaxRadius;
+            }
 
             for (ServerPlayer player : ((ServerLevel) level).players()) {
-                boolean success = BeyondOxygen.ModsLoaded.VS && VSCompat.applyBubbleEffects(player, pos, entity.currentRadius);
+                boolean success = BeyondOxygen.ModsLoaded.VS && VSCompat.applyBubbleEffects(player, pos, entity.currentRadius, entity);
                 if (!success) {
                     Vec3 eyePos = player.getEyePosition();
-                    if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2)
+                    if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2){
                         player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+                        if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
+                    }
                 }
             }
         } else {
             entity.currentRadius = Math.max(0, entity.currentRadius - 0.1f);
         }
+        boolean radiusChanged = Math.abs(entity.currentRadius - entity.lastSentRadius) > 0.01f;
+        boolean energyChanged = Math.abs(entity.energyStorage.getEnergyStored() - entity.lastSentEnergy) > 40;
+        boolean oxygenChanged = Math.abs(entity.tank.getFluidAmount() - entity.lastSentOxygen) > 50;
 
-        if (Math.abs(entity.currentRadius - entity.lastSentRadius) > 0.01f) {
-            entity.lastSentRadius = entity.currentRadius;
+        if (radiusChanged || energyChanged || oxygenChanged) {
+            if (radiusChanged) entity.lastSentRadius = entity.currentRadius;
+            if (energyChanged) entity.lastSentEnergy = entity.energyStorage.getEnergyStored();
+            if (oxygenChanged) entity.lastSentOxygen = entity.tank.getFluidAmount();
+
+            entity.clientEnergyLevel = entity.lastSentEnergy;
+            entity.clientOxygenLevel = entity.lastSentOxygen;
+
             entity.setChanged();
             level.sendBlockUpdated(pos, state, state, 3);
         }
@@ -111,7 +138,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     }
 
     public int getPowerLevel() {
-        return energyStorage.getEnergyStored() * 100 / energyStorage.getMaxEnergyStored();
+        return (int) ((clientEnergyLevel / (float) energyStorage.getMaxEnergyStored()) * 100);
     }
 
     @Override
@@ -124,19 +151,25 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
+        tag.putBoolean("TemperatureRegulatorApplied", temperatureRegulatorApplied);
         tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.putInt("ticks", leftTicks);
         tag.putFloat("radius", currentRadius);
         tag.putInt("energy", energyStorage.getEnergyStored());
+        tag.putFloat("controlledMaxRadius", controlledMaxRadius);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         tank.readFromNBT(tag.getCompound("tank"));
+        temperatureRegulatorApplied = tag.getBoolean("TemperatureRegulatorApplied");
         leftTicks = tag.getInt("ticks");
         currentRadius = tag.getFloat("radius");
         energyStorage.receiveEnergy(tag.getInt("energy"), false);
+        if (tag.contains("controlledMaxRadius")) {
+            controlledMaxRadius = tag.getFloat("controlledMaxRadius");
+        }
     }
 
     @Override
@@ -158,6 +191,8 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         CompoundTag tag = super.getUpdateTag();
         tag.putFloat("radius", currentRadius);
         tag.putInt("tankAmount", tank.getFluidAmount());
+        tag.putInt("energy", energyStorage.getEnergyStored());
+        tag.putFloat("controlledMaxRadius", controlledMaxRadius);
         return tag;
     }
 
@@ -166,8 +201,11 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         super.handleUpdateTag(tag);
         if (tag.contains("radius")) currentRadius = tag.getFloat("radius");
         if (tag.contains("tankAmount")) {
-            int tankAmount = tag.getInt("tankAmount");
-            //TODO: Tank client-side logic implementation for GUI rendering.
+            clientOxygenLevel = tag.getInt("tankAmount");
+        }
+        if (tag.contains("energy")) clientEnergyLevel = tag.getInt("energy");
+        if (tag.contains("controlledMaxRadius")) {
+            controlledMaxRadius = tag.getFloat("controlledMaxRadius");
         }
     }
 
@@ -191,7 +229,14 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         return new BubbleGeneratorMenu(id, inventory, this.getBlockPos());
     }
     public double getOxygenRatio() {
-        if (this.tank.getFluidAmount() == 0) return 0.0;
-        return (double) this.tank.getFluidAmount() / 1000;
+        if (level != null && level.isClientSide) {
+            return clientOxygenLevel / 1000.0;
+        }
+        return tank.getFluidAmount() / 1000.0;
     }
+    public boolean GetRegulator(){
+        return temperatureRegulatorApplied;
+    }
+
+
 }
