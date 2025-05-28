@@ -12,11 +12,14 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.function.Supplier;
 
 public enum SpaceSuitArmorMaterial implements ArmorMaterial {
-    SPACESUIT("spacesuit", 10, new int[] { 4, 6, 4, 3 }, 22, SoundEvents.ARMOR_EQUIP_LEATHER, 0f, 0f,
+    SPACESUIT("spacesuit", 10, new int[]{4, 6, 4, 3}, 22, SoundEvents.ARMOR_EQUIP_LEATHER, 0f, 0f,
             () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.spaceRepairMaterial))),
 
-    CRYO_SUIT("cryo_suit", 12, new int[] { 5, 7, 5, 3 }, 25, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0f, 0.05f,
-            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.cryoRepairMaterial)));
+    CRYO_SUIT("cryo_suit", 12, new int[]{5, 7, 5, 3}, 25, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0f, 0.1f,
+            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.cryoRepairMaterial))),
+
+    THERMAL_SUIT("thermal_suit", 13, new int[]{5, 7, 5, 3}, 25, SoundEvents.ARMOR_EQUIP_GOLD, 1.0f, 0.1f,
+            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.thermalRepairMaterial)));
 
     private final String name;
     private final int durabilityMultiplier;
@@ -40,8 +43,8 @@ public enum SpaceSuitArmorMaterial implements ArmorMaterial {
         this.repairIngredient = repairIngredient;
     }
 
-    private static final int[] DURABILITY = { 13, 15, 16, 11 }; // boots, leggings, chestplate, helmet
-    private static final int[] DEFENSE = { 1, 3, 4, 2 };
+    private static final int[] DURABILITY = {13, 15, 16, 11}; // boots, leggings, chestplate, helmet
+    private static final int[] DEFENSE = {1, 3, 4, 2};
 
     @Override
     public int getDurabilityForType(ArmorItem.Type type) {
