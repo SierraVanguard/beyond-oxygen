@@ -179,5 +179,9 @@ public class VentBlockEntity extends BlockEntity {
     public boolean GetRegulator(){
         return temperatureRegulatorApplied;
     }
+    public boolean isBlockInsideSealedArea(BlockPos pos) {
+        return hermeticArea.isHermetic() && hermeticArea.getArea().contains(pos);
+    }
+
 
 }
