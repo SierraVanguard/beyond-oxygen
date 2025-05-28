@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "beyond_oxygen:block/oxygen_harvester",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "beyond_oxygen:block/oxygen_harvester"
+    },
+    "facing=south": {
+      "model": "beyond_oxygen:block/oxygen_harvester",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "beyond_oxygen:block/oxygen_harvester",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "beyond_oxygen:block/oxygen_harvester",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "beyond_oxygen:block/oxygen_harvester",
+      "x": 90
+    }
+  }
+}

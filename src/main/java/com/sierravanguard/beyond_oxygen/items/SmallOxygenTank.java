@@ -76,7 +76,7 @@ public class SmallOxygenTank extends Item implements ICurioItem {
         CompoundTag tag = stack.getOrCreateTag();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
             int totalTicks = cap.getFluidInTank(0).getAmount() + getLeftTicks(tag);
-            tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen_amount", formatTicksToTime(totalTicks))
+            tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen", formatTicksToTime(totalTicks))
                     .withStyle(ChatFormatting.AQUA));
         });
 

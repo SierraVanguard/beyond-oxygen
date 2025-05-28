@@ -33,7 +33,7 @@ public class VentInfoMessage {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
                 Component message = msg.isSealed
-                        ? Component.translatable("message.vent.oxygen_flow" + msg.oxygenRate + " mB/t").withStyle(ChatFormatting.AQUA)
+                        ? Component.translatable("message.vent.oxygen_flow", msg.oxygenRate).withStyle(ChatFormatting.AQUA)
                         : Component.translatable("message.vent.not_sealed").withStyle(ChatFormatting.RED);
 
                 mc.player.displayClientMessage(message, true);

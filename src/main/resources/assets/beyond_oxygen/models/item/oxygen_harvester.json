@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube_directional",
+  "textures": {
+    "particle": "beyond_oxygen:block/oxygen_harvester",
+    "down": "beyond_oxygen:block/oxygen_harvester",
+    "up": "beyond_oxygen:block/oxygen_harvester",
+    "north": "beyond_oxygen:block/oxygen_harvester",
+    "south": "beyond_oxygen:block/oxygen_harvester",
+    "west": "beyond_oxygen:block/oxygen_harvester",
+    "east": "beyond_oxygen:block/oxygen_harvester"
+  }
+}
