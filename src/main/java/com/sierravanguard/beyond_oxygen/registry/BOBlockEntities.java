@@ -23,10 +23,7 @@ public class BOBlockEntities {
     public static final RegistryObject<BlockEntityType<CryoBedBlockEntity>> CRYO_BED = BLOCK_ENTITY_TYPES.register("cryo_bed",
             () -> BlockEntityType.Builder.of(CryoBedBlockEntity::new, BOBlocks.CRYO_BED.get()).build(null));
     public static final RegistryObject<BlockEntityType<OxygenHarvesterBlockEntity>> OXYGEN_HARVESTER =
-            BLOCK_ENTITY_TYPES.register("oxygen_harvester", () ->
-                    BlockEntityType.Builder.of(
-                            OxygenHarvesterBlockEntity::new,
-                            BOBlocks.OXYGEN_HARVESTER.get()  // Assuming you have a BOBlocks.OXYGEN_HARVESTER registered block
-                    ).build(null)
-            );
+            BLOCK_ENTITY_TYPES.register("oxygen_harvester",
+                    () -> BlockEntityType.Builder.of(OxygenHarvesterBlockEntity::new,
+                            BOBlocks.OXYGEN_HARVESTER.get()).build(null));
 }

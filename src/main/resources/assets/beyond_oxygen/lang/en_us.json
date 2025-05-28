@@ -17,7 +17,7 @@
   "item.beyond_oxygen.canned_apple" : "Canned Apple",
   "item.beyond_oxygen.canned_beef" : "Canned Steak",
   "item.beyond_oxygen.canned_pork" : "Canned Porkchop",
-  "message.vent.oxygen_flow": "Vent O₂ Flow: %s mB/t",
+  "message.vent.oxygen_flow": "Oxygen Flow Rate: %.2f mB/t",
   "message.vent.not_sealed": "Area not sealed!",
   "message.helmet.status": "Helmet: %s",
   "message.helmet.closed": "Closed",
