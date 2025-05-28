@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.sierravanguard.beyond_oxygen.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "beyond_oxygen.refmap.json",
+  "mixins": [
+    "EntityMixin",
+    "BOServerPlayerMixin"
+  ],
+  "client": [
+    "CameraMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
