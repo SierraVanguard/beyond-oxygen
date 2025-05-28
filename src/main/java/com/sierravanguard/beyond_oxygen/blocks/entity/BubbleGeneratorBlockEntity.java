@@ -6,6 +6,7 @@ import com.sierravanguard.beyond_oxygen.client.menu.BubbleGeneratorMenu;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
+import com.sierravanguard.beyond_oxygen.utils.BubbleGeneratorTracker;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -237,6 +238,35 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     public boolean GetRegulator(){
         return temperatureRegulatorApplied;
     }
+    public boolean isBlockInsideBubble(BlockPos pos) {
+        double distance = pos.distSqr(this.worldPosition);
+        double radiusSquared = currentRadius * currentRadius;
+        return distance <= radiusSquared;
+    }
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
+            BubbleGeneratorTracker.register(serverLevel, this.getBlockPos());
+        }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
+            BubbleGeneratorTracker.unregister(serverLevel, this.getBlockPos());
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
+            BubbleGeneratorTracker.unregister(serverLevel, this.getBlockPos());
+        }
+    }
+
 
 
 }

@@ -4,6 +4,7 @@ package com.sierravanguard.beyond_oxygen.registry;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.BubbleGeneratorBlock;
 import com.sierravanguard.beyond_oxygen.blocks.CryoBedBlock;
+import com.sierravanguard.beyond_oxygen.blocks.OxygenHarvesterBlock;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,4 +20,7 @@ public class BOBlocks {
     public static final RegistryObject<Block> BUBBLE_GENERATOR = BLOCKS.register("bubble_generator", () -> new BubbleGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(1.5f).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CRYO_BED = BLOCKS.register("cryo_bed",
             () -> new CryoBedBlock(Block.Properties.copy(Blocks.IRON_BLOCK).strength(0.5f)));
+    public static final RegistryObject<Block> OXYGEN_HARVESTER = BLOCKS.register("oxygen_harvester",
+            () -> new OxygenHarvesterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(1.5f).requiresCorrectToolForDrops())
+    );
 }

@@ -102,4 +102,7 @@ public class BOItems {
             () -> new BlockItem(BOBlocks.CRYO_BED.get(), new Item.Properties()));
     public static final RegistryObject<Item> THERMAL_REGULATOR = ITEMS.register("thermal_regulator",
             () -> new ThermalRegulatorItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> OXYGEN_HARVESTER = ITEMS.register("oxygen_harvester",
+            () -> new BlockItem(BOBlocks.OXYGEN_HARVESTER.get(), new Item.Properties()));
+
 }

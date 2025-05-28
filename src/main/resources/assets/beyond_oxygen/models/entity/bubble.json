@@ -1,0 +1,9 @@
+{
+  "loader": "forge:obj",
+  "model": "beyond_oxygen:models/entity/bubble.obj",
+  "flip-v": true,
+  "textures": {
+    "bubble.png": "beyond_oxygen:entity/bubble",
+    "particle": "beyond_oxygen:entity/bubble"
+  }
+}
