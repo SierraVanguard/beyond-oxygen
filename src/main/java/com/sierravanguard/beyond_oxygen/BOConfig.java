@@ -23,10 +23,12 @@ public class BOConfig {
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> UNBREATHABLE_DIMENSIONS = BUILDER.comment("List of unbreathable dimensions").defineListAllowEmpty("unbreathableDimensions",List.of("minecraft:the_end"),s->s instanceof String);
     private static final ForgeConfigSpec.ConfigValue<Integer> VENT_CONSUMPTION = BUILDER.comment("How many blocks vent can fill with 1 oxygen unit").define("ventConsumption", 20);
     private static final ForgeConfigSpec.ConfigValue<String> SPACE_REPAIR_MATERIAL = BUILDER.comment("The item ID of the material to repair the spacesuit with").define("space_repair_material", "mekanism:ingot_steel");
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_HELMETS = BUILDER.comment("List of item IDs that count as spacesuit helmets").defineListAllowEmpty("space_helmets", List.of("beyond_oxygen:spacesuit_helmet"), s -> s instanceof String);
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_CHESTPLATES = BUILDER.comment("List of item IDs that count as spacesuit chestplates").defineListAllowEmpty("space_chestplates", List.of("beyond_oxygen:spacesuit_chestplate"), s -> s instanceof String);
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_LEGGINGS = BUILDER.comment("List of item IDs that count as spacesuit leggings").defineListAllowEmpty("space_leggings", List.of("beyond_oxygen:spacesuit_leggings"), s -> s instanceof String);
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_BOOTS = BUILDER.comment("List of item IDs that count as spacesuit boots").defineListAllowEmpty("space_boots", List.of("beyond_oxygen:spacesuit_boots"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<String> CRYO_REPAIR_MATERIAL = BUILDER.comment("The item ID of the material to repair the cryo suit with").define("cryo_repair_material", "mekanism:ingot_refined_obsidian");
+    private static final ForgeConfigSpec.ConfigValue<String> THERMAL_REPAIR_MATERIAL = BUILDER.comment("The item ID of the material to repair the thermal suit with").define("thermal_repair_material", "mekanism:ingot_refined_glowstone");
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_HELMETS = BUILDER.comment("List of item IDs that count as spacesuit helmets").defineListAllowEmpty("space_helmets", List.of("beyond_oxygen:spacesuit_helmet", "beyond_oxygen:cryo_suit_helmet"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_CHESTPLATES = BUILDER.comment("List of item IDs that count as spacesuit chestplates").defineListAllowEmpty("space_chestplates", List.of("beyond_oxygen:spacesuit_chestplate", "beyond_oxygen:cryo_suit_chestplate"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_LEGGINGS = BUILDER.comment("List of item IDs that count as spacesuit leggings").defineListAllowEmpty("space_leggings", List.of("beyond_oxygen:spacesuit_leggings", "beyond_oxygen:cryo_suit_leggings"), s -> s instanceof String);
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_BOOTS = BUILDER.comment("List of item IDs that count as spacesuit boots").defineListAllowEmpty("space_boots", List.of("beyond_oxygen:spacesuit_boots", "beyond_oxygen:cryo_suit_boots"), s -> s instanceof String);
     private static final ForgeConfigSpec.ConfigValue<Integer> BUBBLE_MAX_RADIUS = BUILDER
             .comment("Maximum radius of bubble generators")
             .defineInRange("bubbleMaxRadius", 5, 5, 20); // Default 5, min 1, max 20
@@ -40,6 +42,8 @@ public class BOConfig {
     public static List<ResourceLocation> oxygenFluids;
     public static List<ResourceLocation> unbreathableDimensions;
     public static ResourceLocation spaceRepairMaterial;
+    public static ResourceLocation cryoRepairMaterial;
+    public static ResourceLocation thermalRepairMaterial;
     public static List<String> spaceHelmets;
     public static List<String> spaceChestplates;
     public static List<String> spaceLeggings;
@@ -65,6 +69,10 @@ public class BOConfig {
         ventConsumption = VENT_CONSUMPTION.get();
         String[] space_repair_material_pair = SPACE_REPAIR_MATERIAL.get().split(":");
         spaceRepairMaterial = ResourceLocation.fromNamespaceAndPath(space_repair_material_pair[0], space_repair_material_pair[1]);
+        String[] cryo_repair_material_pair = CRYO_REPAIR_MATERIAL.get().split(":");
+        cryoRepairMaterial = ResourceLocation.fromNamespaceAndPath(cryo_repair_material_pair[0], cryo_repair_material_pair[1]);
+        String[] thermal_repair_material_pair = THERMAL_REPAIR_MATERIAL.get().split(":");
+        thermalRepairMaterial = ResourceLocation.fromNamespaceAndPath(thermal_repair_material_pair[0], thermal_repair_material_pair[1]);
         spaceHelmets = new ArrayList<>(SPACE_HELMETS.get());
         spaceChestplates = new ArrayList<>(SPACE_CHESTPLATES.get());
         spaceLeggings = new ArrayList<>(SPACE_LEGGINGS.get());
