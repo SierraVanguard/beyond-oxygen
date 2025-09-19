@@ -57,22 +57,22 @@ public class BOConfig {
         oxygenFluids = new ArrayList<>();
         for (String fluid : oxygenFluidConf){
             String[] pair = fluid.split(":");
-            oxygenFluids.add(ResourceLocation.fromNamespaceAndPath(pair[0],pair[1]));
+            oxygenFluids.add(new ResourceLocation(pair[0],pair[1]));
         }
         List<? extends String> unbreathableDimConf = UNBREATHABLE_DIMENSIONS.get();
         unbreathableDimensions = new ArrayList<>();
         for (String dim : unbreathableDimConf){
             String[] pair = dim.split(":");
-            unbreathableDimensions.add(ResourceLocation.fromNamespaceAndPath(pair[0],pair[1]));
+            unbreathableDimensions.add(new ResourceLocation(pair[0],pair[1]));
         }
         oxygenConsumption = OXYGEN_CONSUMPTION.get();
         ventConsumption = VENT_CONSUMPTION.get();
         String[] space_repair_material_pair = SPACE_REPAIR_MATERIAL.get().split(":");
-        spaceRepairMaterial = ResourceLocation.fromNamespaceAndPath(space_repair_material_pair[0], space_repair_material_pair[1]);
+        spaceRepairMaterial = new ResourceLocation(space_repair_material_pair[0], space_repair_material_pair[1]);
         String[] cryo_repair_material_pair = CRYO_REPAIR_MATERIAL.get().split(":");
-        cryoRepairMaterial = ResourceLocation.fromNamespaceAndPath(cryo_repair_material_pair[0], cryo_repair_material_pair[1]);
+        cryoRepairMaterial = new ResourceLocation(cryo_repair_material_pair[0], cryo_repair_material_pair[1]);
         String[] thermal_repair_material_pair = THERMAL_REPAIR_MATERIAL.get().split(":");
-        thermalRepairMaterial = ResourceLocation.fromNamespaceAndPath(thermal_repair_material_pair[0], thermal_repair_material_pair[1]);
+        thermalRepairMaterial = new ResourceLocation(thermal_repair_material_pair[0], thermal_repair_material_pair[1]);
         spaceHelmets = new ArrayList<>(SPACE_HELMETS.get());
         spaceChestplates = new ArrayList<>(SPACE_CHESTPLATES.get());
         spaceLeggings = new ArrayList<>(SPACE_LEGGINGS.get());

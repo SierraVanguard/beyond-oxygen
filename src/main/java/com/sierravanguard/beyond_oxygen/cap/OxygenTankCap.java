@@ -18,7 +18,9 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 public class OxygenTankCap extends FluidHandlerItemStack {
     public OxygenTankCap(@NotNull ItemStack container, int capacity) {
         super(container, capacity);
-        loadAcceptedFluidsFromConfig(BOConfig.oxygenFluids);
+        if (BOConfig.oxygenFluids != null) {
+            loadAcceptedFluidsFromConfig(BOConfig.oxygenFluids);
+        }
     }
 
     private final Set<Fluid> acceptedFluids = new HashSet<>();
