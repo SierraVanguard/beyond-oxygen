@@ -7,7 +7,7 @@
   ],
   "key": {
     "S": {
-      "item": "forge:ingots/steel"
+      "tag": "forge:ingots/steel"
     },
     "C": {
       "item": "mekanism:basic_control_circuit"

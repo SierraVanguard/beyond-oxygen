@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen;
 
+import com.sierravanguard.beyond_oxygen.compat.AdAstraConfigHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -10,8 +11,6 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Forge's config APIs
 @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BOConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
@@ -65,6 +64,7 @@ public class BOConfig {
             String[] pair = dim.split(":");
             unbreathableDimensions.add(ResourceLocation.fromNamespaceAndPath(pair[0],pair[1]));
         }
+        AdAstraConfigHelper.injectAdAstraDimensions();
         oxygenConsumption = OXYGEN_CONSUMPTION.get();
         ventConsumption = VENT_CONSUMPTION.get();
         String[] space_repair_material_pair = SPACE_REPAIR_MATERIAL.get().split(":");

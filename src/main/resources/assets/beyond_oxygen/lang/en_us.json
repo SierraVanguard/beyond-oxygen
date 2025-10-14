@@ -47,5 +47,7 @@
   "item.beyond_oxygen.thermal_suit_helmet": "Thermal Suit Helmet",
   "item.beyond_oxygen.thermal_suit_chestplate": "Thermal Suit Chestplate",
   "item.beyond_oxygen.thermal_suit_leggings": "Thermal Suit Leggings",
-  "item.beyond_oxygen.thermal_suit_boots": "Thermal Suit Boots"
+  "item.beyond_oxygen.thermal_suit_boots": "Thermal Suit Boots",
+  "key.beyond_oxygen.toggle_helmet": "Toggle Helmet",
+  "key.categories.beyond_oxygen": "Beyond Oxygen"
 }

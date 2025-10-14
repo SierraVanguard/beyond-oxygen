@@ -1,7 +1,6 @@
 package com.sierravanguard.beyond_oxygen.client.overlay;
 
-import com.sierravanguard.beyond_oxygen.items.LargeOxygenTank;
-import com.sierravanguard.beyond_oxygen.registry.BOItems;
+import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
@@ -12,16 +11,11 @@ import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotResult;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class OxygenTankOverlay {
-
-    private static final String BACK_SLOT = "back";
 
     @SubscribeEvent
     public static void onRenderOverlay(RenderGuiEvent.Post event) {
@@ -29,20 +23,20 @@ public class OxygenTankOverlay {
         Player player = mc.player;
         if (player == null) return;
 
-        ItemStack tankStack = getEquippedOxygenTank(player);
-        if (tankStack.isEmpty()) return;
+        ItemStack chestplate = player.getInventory().armor.get(2);
+        if (chestplate.isEmpty() || !(chestplate.getItem() instanceof OxygenStorageArmorItem)) return;
 
         AtomicInteger remainingTicks = new AtomicInteger(0);
-        tankStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
+        chestplate.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
             int amount = cap.getFluidInTank(0).getAmount();
-            CompoundTag tag = tankStack.getOrCreateTag();
+            CompoundTag tag = chestplate.getOrCreateTag();
             remainingTicks.set(amount + getLeftTicks(tag));
         });
 
         int ticks = remainingTicks.get();
         if (ticks <= 0) return;
 
-        String timeString = "O2 REMAINING: " + LargeOxygenTank.formatTicksToTime(ticks);
+        String timeString = "O₂ REMAINING: " + OxygenStorageArmorItem.formatTicksToTime(ticks);
         renderOxygenText(event.getGuiGraphics(), timeString, event.getWindow().getGuiScaledWidth());
     }
 
@@ -50,65 +44,12 @@ public class OxygenTankOverlay {
         Minecraft mc = Minecraft.getInstance();
         int x = screenWidth / 2 - mc.font.width(text) / 2;
         int y = 10;
-        guiGraphics.drawString(
-                mc.font,
-                text,
-                x + 1,
-                y + 1,
-                0xFF000000,
-                false
-        );
-        guiGraphics.drawString(
-                mc.font,
-                text,
-                x,
-                y,
-                0xFF00FFFF,
-                false
-        );
-    }
 
-    private static ItemStack getEquippedOxygenTank(Player player) {
-        ItemStack backTank = getBackSlotTank(player);
-        if (!backTank.isEmpty()) {
-            return backTank;
-        }
-        ItemStack mainHand = player.getMainHandItem();
-        if (isOxygenTank(mainHand)) {
-            return mainHand;
-        }
-
-        ItemStack offHand = player.getOffhandItem();
-        if (isOxygenTank(offHand)) {
-            return offHand;
-        }
-
-        return ItemStack.EMPTY;
-    }
-
-    private static ItemStack getBackSlotTank(Player player) {
-        try {
-            List<SlotResult> backItems = CuriosApi.getCuriosHelper().findCurios(player, BACK_SLOT);
-            for (SlotResult slotResult : backItems) {
-                ItemStack stack = slotResult.stack();
-                if (isOxygenTank(stack)) {
-                    return stack;
-                }
-            }
-        } catch (Exception e) {
-        }
-        return ItemStack.EMPTY;
+        guiGraphics.drawString(mc.font, text, x + 1, y + 1, 0xFF000000, false);
+        guiGraphics.drawString(mc.font, text, x, y, 0xFF00FFFF, false);
     }
 
     private static int getLeftTicks(CompoundTag tag) {
         return tag != null ? tag.getInt("ticks") : 0;
-    }
-
-    private static boolean isOxygenTank(ItemStack stack) {
-        if (stack.isEmpty()) return false;
-        return stack.getItem() == BOItems.SMALL_OXYGEN_TANK.get() ||
-                stack.getItem() == BOItems.MEDIUM_OXYGEN_TANK.get() ||
-                stack.getItem() == BOItems.LARGE_OXYGEN_TANK.get() ||
-                stack.getItem() == BOItems.ATMOSPHERIC_OXYGEN_TANK.get();
     }
 }

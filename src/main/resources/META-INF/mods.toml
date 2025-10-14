@@ -56,13 +56,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
-modId="curios"
-mandatory=true
-versionRange="[5.0.0,)"
-ordering="NONE"
-side="BOTH"
-
-[[dependencies."${mod_id}"]]
 modId="valkyrienskies"
 mandatory=false
 versionRange="[2.0.0,)"
@@ -78,9 +71,17 @@ side="BOTH"
 comment="Optional compatibility with Starlance!"
 
 [[dependencies."${mod_id}"]]
-modId="col_sweat"
+modId="cold_sweat"
 mandatory=false
-versionRange="[1.0,)"
+versionRange="[2.4-b05c,)"
+ordering="AFTER"
+side="BOTH"
+comment="Optional compatibility with Cold Sweat!"
+
+[[dependencies."${mod_id}"]]
+modId="ad_astra"
+mandatory=false
+versionRange="[1.15.20,)"
 ordering="AFTER"
 side="BOTH"
 comment="Optional compatibility with Cold Sweat!"
