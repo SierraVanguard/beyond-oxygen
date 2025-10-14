@@ -16,13 +16,11 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class OxygenTank extends Item implements ICurioItem{
+public class OxygenTank extends Item{
 
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
@@ -74,30 +72,5 @@ public class OxygenTank extends Item implements ICurioItem{
     private void setLeftTicks(CompoundTag tag, int value) {
         if(tag==null) return;
         tag.putInt("ticks", value);
-    }
-
-
-    @Override
-    public void curioTick(SlotContext slotContext, ItemStack stack) {
-        if(slotContext.entity() instanceof ServerPlayer player){
-            MobEffectInstance effect = player.getEffect(BOEffects.OXYGEN_SATURATION.get());
-            if(effect!=null && effect.getDuration()>=2) return;
-            CompoundTag tag = stack.getTag();
-            AtomicInteger ticks = new AtomicInteger(getLeftTicks(tag));
-            if (ticks.get() <= 0) {
-                stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap->{
-                    if(!cap.getFluidInTank(0).isEmpty()){
-                        ticks.set(BOConfig.oxygenConsumption);
-                        cap.drain(1, IFluidHandler.FluidAction.EXECUTE);
-                    }
-                });
-            }
-            if(ticks.get()>0){
-                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(),2,0,false,false));
-                ticks.set(ticks.get()-1);
-            }
-            setLeftTicks(tag,ticks.get());
-            stack.setTag(tag);
-        }
     }
 }

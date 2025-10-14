@@ -3,7 +3,6 @@ package com.sierravanguard.beyond_oxygen.client;
 import com.sierravanguard.beyond_oxygen.client.renderer.armor.SpacesuitHelmetLayer;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOBlocks;
-import com.sierravanguard.beyond_oxygen.registry.BOCurioRenderers;
 import com.sierravanguard.beyond_oxygen.registry.BOMenus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -27,7 +26,6 @@ public class ClientSetup {
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             EntityModelSet modelSet = Minecraft.getInstance().getEntityModels();
-            BOCurioRenderers.register(modelSet);
             BlockEntityRenderers.register(
                     BOBlockEntities.BUBBLE_GENERATOR.get(),
                     BubbleGeneratorBlockEntityRenderer::new

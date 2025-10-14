@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": {"item":  "mekanism:alloy_infused"},
-    "B": {"item":  "beyond_oxygen:oxygen_tank"},
+    "B": {"item":  "mekanism:basic_fluid_tank"},
     "R": {"item":  "mekanism:advanced_control_circuit"},
     "S": {"item":  "mekanism:steel_casing"},
     "I": {"item":  "minecraft:iron_bars"}
