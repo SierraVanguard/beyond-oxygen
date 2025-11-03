@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.7.+'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -196,8 +196,6 @@ dependencies {
     implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
     implementation fg.deobf("curse.maven:mekanism-268560:6552911")
 
-    implementation fg.deobf("curse.maven:sinytra-connector-890127:5761411")
-
     implementation fg.deobf("curse.maven:cold-sweat-506194:7097419")
 
     implementation fg.deobf("curse.maven:ad-astra-635042:6262032")
@@ -255,7 +253,8 @@ tasks.named('jar', Jar).configure {
                     "Implementation-Title"    : project.name,
                     "Implementation-Version"  : project.jar.archiveVersion,
                     "Implementation-Vendor"   : mod_authors,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'MixinConfigs'            : "${mod_id}.mixins.json"])
     }
 
     // This is the preferred method to reobfuscate your jar file
