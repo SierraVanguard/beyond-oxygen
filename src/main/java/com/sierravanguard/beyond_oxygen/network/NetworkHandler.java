@@ -3,13 +3,20 @@ package com.sierravanguard.beyond_oxygen.network;
 import com.sierravanguard.beyond_oxygen.blocks.BubbleGeneratorBlock;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
 import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+
+import java.util.List;
+import java.util.Set;
 
 public class NetworkHandler {
     private static final String PROTOCOL_VERSION = "1";
@@ -47,6 +54,10 @@ public class NetworkHandler {
                 VentInfoMessage::encode,
                 VentInfoMessage::decode,
                 VentInfoMessage::handle);
+        CHANNEL.registerMessage(nextID(), SyncHermeticBlocksS2CPacket.class,
+                SyncHermeticBlocksS2CPacket::encode,
+                SyncHermeticBlocksS2CPacket::decode,
+                SyncHermeticBlocksS2CPacket::handle);
     }
 
     public static void sendToggleHelmetPacket() {
@@ -56,4 +67,14 @@ public class NetworkHandler {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                 new SyncSealedAreaStatusPacket(player.getUUID(), isInSealedArea));
     }
+    public static void sendHermeticBlocksToPlayersInLevel(ServerLevel level, int shipId, Set<Vec3> blocks) {
+        SyncHermeticBlocksS2CPacket pkt = new SyncHermeticBlocksS2CPacket(shipId, blocks);
+        for (ServerPlayer player : level.players()) {
+            CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), pkt);
+        }
+    }
+    public static void sendToAllPlayers(Object pkt) {
+        CHANNEL.send(PacketDistributor.ALL.noArg(), pkt);
+    }
+
 }

@@ -77,15 +77,18 @@ public class VSCompat {
         if (event.phase == TickEvent.Phase.END) {
             playersInSealedShips.entrySet().removeIf(entry -> {
                 int ticksLeft = entry.getValue() - 1;
+                ServerPlayer player = (ServerPlayer) entry.getKey();
                 if (ticksLeft <= 0) {
-                    return true; // Remove player
+                    NetworkHandler.sendSealedAreaStatusToClient(player, false);
+                    return true;
                 }
                 entry.setValue(ticksLeft);
+                // **Always resend true while in area**
+                NetworkHandler.sendSealedAreaStatusToClient(player, true);
                 return false;
             });
         }
     }
-
     public static boolean applyBubbleEffects(ServerPlayer player, BlockPos origin, float radius, BubbleGeneratorBlockEntity entity) {
         Level level = player.level();
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
@@ -141,4 +144,5 @@ public class VSCompat {
         }
         return null;
     }
+
 }
