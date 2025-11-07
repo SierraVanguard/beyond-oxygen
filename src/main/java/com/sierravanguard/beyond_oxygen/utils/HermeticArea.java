@@ -63,6 +63,8 @@ public class HermeticArea {
                 }
 
             }
+            //for future optimizations, shipID stays. For now, the method is as precise as an axe, forcing recalculation of ALL hermetic areas.
+            NetworkHandler.sendInvalidateHermeticAreas(shipId, true);
             NetworkHandler.sendToAllPlayers(new SyncHermeticBlocksS2CPacket(shipId, blocks));
         }
 

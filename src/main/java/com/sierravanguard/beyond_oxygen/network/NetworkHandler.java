@@ -1,7 +1,6 @@
 package com.sierravanguard.beyond_oxygen.network;
 
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,7 +82,7 @@ public class NetworkHandler {
     public static void sendToAllPlayers(Object pkt) {
         CHANNEL.send(PacketDistributor.ALL.noArg(), pkt);
     }
-    public static void sendInvalidateHermeticAreas(ServerLevel level, long shipId, boolean clearAll) {
+    public static void sendInvalidateHermeticAreas(long shipId, boolean clearAll) {
         InvalidateHermeticAreasPacket pkt = new InvalidateHermeticAreasPacket(shipId, clearAll);
         CHANNEL.send(PacketDistributor.ALL.noArg(), pkt);
     }

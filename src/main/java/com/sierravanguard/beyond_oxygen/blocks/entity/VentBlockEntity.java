@@ -93,8 +93,6 @@ public class VentBlockEntity extends BlockEntity {
                     var ship = com.sierravanguard.beyond_oxygen.utils.VSCompat.getShipAtPosition(serverLevel, pos);
                     if (ship != null) shipId = ship.getId();
                 }
-                //for future optimizations, shipID stays. For now, the method is as precise as an axe, forcing recalculation of ALL hermetic areas.
-                NetworkHandler.sendInvalidateHermeticAreas(serverLevel, shipId, true);
             }
 
             entity.hermeticArea.bakeArea((ServerLevel) level, pos.offset(dir.getNormal()), dir.getOpposite());
