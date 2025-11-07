@@ -36,11 +36,9 @@ public class ClientSetup {
     }
     @SubscribeEvent
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
-        // Iterate all player skins (vanilla + modded)
         for (String skin : event.getSkins()) {
             PlayerRenderer renderer = event.getSkin(skin);
             if (renderer != null) {
-                // Add your custom helmet layer
                 renderer.addLayer(new SpacesuitHelmetLayer(renderer));
             }
         }

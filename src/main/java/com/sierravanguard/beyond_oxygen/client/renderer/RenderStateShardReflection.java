@@ -31,8 +31,6 @@ public class RenderStateShardReflection {
             throw new RuntimeException("Failed to reflect RenderStateShard constants", e);
         }
     }
-
-    @SuppressWarnings("unchecked")
     private static <T> T getStaticField(Class<?> clazz, String name) throws Exception {
         Field f = clazz.getDeclaredField(name);
         f.setAccessible(true);

@@ -33,7 +33,6 @@ public class SyncSealedAreaStatusPacket {
             Player localPlayer = Minecraft.getInstance().player;
             if (localPlayer != null && localPlayer.getUUID().equals(msg.playerId)) {
                 ClientSealedAreaState.setSealedStatus(msg.playerId, msg.isInSealedArea);
-                System.out.println("[Beyond Oxygen] Client sealed state updated: " + msg.isInSealedArea);
             }
         });
         ctx.get().setPacketHandled(true);
