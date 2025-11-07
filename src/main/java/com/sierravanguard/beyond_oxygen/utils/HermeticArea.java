@@ -28,10 +28,6 @@ public class HermeticArea {
 
     public HermeticArea() {}
 
-    /**
-     * Bakes a hermetic area starting from the given position.
-     * Returns true if the area is fully sealed.
-     */
     public boolean bakeArea(ServerLevel level, BlockPos start, Direction startDir) {
         area.clear();
 
@@ -54,28 +50,19 @@ public class HermeticArea {
         }
 
         hermetic = oldLayer.isEmpty();
-
-        // Send to clients if sealed
         if (hermetic && !area.isEmpty()) {
-            // Try to find which ship (if any) this area belongs to
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, start);
             long shipId = (ship != null) ? ship.getId() : -1L;
 
             Set<Vec3> blocks = new HashSet<>();
             for (BlockPos p : area) {
                 if (ship != null) {
-                    // Send ship-local block coordinates (do NOT convert to world coordinates here).
                     blocks.add(new Vec3(p.getX(), p.getY(), p.getZ()));
-                    System.out.printf("[HermeticArea] Ship-local pos %s sent as local coords%n", p);
                 } else {
-                    // World-space blocks
                     blocks.add(new Vec3(p.getX(), p.getY(), p.getZ()));
-                    System.out.printf("[HermeticArea] World block: %s%n", p);
                 }
 
             }
-
-            System.out.printf("[HermeticArea] Sending hermetic area: shipId=%d, blocks=%d%n", shipId, blocks.size());
             NetworkHandler.sendToAllPlayers(new SyncHermeticBlocksS2CPacket(shipId, blocks));
         }
 

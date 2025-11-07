@@ -34,23 +34,16 @@ public class HermeticAreaClientManager {
     public static Long getShipIdForAABB(AABB aabb) {
         return aabbToShipId.get(aabb);
     }
-
-    /** Returns individual AABBs for each hermetic block (no merging) */
     public static List<AABB> getAll(Level level) {
         aabbToShipId.clear();
         List<AABB> result = new ArrayList<>();
-
-        // Add world-space AABBs (no ship association)
         for (Vec3 block : worldHermeticBlocks) {
             AABB aabb = new AABB(
                     block.x, block.y, block.z,
                     block.x + 1.0, block.y + 1.0, block.z + 1.0
             );
             result.add(aabb);
-            // No ship ID for world blocks
         }
-
-        // Add ship-space AABBs (store ship association)
         for (Map.Entry<Long, Set<Vec3>> entry : hermeticBlocksPerShip.entrySet()) {
             long shipId = entry.getKey();
             Set<Vec3> localBlocks = entry.getValue();
@@ -64,11 +57,6 @@ public class HermeticAreaClientManager {
                 aabbToShipId.put(aabb, shipId);
             }
         }
-
-        System.out.printf("[HermeticAreaClientManager] getAll() returning %d individual block AABBs (world: %d, ship: %d)%n",
-                result.size(), worldHermeticBlocks.size(),
-                hermeticBlocksPerShip.values().stream().mapToInt(Set::size).sum());
-
         return result;
     }
 
@@ -76,12 +64,10 @@ public class HermeticAreaClientManager {
         try {
             var shipData = VSGameUtilsKt.getShipObjectWorld(level).getAllShips();
             if (shipData == null) {
-                System.out.println("[HermeticAreaClientManager] getClientShipById: shipData is null!");
                 return null;
             }
             Ship ship = shipData.getById(shipId);
             if (ship == null) {
-                System.out.printf("[HermeticAreaClientManager] getClientShipById: no ship found for id %d%n", shipId);
             }
             return ship;
         } catch (Exception e) {
@@ -89,26 +75,13 @@ public class HermeticAreaClientManager {
             return null;
         }
     }
-
-    /**
-     * Return the set of hermetic block positions for the given ship id.
-     * The returned set is the internal set (not copied) — do NOT mutate it.
-     * We return an empty set if no blocks exist for the ship.
-     */
     public static Set<Vec3> getBlocksForShip(long shipId) {
         Set<Vec3> s = hermeticBlocksPerShip.get(shipId);
         return (s == null) ? Collections.emptySet() : Collections.unmodifiableSet(s);
     }
-
-    /**
-     * Return the world hermetic blocks (world-space blocks, not attached to a ship).
-     * The returned set is unmodifiable.
-     */
     public static Set<Vec3> getWorldHermeticBlocks() {
         return Collections.unmodifiableSet(worldHermeticBlocks);
     }
-
-    // Keep the mergeBlocks method for potential future use, but it's no longer called by getAll()
     private static List<AABB> mergeBlocks(Collection<?> positions) {
         List<AABB> aabbs = new ArrayList<>();
         if (positions.isEmpty()) return aabbs;
@@ -118,9 +91,6 @@ public class HermeticAreaClientManager {
             if (pos instanceof Vec3 vec) remaining.add(new Vector3d(vec.x, vec.y, vec.z));
             else if (pos instanceof Vector3d vec3d) remaining.add(vec3d);
         }
-
-        System.out.printf("[HermeticAreaClientManager] mergeBlocks() called for %d positions%n", remaining.size());
-
         while (!remaining.isEmpty()) {
             Vector3d start = remaining.iterator().next();
             remaining.remove(start);
@@ -152,8 +122,6 @@ public class HermeticAreaClientManager {
 
             aabbs.add(new AABB(minX, minY, minZ, maxX + 1.0, maxY + 1.0, maxZ + 1.0));
         }
-
-        System.out.printf("[HermeticAreaClientManager] mergeBlocks() returning %d AABBs%n", aabbs.size());
         return aabbs;
     }
 }

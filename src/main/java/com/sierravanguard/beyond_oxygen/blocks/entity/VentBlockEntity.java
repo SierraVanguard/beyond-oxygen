@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
+import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
@@ -40,8 +41,6 @@ public class VentBlockEntity extends BlockEntity {
     private int checkTick = 0;
     public int temperatureRegulatorCooldown = 0;
     public final HermeticArea hermeticArea = new HermeticArea();
-
-    // New boolean flag for thermal regulator
     public boolean temperatureRegulatorApplied = false;
 
     public VentBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
@@ -88,9 +87,20 @@ public class VentBlockEntity extends BlockEntity {
         Direction dir = state.getValue(VentBlock.FACING);
 
         if (entity.checkTick <= 0) {
+            if (level instanceof ServerLevel serverLevel) {
+                long shipId = -1L;
+                if (BeyondOxygen.ModsLoaded.VS) {
+                    var ship = com.sierravanguard.beyond_oxygen.utils.VSCompat.getShipAtPosition(serverLevel, pos);
+                    if (ship != null) shipId = ship.getId();
+                }
+                //for future optimizations, shipID stays. For now, the method is as precise as an axe, forcing recalculation of ALL hermetic areas.
+                NetworkHandler.sendInvalidateHermeticAreas(serverLevel, shipId, true);
+            }
+
             entity.hermeticArea.bakeArea((ServerLevel) level, pos.offset(dir.getNormal()), dir.getOpposite());
             entity.checkTick = 60;
         }
+
         entity.checkTick--;
 
         if (entity.tank.isEmpty()) return;

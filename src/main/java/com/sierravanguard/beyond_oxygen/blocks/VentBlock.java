@@ -74,7 +74,7 @@ public class VentBlock extends Block implements EntityBlock {
 
                 if (isShift && isEmptyHand && vent.temperatureRegulatorApplied) {
                     vent.temperatureRegulatorApplied = false;
-                    vent.temperatureRegulatorCooldown = 40; // e.g. 1 second cooldown
+                    vent.temperatureRegulatorCooldown = 40;
                     vent.setChanged();
 
                     ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
