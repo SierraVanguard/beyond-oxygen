@@ -65,7 +65,7 @@ public class OxygenHarvesterBlock extends Block implements EntityBlock {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof OxygenHarvesterBlockEntity harvester) {
                 player.displayClientMessage(
-                        Component.literal(String.format("Harvesting %.2f mB per cycle", harvester.getOxygenHarvesting())),
+                        Component.literal(String.format("Harvesting %.2f mB per cycle", harvester.getOxygenHarvested())),
                         true
                 );
             }

@@ -4,10 +4,7 @@ import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
 import com.sierravanguard.beyond_oxygen.items.CannedFoodItem;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
-import com.sierravanguard.beyond_oxygen.utils.CryoBedManager;
-import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
-import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
+import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -60,6 +57,8 @@ public class ModEvents {
                 player.sendSystemMessage(Component.translatable("message.cryo_bed.unassigned"));
             });
         }
+        HermeticAreaServerManager.onBlockChanged((ServerLevel) level, pos);
+
     }
     @SubscribeEvent
     public static void onHelmetChange(LivingEquipmentChangeEvent event) {
@@ -80,17 +79,6 @@ public class ModEvents {
         }
     }
     @SubscribeEvent
-    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        ServerPlayer player = (ServerPlayer) event.getEntity();
-        NetworkHandler.sendSealedAreaStatusToClient(player, false);
-    }
-
-    @SubscribeEvent
-    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        ServerPlayer player = (ServerPlayer) event.getEntity();
-        NetworkHandler.sendSealedAreaStatusToClient(player, false);
-    }
-    @SubscribeEvent
     public static void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (!BOConfig.unbreathableDimensions.contains(level.dimension().location())) {
@@ -105,4 +93,36 @@ public class ModEvents {
             }
         }
     }
+
+    @SubscribeEvent
+    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        BlockPos pos = event.getPos();
+        HermeticAreaServerManager.onBlockChanged(level, pos);
+        System.out.println("BlockChanged event fired!");
+    }
+
+    @SubscribeEvent
+    public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        BlockPos pos = event.getPos();
+        HermeticAreaServerManager.onBlockChanged(level, pos);
+    }
+
+    @SubscribeEvent
+    public static void onNeighborNotify(BlockEvent.NeighborNotifyEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        BlockPos pos = event.getPos();
+        HermeticAreaServerManager.onBlockChanged(level, pos);
+    }
+    @SubscribeEvent
+    public static void onBlockToolModification(BlockEvent.BlockToolModificationEvent event) {
+        if (event.getLevel().isClientSide()) return;
+
+        ServerLevel level = (ServerLevel) event.getLevel();
+        BlockPos pos = event.getPos();
+        HermeticAreaServerManager.onBlockChanged(level, pos);
+    }
+
+
 }

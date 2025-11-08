@@ -7,6 +7,7 @@ import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -53,70 +54,95 @@ public class VentBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return type == BOBlockEntities.VENT_BLOCK_ENTITY.get() ? VentBlockEntity::tick : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, BOBlockEntities.VENT_BLOCK_ENTITY.get(), (lvl, pos, bs, be) -> VentBlockEntity.tick(lvl, pos, bs, (VentBlockEntity) be));
     }
 
+    private static <T extends BlockEntity> BlockEntityTicker<T> createTickerHelper(
+            BlockEntityType<T> givenType,
+            BlockEntityType<?> expectedType,
+            BlockEntityTicker<? super T> ticker
+    ) {
+        return expectedType.equals(givenType) ? (BlockEntityTicker<T>) ticker : null;
+    }
+
+
+
+
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof VentBlockEntity vent) {
-                ItemStack held = player.getItemInHand(hand);
-                boolean isEmptyHand = held.isEmpty();
-                boolean isShift = player.isShiftKeyDown();
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
+        if (level.isClientSide) return InteractionResult.SUCCESS;
 
-                if (vent.temperatureRegulatorCooldown > 0) {
-                    player.displayClientMessage(
-                            net.minecraft.network.chat.Component.literal("Please wait before interacting again."), true);
-                    return InteractionResult.SUCCESS;
-                }
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof VentBlockEntity vent)) return InteractionResult.PASS;
 
-                if (isShift && isEmptyHand && vent.temperatureRegulatorApplied) {
-                    vent.temperatureRegulatorApplied = false;
-                    vent.temperatureRegulatorCooldown = 40;
-                    vent.setChanged();
+        ItemStack held = player.getItemInHand(hand);
+        boolean isEmptyHand = held.isEmpty();
+        boolean isShift = player.isShiftKeyDown();
 
-                    ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
-                    if (!player.getInventory().add(regulator)) {
-                        player.drop(regulator, false);
-                    }
-
-                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Thermal regulator removed."), true);
-                    return InteractionResult.SUCCESS;
-                }
-                if (!held.isEmpty() && held.is(BOItems.THERMAL_REGULATOR.get())) {
-                    return InteractionResult.PASS;
-                }
-                boolean sealed = vent.hermeticArea.isHermetic();
-                float oxygenRate = sealed ? vent.getCurrentOxygenRate() : 0f;
-
-                NetworkHandler.CHANNEL.send(
-                        PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
-                        new VentInfoMessage(sealed, oxygenRate)
-                );
-
-                return InteractionResult.SUCCESS;
-            }
+        // Cooldown guard
+        if (vent.temperatureRegulatorCooldown > 0) {
+            player.displayClientMessage(Component.literal("Please wait before interacting again."), true);
+            return InteractionResult.SUCCESS;
         }
 
-        return InteractionResult.PASS;
+        // Remove thermal regulator
+        if (isShift && isEmptyHand && vent.temperatureRegulatorApplied) {
+            vent.temperatureRegulatorApplied = false;
+            vent.temperatureRegulatorCooldown = 40;
+            vent.setChanged();
+
+            ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
+            if (!player.getInventory().add(regulator)) {
+                player.drop(regulator, false);
+            }
+
+            player.displayClientMessage(Component.literal("Thermal regulator removed."), true);
+            return InteractionResult.SUCCESS;
+        }
+        if (!held.isEmpty() && held.is(BOItems.THERMAL_REGULATOR.get()) && !vent.temperatureRegulatorApplied) {
+            vent.temperatureRegulatorApplied = true;
+            vent.temperatureRegulatorCooldown = 40;
+            vent.setChanged();
+            held.shrink(1);
+
+            player.displayClientMessage(Component.literal("Thermal regulator installed."), true);
+            return InteractionResult.SUCCESS;
+        }
+
+        // Display vent info
+        if (vent.getHermeticArea() == null) {
+            player.displayClientMessage(Component.literal("Vent area not initialized yet."), true);
+            return InteractionResult.SUCCESS;
+        }
+
+        boolean sealed = vent.getHermeticArea().isHermetic();
+        float oxygenRate = sealed ? vent.getCurrentOxygenRate() : 0f;
+
+        NetworkHandler.CHANNEL.send(
+                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                new VentInfoMessage(sealed, oxygenRate)
+        );
+
+        return InteractionResult.SUCCESS;
     }
 
-
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos,
+                         BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof VentBlockEntity vent) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof VentBlockEntity vent) {
                 if (vent.temperatureRegulatorApplied) {
                     ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
                     popResource(level, pos, regulator);
                 }
-                dropResources(state, level, pos, blockEntity);
+                dropResources(state, level, pos, be);
                 level.removeBlockEntity(pos);
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
+
 }

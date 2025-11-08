@@ -21,6 +21,11 @@ public class HermeticAreaClientManager {
         worldHermeticBlocks.clear();
         aabbToShipId.clear();
     }
+    public static void clearShip(long shipId) {
+        hermeticBlocksPerShip.remove(shipId);
+        aabbToShipId.entrySet().removeIf(entry -> entry.getValue().equals(shipId));
+    }
+
 
     public static void setHermeticBlocksForShip(long shipId, Collection<Vec3> blocks) {
         hermeticBlocksPerShip.put(shipId, new HashSet<>(blocks));

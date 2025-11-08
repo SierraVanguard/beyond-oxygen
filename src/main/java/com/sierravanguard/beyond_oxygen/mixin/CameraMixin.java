@@ -28,7 +28,7 @@ public abstract class CameraMixin {
     private void onTick(CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.level() != null) {
-            neo$isInSealedArea = VSCompat.playersInSealedShips.containsKey(player);
+            neo$isInSealedArea = VSCompat.playersInSealedAreas.containsKey(player);
         }
     }
 

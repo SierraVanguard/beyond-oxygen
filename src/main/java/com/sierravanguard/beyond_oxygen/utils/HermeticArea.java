@@ -5,94 +5,179 @@ import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.network.SyncHermeticBlocksS2CPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class HermeticArea {
+    private static final int LIMIT = BOConfig.ventRange;
 
-    public static final int limit = BOConfig.ventRange;
+    private final Set<BlockPos> blocks = new HashSet<>();
+    private final Set<BlockPos> boundaryBlocks = new HashSet<>();
+    private final ServerLevel level;
+    private final long shipId;
 
-    private final Set<BlockPos> area = new HashSet<>();
-    private boolean hermetic = false;
+    private boolean hermetic;
+    private boolean dirty;
 
-    public HermeticArea() {}
+    public HermeticArea(ServerLevel level, BlockPos start) {
+        this.level = level;
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, start);
+        this.shipId = (ship == null) ? -1L : ship.getId();
+        this.dirty = true;
+        HermeticAreaServerManager.register(this);
+    }
 
-    public boolean bakeArea(ServerLevel level, BlockPos start, Direction startDir) {
-        area.clear();
+    public boolean bake(BlockPos ventPos) {
+        if (!dirty) return hermetic;
 
-        if (HermeticUtils.isHermetic(level, start, startDir)) {
-            hermetic = false;
-            return false;
-        }
+        dirty = false;
+        blocks.clear();
+        boundaryBlocks.clear();
 
-        area.add(start);
-        List<AirBlockData> oldLayer = new ArrayList<>();
-        oldLayer.add(new AirBlockData(start).setSource(startDir));
+        Deque<AirBlockData> queue = new ArrayDeque<>();
+        BlockState ventState = level.getBlockState(ventPos);
+        blocks.add(ventPos);
+        Direction ventFacing = ventState.hasProperty(com.sierravanguard.beyond_oxygen.blocks.VentBlock.FACING)
+                ? ventState.getValue(com.sierravanguard.beyond_oxygen.blocks.VentBlock.FACING)
+                : Direction.UP;
 
-        while (area.size() < limit && !oldLayer.isEmpty()) {
-            List<AirBlockData> temp = new ArrayList<>();
-            for (AirBlockData blockData : oldLayer) {
-                if (area.size() >= limit) break;
-                bakeNeighbors(level, blockData, temp);
+        for (Direction dir : Direction.values()) {
+            BlockPos neighbor = ventPos.relative(dir);
+            if (neighbor.equals(ventPos)) continue;
+
+            BlockState state = level.getBlockState(neighbor);
+            boolean hermeticCheck;
+            if (dir == ventFacing) {
+                hermeticCheck = false;
+            } else {
+                hermeticCheck = HermeticUtils.isHermetic(level, neighbor, dir.getOpposite());
             }
-            oldLayer = temp;
+
+
+            if (!hermeticCheck) {
+                if (!blocks.contains(neighbor)) {
+                    blocks.add(neighbor);
+                    queue.add(new AirBlockData(neighbor).setSource(dir.getOpposite()));
+                }
+            } else {
+                boundaryBlocks.add(neighbor);
+            }
         }
+        while (!queue.isEmpty() && blocks.size() < LIMIT) {
+            AirBlockData current = queue.poll();
 
-        hermetic = oldLayer.isEmpty();
-        if (hermetic && !area.isEmpty()) {
-            Ship ship = VSGameUtilsKt.getShipManagingPos(level, start);
-            long shipId = (ship != null) ? ship.getId() : -1L;
+            for (Direction dir : Direction.values()) {
+                if (current.isSource(dir)) continue;
 
-            Set<Vec3> blocks = new HashSet<>();
-            for (BlockPos p : area) {
-                if (ship != null) {
-                    blocks.add(new Vec3(p.getX(), p.getY(), p.getZ()));
-                } else {
-                    blocks.add(new Vec3(p.getX(), p.getY(), p.getZ()));
+                BlockPos neighbor = current.relative(dir);
+                if (blocks.contains(neighbor)) continue;
+
+                BlockState neighborState = level.getBlockState(neighbor);
+                if (neighbor.equals(ventPos) || neighborState.getBlock() instanceof com.sierravanguard.beyond_oxygen.blocks.VentBlock) {
+                    continue;
                 }
 
+                boolean hermetic = HermeticUtils.isHermetic(level, neighbor, dir.getOpposite());
+                boolean canFlow = !hermetic && HermeticUtils.canFlowTrough(level, current, current.getSource(), dir);
+
+                if (canFlow) {
+                    blocks.add(neighbor);
+                    queue.add(new AirBlockData(neighbor).setSource(dir.getOpposite()));
+                } else if (hermetic) {
+                    boundaryBlocks.add(neighbor);
+                }
             }
-            //for future optimizations, shipID stays. For now, the method is as precise as an axe, forcing recalculation of ALL hermetic areas.
-            NetworkHandler.sendInvalidateHermeticAreas(shipId, true);
-            NetworkHandler.sendToAllPlayers(new SyncHermeticBlocksS2CPacket(shipId, blocks));
         }
 
-
+        hermetic = queue.isEmpty();
+        syncToClients();
         return hermetic;
     }
-
-    public void bakeNeighbors(ServerLevel level, AirBlockData pos, @Nullable List<AirBlockData> temp) {
-        for (Direction dir : Direction.values()) {
-            if (pos.isSource(dir)) continue;
-            if (area.size() >= limit) return;
-
-            BlockPos neighbor = pos.relative(dir);
-            if (!area.contains(neighbor)
-                    && !HermeticUtils.isHermetic(level, neighbor, dir.getOpposite())
-                    && HermeticUtils.canFlowTrough(level, pos, pos.getSource(), dir)) {
-
-                area.add(neighbor);
-                if (temp != null) temp.add(new AirBlockData(neighbor).setSource(dir.getOpposite()));
-            }
+    public static ListTag serializePositions(Set<BlockPos> positions) {
+        ListTag list = new ListTag();
+        for (BlockPos pos : positions) {
+            CompoundTag pTag = new CompoundTag();
+            pTag.putInt("x", pos.getX());
+            pTag.putInt("y", pos.getY());
+            pTag.putInt("z", pos.getZ());
+            list.add(pTag);
         }
+        return list;
     }
 
-    public Set<BlockPos> getArea() {
-        return area;
+
+    public static Set<BlockPos> deserializePositions(ListTag list) {
+        Set<BlockPos> positions = new HashSet<>();
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag pTag = list.getCompound(i);
+            positions.add(new BlockPos(pTag.getInt("x"), pTag.getInt("y"), pTag.getInt("z")));
+        }
+        return positions;
+    }
+    public void setBlocks(Set<BlockPos> newBlocks) {
+        blocks.clear();
+        blocks.addAll(newBlocks);
+    }
+
+    public void setBoundaryBlocks(Set<BlockPos> newBoundary) {
+        boundaryBlocks.clear();
+        boundaryBlocks.addAll(newBoundary);
+    }
+
+    public void setHermetic(boolean value) {
+        hermetic = value;
+    }
+
+    public Set<BlockPos> getBoundaryBlocks() {
+        return Collections.unmodifiableSet(boundaryBlocks);
+    }
+
+    public void markDirty() {
+        dirty = true;
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public boolean contains(BlockPos pos) {
+        return blocks.contains(pos);
     }
 
     public boolean isHermetic() {
         return hermetic;
+    }
+
+    public long getShipId() {
+        return shipId;
+    }
+
+    public Set<BlockPos> getBlocks() {
+        return Collections.unmodifiableSet(blocks);
+    }
+
+    private void syncToClients() {
+        Set<Vec3> vecs = new HashSet<>();
+        for (BlockPos p : blocks) vecs.add(new Vec3(p.getX(), p.getY(), p.getZ()));
+
+        if (hermetic)
+            NetworkHandler.sendToAllPlayers(new SyncHermeticBlocksS2CPacket(shipId, vecs));
+        else
+            NetworkHandler.sendInvalidateHermeticAreas(shipId, false);
+    }
+    public void clear() {
+        blocks.clear();
+        boundaryBlocks.clear();
+        hermetic = false;
+        dirty = false;
+        HermeticAreaServerManager.unregister(this);
+        NetworkHandler.sendInvalidateHermeticAreas(shipId, false);
     }
 }

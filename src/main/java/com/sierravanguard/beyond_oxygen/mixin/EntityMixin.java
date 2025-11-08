@@ -48,7 +48,7 @@ public abstract class EntityMixin {
     @Inject(method = "baseTick", at = @At("HEAD"))
     private void onBaseTick(CallbackInfo ci) {
         if ((Object) this instanceof Player player && !level.isClientSide) {
-            neo$isInSealedArea = VSCompat.playersInSealedShips.containsKey(player);
+            neo$isInSealedArea = VSCompat.playersInSealedAreas.containsKey(player);
             NetworkHandler.sendSealedAreaStatusToClient(player, neo$isInSealedArea);
         }
     }

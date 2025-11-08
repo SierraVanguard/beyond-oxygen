@@ -30,7 +30,7 @@ import java.util.*;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class HermeticWaterMaskRenderer {
 
-    private static final double Z_FIGHT_OFFSET = 0.002;
+    private static final double Z_FIGHT_OFFSET = 0.001;
 
     private static final RenderType WATER_MASK = RenderType.create(
             "hermetic_water_mask",
@@ -50,7 +50,7 @@ public final class HermeticWaterMaskRenderer {
 
     private HermeticWaterMaskRenderer() {}
     private static final Map<Long, CachedSurface> WATER_SURFACE_CACHE = new HashMap<>();
-    private static final int SURFACE_UPDATE_INTERVAL = 20; // ticks between recomputes
+    private static final int SURFACE_UPDATE_INTERVAL = 20;
 
     private static class CachedSurface {
         double y;
@@ -116,14 +116,9 @@ public final class HermeticWaterMaskRenderer {
             } else {
                 sliceY = cached.y;
             }
-            double offset = 0.0;
-            if (inSealed && cameraPos.y <= sliceY) {
-                offset = -0.002;
-            } else if (!inSealed && cameraPos.y > sliceY) {
-                offset = +0.002;
-            }
 
-            renderAABB(consumer, poseMatrix, shipToWorld, aabb, cameraPos, sliceY + offset);
+
+            renderAABB(consumer, poseMatrix, shipToWorld, aabb, cameraPos, sliceY);
         }
 
         buffer.endBatch();
@@ -192,25 +187,27 @@ public final class HermeticWaterMaskRenderer {
         final double finalCz = cz;
 
         uniq.sort(Comparator.comparingDouble(v -> Math.atan2(v.z - finalCz, v.x - finalCx)));
-
+        boolean cameraBelow = cameraPos.y < sliceY;
         Vector3d base = uniq.get(0);
         for (int i = 1; i + 1 < uniq.size(); i++) {
             Vector3d p1 = uniq.get(i);
             Vector3d p2 = uniq.get(i + 1);
             emitTri(consumer, poseMatrix,
-                    toCamera(base, cameraPos),
-                    toCamera(p1, cameraPos),
-                    toCamera(p2, cameraPos));
+                    toCamera(base, cameraPos,cameraBelow),
+                    toCamera(p1, cameraPos,cameraBelow),
+                    toCamera(p2, cameraPos,cameraBelow));
         }
     }
 
-    private static float[] toCamera(Vector3d world, Vec3 cam) {
+    private static float[] toCamera(Vector3d world, Vec3 cam, boolean below) {
+        float offset = (float) (below ? -Z_FIGHT_OFFSET-0.001 : Z_FIGHT_OFFSET);
         return new float[]{
                 (float) (world.x - cam.x),
-                (float) (world.y - cam.y + Z_FIGHT_OFFSET),
+                (float) (world.y - cam.y + offset),
                 (float) (world.z - cam.z)
         };
     }
+
 
 
     private static void emitTri(VertexConsumer consumer, Matrix4f poseMatrix,

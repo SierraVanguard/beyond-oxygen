@@ -69,7 +69,7 @@ public class BubbleGeneratorBlock extends Block implements EntityBlock {
                 }
                 if (isShift && isEmptyHand && generator.temperatureRegulatorApplied) {
                     generator.temperatureRegulatorApplied = false;
-                    generator.temperatureRegulatorCooldown = 40; // e.g. 1 second cooldown
+                    generator.temperatureRegulatorCooldown = 40;
                     generator.setChanged();
 
                     ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());

@@ -1,26 +1,22 @@
 package com.sierravanguard.beyond_oxygen.blocks.entity;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
+import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
-import com.sierravanguard.beyond_oxygen.utils.VentTracker;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
+import com.sierravanguard.beyond_oxygen.utils.VentTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,69 +32,67 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
 
     private float oxygenLastHarvested = 0;
     private int assignmentCooldown = 0;
+
     private BlockPos assignedVentPos = null;
     private HermeticArea cachedSealedArea = null;
+    private Iterator<BlockPos> scanIterator = null;
+    private boolean isInHarvestCycle = false;
 
-    private final FluidTank oxygenTank = new FluidTank(10000, fluidStack -> {
-        for (var fluidId : BOConfig.oxygenFluids) {
-            if (fluidStack.getFluid() == ForgeRegistries.FLUIDS.getValue(fluidId)) {
-                return true;
-            }
-        }
-        return false;
-    }) {
+    private final FluidTank oxygenTank = new FluidTank(10000, stack -> BOConfig.oxygenFluids.stream()
+            .map(ForgeRegistries.FLUIDS::getValue)
+            .anyMatch(f -> f == stack.getFluid())) {
         @Override
         protected void onContentsChanged() {
             super.onContentsChanged();
             setChanged();
-            if (level != null && !level.isClientSide) {
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-            }
+            if (level != null && !level.isClientSide) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
     };
-
-    private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(() -> oxygenTank);
+    private LazyOptional<FluidTank> tankOptional = LazyOptional.of(() -> oxygenTank);
 
     private final EnergyStorage energyStorage = new EnergyStorage(100000) {
         @Override
         public int receiveEnergy(int maxReceive, boolean simulate) {
-            int received = super.receiveEnergy(maxReceive, simulate);
-            if (received > 0 && !simulate) setChanged();
-            return received;
+            int r = super.receiveEnergy(maxReceive, simulate);
+            if (r > 0 && !simulate) setChanged();
+            return r;
         }
 
         @Override
         public int extractEnergy(int maxExtract, boolean simulate) {
-            int extracted = super.extractEnergy(maxExtract, simulate);
-            if (extracted > 0 && !simulate) setChanged();
-            return extracted;
+            int e = super.extractEnergy(maxExtract, simulate);
+            if (e > 0 && !simulate) setChanged();
+            return e;
         }
     };
+    private LazyOptional<EnergyStorage> energyOptional = LazyOptional.of(() -> energyStorage);
 
-    private LazyOptional<EnergyStorage> energyLazyOptional = LazyOptional.of(() -> energyStorage);
-
-    private Iterator<BlockPos> scanIterator = null;
-    private boolean isInHarvestCycle = false;
-
-    public OxygenHarvesterBlockEntity(BlockPos pos, BlockState state) {
+    public OxygenHarvesterBlockEntity(BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
         super(BOBlockEntities.OXYGEN_HARVESTER.get(), pos, state);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
+    public static void tick(Level level, BlockPos pos, net.minecraft.world.level.block.state.BlockState state, BlockEntity be) {
         if (level.isClientSide || !(be instanceof OxygenHarvesterBlockEntity harvester)) return;
+        ServerLevel serverLevel = (ServerLevel) level;
 
-        if (harvester.assignmentCooldown-- <= 0 || harvester.cachedSealedArea == null || !harvester.cachedSealedArea.isHermetic()) {
+        // Reassign vent if cooldown expired or area invalid
+        if (harvester.assignmentCooldown-- <= 0 ||
+                harvester.cachedSealedArea == null ||
+                !harvester.cachedSealedArea.isHermetic() ||
+                harvester.cachedSealedArea.isDirty()) {
+
             harvester.assignmentCooldown = ASSIGNMENT_INTERVAL;
-            harvester.findAndAssignVent((ServerLevel) level);
+            harvester.findAndAssignVent(serverLevel);
             harvester.scanIterator = null;
         }
 
         boolean canHarvest = harvester.cachedSealedArea != null &&
+                harvester.cachedSealedArea.isHermetic() &&
                 harvester.energyStorage.getEnergyStored() >= ENERGY_COST_PER_HARVEST &&
                 harvester.getOxygenTankSpace() >= OXYGEN_PER_PLANT;
 
         if (canHarvest || harvester.isInHarvestCycle) {
-            harvester.harvest((ServerLevel) level);
+            harvester.harvest(serverLevel);
         } else {
             harvester.oxygenLastHarvested = 0;
             harvester.scanIterator = null;
@@ -107,19 +101,17 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
     }
 
     private void findAndAssignVent(ServerLevel serverLevel) {
-        this.assignedVentPos = null;
-        this.cachedSealedArea = null;
-        this.scanIterator = null;
+        assignedVentPos = null;
+        cachedSealedArea = null;
 
-        var vents = VentTracker.getVentsIn(serverLevel);
-        for (BlockPos ventPos : vents) {
-            BlockEntity ventBE = serverLevel.getBlockEntity(ventPos);
-            if (!(ventBE instanceof VentBlockEntity vent)) continue;
+        for (BlockPos ventPos : VentTracker.getVentsIn(serverLevel)) {
+            BlockEntity be = serverLevel.getBlockEntity(ventPos);
+            if (!(be instanceof VentBlockEntity vent)) continue;
 
-            HermeticArea area = vent.hermeticArea;
-            if (area != null && area.isHermetic() && area.getArea().contains(this.worldPosition)) {
-                this.assignedVentPos = ventPos;
-                this.cachedSealedArea = area;
+            HermeticArea area = vent.getHermeticArea();
+            if (area != null && area.isHermetic() && area.getBlocks().contains(this.worldPosition)) {
+                assignedVentPos = ventPos;
+                cachedSealedArea = area;
                 break;
             }
         }
@@ -133,16 +125,13 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
             return;
         }
 
-        var oxygenFluid = ForgeRegistries.FLUIDS.getValue(BOConfig.oxygenFluids.get(0));
-        if (oxygenFluid == null) {
-            return;
-        }
-
         if (scanIterator == null || !isInHarvestCycle) {
-            scanIterator = new ArrayList<>(cachedSealedArea.getArea()).iterator();
-
+            scanIterator = new ArrayList<>(cachedSealedArea.getBlocks()).iterator();
             isInHarvestCycle = true;
         }
+
+        var oxygenFluid = ForgeRegistries.FLUIDS.getValue(BOConfig.oxygenFluids.get(0));
+        if (oxygenFluid == null) return;
 
         int oxygenHarvested = 0;
         int scanned = 0;
@@ -152,10 +141,10 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
                 energyStorage.getEnergyStored() >= ENERGY_COST_PER_HARVEST) {
 
             BlockPos checkPos = scanIterator.next();
-            BlockState state = serverLevel.getBlockState(checkPos);
+            var state = serverLevel.getBlockState(checkPos);
 
-            if (state.is(BlockTags.LEAVES) || state.is(BlockTags.CROPS)) {
-                oxygenTank.fill(new FluidStack(oxygenFluid, OXYGEN_PER_PLANT), IFluidHandler.FluidAction.EXECUTE);
+            if (state.is(net.minecraft.tags.BlockTags.LEAVES) || state.is(net.minecraft.tags.BlockTags.CROPS)) {
+                oxygenTank.fill(new net.minecraftforge.fluids.FluidStack(oxygenFluid, OXYGEN_PER_PLANT), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
                 energyStorage.extractEnergy(ENERGY_COST_PER_HARVEST, false);
                 oxygenHarvested += OXYGEN_PER_PLANT;
             }
@@ -164,8 +153,8 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
         }
 
         if (!scanIterator.hasNext()) {
-            isInHarvestCycle = false;
             scanIterator = null;
+            isInHarvestCycle = false;
         }
 
         oxygenLastHarvested = oxygenHarvested;
@@ -177,23 +166,23 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.FLUID_HANDLER) return tankLazyOptional.cast();
-        if (cap == ForgeCapabilities.ENERGY) return energyLazyOptional.cast();
+        if (cap == ForgeCapabilities.FLUID_HANDLER) return tankOptional.cast();
+        if (cap == ForgeCapabilities.ENERGY) return energyOptional.cast();
         return super.getCapability(cap, side);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        tankLazyOptional.invalidate();
-        energyLazyOptional.invalidate();
+        tankOptional.invalidate();
+        energyOptional.invalidate();
     }
 
     @Override
     public void reviveCaps() {
         super.reviveCaps();
-        tankLazyOptional = LazyOptional.of(() -> oxygenTank);
-        energyLazyOptional = LazyOptional.of(() -> energyStorage);
+        tankOptional = LazyOptional.of(() -> oxygenTank);
+        energyOptional = LazyOptional.of(() -> energyStorage);
     }
 
     @Override
@@ -212,32 +201,7 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
         if (tag.contains("assignedVentPos")) assignedVentPos = BlockPos.of(tag.getLong("assignedVentPos"));
     }
 
-    @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag tag = super.getUpdateTag();
-        tag.put("oxygenTank", oxygenTank.writeToNBT(new CompoundTag()));
-        tag.putInt("energy", energyStorage.getEnergyStored());
-        return tag;
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        super.handleUpdateTag(tag);
-        oxygenTank.readFromNBT(tag.getCompound("oxygenTank"));
-        energyStorage.receiveEnergy(tag.getInt("energy"), false);
-    }
-
-    @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        handleUpdateTag(pkt.getTag());
-    }
-
-    public float getOxygenHarvesting() {
+    public float getOxygenHarvested() {
         return oxygenLastHarvested;
     }
 

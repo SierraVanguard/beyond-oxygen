@@ -29,15 +29,20 @@ public class InvalidateHermeticAreasPacket {
     }
 
     public static void handle(InvalidateHermeticAreasPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            if (msg.clearAll) {
-                HermeticAreaClientManager.clear();
-                System.out.println("[Beyond Oxygen] Cleared all client hermetic areas.");
-            } else {
-                HermeticAreaClientManager.getBlocksForShip(msg.shipId).clear();
-                System.out.println("[Beyond Oxygen] Cleared client hermetic areas for ship " + msg.shipId);
+        NetworkEvent.Context context = ctx.get();
+        context.enqueueWork(() -> {
+
+            if (context.getDirection().getReceptionSide().isClient()) {
+                if (msg.clearAll) {
+                    HermeticAreaClientManager.clear();
+                    System.out.println("[Beyond Oxygen] Cleared all client hermetic areas.");
+                } else {
+                    HermeticAreaClientManager.clearShip(msg.shipId);
+                    System.out.println("[Beyond Oxygen] Cleared client hermetic areas for ship " + msg.shipId);
+                }
             }
         });
-        ctx.get().setPacketHandled(true);
+        context.setPacketHandled(true);
     }
 }
+

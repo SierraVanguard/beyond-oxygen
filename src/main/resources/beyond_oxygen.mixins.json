@@ -5,13 +5,11 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "beyond_oxygen.refmap.json",
   "mixins": [
-    "EntityServerMixin",
     "BOServerPlayerMixin",
     "EntityMixin"
   ],
   "client": [
-    "CameraMixin",
-    "EntityClientMixin"
+    "CameraMixin"
   ],
   "injectors": {
     "defaultRequire": 1

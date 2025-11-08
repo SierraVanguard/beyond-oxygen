@@ -4,7 +4,6 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
-import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
@@ -27,7 +26,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,19 +36,20 @@ import java.util.Set;
 public class VentBlockEntity extends BlockEntity {
 
     private int leftTicks = 0;
-    private int checkTick = 0;
     public int temperatureRegulatorCooldown = 0;
-    public final HermeticArea hermeticArea = new HermeticArea();
     public boolean temperatureRegulatorApplied = false;
 
-    public VentBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
-        super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), p_155229_, p_155230_);
+    private HermeticArea hermeticArea;
+    private final Set<Fluid> acceptedFluids = new HashSet<>();
+    private final FluidTank tank = new FluidTank(1000, fluidStack -> acceptedFluids.contains(fluidStack.getFluid()));
+    private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(() -> tank);
+
+    public VentBlockEntity(BlockPos pos, BlockState state) {
+        super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), pos, state);
         loadAcceptedFluidsFromConfig(BOConfig.oxygenFluids);
     }
 
-    private final Set<Fluid> acceptedFluids = new HashSet<>();
-
-    public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
+    private void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
         for (ResourceLocation fluidId : fluidIds) {
             Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
             if (fluid != null) {
@@ -59,10 +58,6 @@ public class VentBlockEntity extends BlockEntity {
         }
     }
 
-    private final FluidTank tank = new FluidTank(1000, fluidStack -> acceptedFluids.contains(fluidStack.getFluid()));
-
-    private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(() -> tank);
-
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.FLUID_HANDLER) return tankLazyOptional.cast();
@@ -70,61 +65,69 @@ public class VentBlockEntity extends BlockEntity {
     }
 
     private boolean consumeOxygen(int amount) {
-        int total = tank.getFluidAmount() * BOConfig.oxygenConsumption + leftTicks;
-        if (total < amount) return false;
-        total = total - amount;
-        tank.getFluid().setAmount(total / 10);
-        leftTicks = total % 10;
+        int current = tank.getFluidAmount();
+        if (current < amount) return false;
+        tank.drain(amount, net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
         return true;
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity t) {
+    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (level.isClientSide) return;
-        VentBlockEntity entity = (VentBlockEntity) t;
-        if (entity.temperatureRegulatorCooldown > 0) {
-            entity.temperatureRegulatorCooldown--;
+        Direction facing = state.getValue(VentBlock.FACING);
+        VentBlockEntity vent = (VentBlockEntity) blockEntity;
+        ServerLevel serverLevel = (ServerLevel) level;
+        if (vent.hermeticArea == null) {
+            vent.hermeticArea = new HermeticArea(serverLevel, pos);
+            vent.hermeticArea.markDirty();
         }
-        Direction dir = state.getValue(VentBlock.FACING);
-
-        if (entity.checkTick <= 0) {
-            if (level instanceof ServerLevel serverLevel) {
-                long shipId = -1L;
-                if (BeyondOxygen.ModsLoaded.VS) {
-                    var ship = com.sierravanguard.beyond_oxygen.utils.VSCompat.getShipAtPosition(serverLevel, pos);
-                    if (ship != null) shipId = ship.getId();
-                }
-            }
-
-            entity.hermeticArea.bakeArea((ServerLevel) level, pos.offset(dir.getNormal()), dir.getOpposite());
-            entity.checkTick = 60;
+        if (vent.temperatureRegulatorCooldown > 0) {
+            vent.temperatureRegulatorCooldown--;
         }
-
-        entity.checkTick--;
-
-        if (entity.tank.isEmpty()) return;
-
-        List<ServerPlayer> players = ((ServerLevel) level).players();
-        int oxygenNeeded = entity.hermeticArea.getArea().size() / BOConfig.ventConsumption;
-
-        // Adjust oxygen needed if thermal regulator is applied (example: halve oxygen consumption)
-        if (entity.temperatureRegulatorApplied) {
-            oxygenNeeded /= 2;
+        if (vent.hermeticArea.isDirty()) {
+            vent.hermeticArea.bake(pos.relative(facing));
         }
+        for (ServerPlayer player : serverLevel.players()) {
+            boolean isInside = vent.isPlayerInsideHermeticArea(player);
+            VSCompat.applySealedEffects(player, pos, vent.hermeticArea,vent);
+            if (isInside && !vent.tank.isEmpty()) {
+                int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / BOConfig.ventConsumption);
+                if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
 
-        if (entity.hermeticArea.isHermetic() && entity.consumeOxygen(oxygenNeeded)) {
-            for (ServerPlayer player : players) {
-                boolean vsLogicSuccess = BeyondOxygen.ModsLoaded.VS && VSCompat.applySealedEffects(player, pos, entity.hermeticArea, entity);
-                if (!vsLogicSuccess) {
-                    Vec3 eyePos = player.getEyePosition();
-                    BlockPos eyeBlockPos = new BlockPos((int) Math.floor(eyePos.x), (int) Math.floor(eyePos.y), (int) Math.floor(eyePos.z));
-                    if (entity.hermeticArea.getArea().contains(eyeBlockPos)) {
-                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
-                        if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
+                if (vent.consumeOxygen(oxygenNeeded)) {
+                    player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+                    if (vent.temperatureRegulatorApplied) {
+                        CompatLoader.setComfortableTemperature(player);
                     }
                 }
             }
         }
     }
+
+
+    private boolean isPlayerInsideHermeticArea(ServerPlayer player) {
+        Vec3 eyePos = player.getEyePosition();
+        BlockPos eyeBlock;
+        if (BeyondOxygen.ModsLoaded.VS && level instanceof ServerLevel serverLevel) {
+            var ship = VSCompat.getShipAtPosition(serverLevel, this.worldPosition);
+            if (ship != null) {
+                var shipEye = ship.getTransform().getWorldToShip().transformPosition(
+                        new org.joml.Vector3d(eyePos.x, eyePos.y, eyePos.z)
+                );
+                eyeBlock = new BlockPos(
+                        (int) Math.floor(shipEye.x),
+                        (int) Math.floor(shipEye.y),
+                        (int) Math.floor(shipEye.z)
+                );
+            } else {
+                eyeBlock = BlockPos.containing(eyePos);
+            }
+        } else {
+            eyeBlock = BlockPos.containing(eyePos);
+        }
+
+        return hermeticArea != null && hermeticArea.isHermetic() && hermeticArea.contains(eyeBlock);
+    }
+
 
     @Override
     public void invalidateCaps() {
@@ -142,7 +145,7 @@ public class VentBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.put("tank", tank.writeToNBT(new CompoundTag()));
-        tag.putInt("ticks", leftTicks);
+        tag.putInt("leftTicks", leftTicks);
         tag.putBoolean("temperatureRegulatorApplied", temperatureRegulatorApplied);
     }
 
@@ -150,46 +153,54 @@ public class VentBlockEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
         tank.readFromNBT(tag.getCompound("tank"));
-        leftTicks = tag.getInt("ticks");
-        if (tag.contains("temperatureRegulatorApplied")) {
-            temperatureRegulatorApplied = tag.getBoolean("temperatureRegulatorApplied");
-        }
+        leftTicks = tag.getInt("leftTicks");
+        temperatureRegulatorApplied = tag.getBoolean("temperatureRegulatorApplied");
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
-            VentTracker.registerVent(serverLevel, this.getBlockPos());
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+            VentTracker.registerVent(serverLevel, worldPosition);
+            if (hermeticArea == null) {
+                hermeticArea = new HermeticArea(serverLevel, worldPosition);
+            }
+            hermeticArea.markDirty();
+            hermeticArea.bake(worldPosition);
+            for (ServerPlayer player : serverLevel.players()) {
+                VSCompat.applySealedEffects(player, worldPosition, hermeticArea, this);
+            }
+
         }
     }
+
 
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
-        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
-            VentTracker.unregisterVent(serverLevel, this.getBlockPos());
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+            VentTracker.unregisterVent(serverLevel, worldPosition);
         }
     }
 
     @Override
     public void setRemoved() {
         super.setRemoved();
-        if (!this.level.isClientSide && this.level instanceof ServerLevel serverLevel) {
-            VentTracker.unregisterVent(serverLevel, this.getBlockPos());
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+            VentTracker.unregisterVent(serverLevel, worldPosition);
+            hermeticArea.clear();
         }
     }
 
     public float getCurrentOxygenRate() {
-        int areaSize = hermeticArea.getArea().size();
-        return areaSize / (float) BOConfig.ventConsumption;
+        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOConfig.ventConsumption;
     }
-    public boolean GetRegulator(){
-        return temperatureRegulatorApplied;
-    }
+
     public boolean isBlockInsideSealedArea(BlockPos pos) {
-        return hermeticArea.isHermetic() && hermeticArea.getArea().contains(pos);
+        return hermeticArea != null && hermeticArea.isHermetic() && hermeticArea.contains(pos);
     }
 
-
+    public HermeticArea getHermeticArea() {
+        return this.hermeticArea;
+    }
 }

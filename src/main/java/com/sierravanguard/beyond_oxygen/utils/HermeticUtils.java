@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.blocks.OxygenHarvesterBlock;
+import com.sierravanguard.beyond_oxygen.blocks.VentBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -14,6 +15,11 @@ public class HermeticUtils {
         if (state.getBlock() instanceof OxygenHarvesterBlock) {
             return false;
         }
+        if (state.getBlock() instanceof VentBlock ventBlock) {
+            Direction facing = state.getValue(VentBlock.FACING);
+            return dir != facing;
+        }
+
         return state.isFaceSturdy(level, pos, dir);
     }
     public static boolean canFlowTrough(ServerLevel level, BlockPos pos, Direction from, Direction to){

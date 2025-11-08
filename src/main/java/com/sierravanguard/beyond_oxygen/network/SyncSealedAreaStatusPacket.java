@@ -30,12 +30,10 @@ public class SyncSealedAreaStatusPacket {
 
     public static void handle(SyncSealedAreaStatusPacket msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            Player localPlayer = Minecraft.getInstance().player;
-            if (localPlayer != null && localPlayer.getUUID().equals(msg.playerId)) {
-                ClientSealedAreaState.setSealedStatus(msg.playerId, msg.isInSealedArea);
-            }
+            ClientSealedAreaState.setSealedStatus(msg.playerId, msg.isInSealedArea);
         });
         ctx.get().setPacketHandled(true);
     }
+
 
 }
