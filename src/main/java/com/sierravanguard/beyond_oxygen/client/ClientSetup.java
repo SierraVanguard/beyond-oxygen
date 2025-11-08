@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.client;
 
+import com.sierravanguard.beyond_oxygen.client.renderer.RenderStateShardReflection;
 import com.sierravanguard.beyond_oxygen.client.renderer.armor.SpacesuitHelmetLayer;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOBlocks;
@@ -31,6 +32,7 @@ public class ClientSetup {
                     BubbleGeneratorBlockEntityRenderer::new
             );
         });
+        event.enqueueWork(RenderStateShardReflection::initializeSafe);
         ItemBlockRenderTypes.setRenderLayer(BOBlocks.CRYO_BED.get(), RenderType.translucent());
         MenuScreens.register(BOMenus.BUBBLE_GENERATOR.get(), BubbleGeneratorScreen::new);
     }

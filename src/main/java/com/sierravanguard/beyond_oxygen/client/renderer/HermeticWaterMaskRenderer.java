@@ -40,10 +40,10 @@ public final class HermeticWaterMaskRenderer {
             false,
             false,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShardReflection.WATER_MASK_SHADER)
-                    .setTextureState(RenderStateShardReflection.NO_TEXTURE)
-                    .setWriteMaskState(RenderStateShardReflection.DEPTH_WRITE)
-                    .setCullState(RenderStateShardReflection.NO_CULL)
+                    .setShaderState(RenderStateShardReflection.waterMaskShader())
+                    .setTextureState(RenderStateShardReflection.noTexture())
+                    .setWriteMaskState(RenderStateShardReflection.depthWrite())
+                    .setCullState(RenderStateShardReflection.noCull())
                     .createCompositeState(false)
     );
 
