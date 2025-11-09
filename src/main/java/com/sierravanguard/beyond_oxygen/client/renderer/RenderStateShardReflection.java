@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen.client.renderer;
 
 import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,23 +11,25 @@ import java.util.Map;
 
 public final class RenderStateShardReflection {
     private static final Logger LOGGER = LoggerFactory.getLogger("BeyondOxygen/RenderStateShardReflection");
-
     private static final Map<String, Object> CACHE = new HashMap<>();
     private static boolean initialized = false;
 
     private RenderStateShardReflection() {} // utility class
+
     public static synchronized void initializeSafe() {
         if (initialized) return;
         try {
+            // Class reference
             Class<RenderStateShard> clazz = RenderStateShard.class;
 
-            cache(clazz, "RENDERTYPE_WATER_MASK_SHADER");
-            cache(clazz, "DEPTH_WRITE");
-            cache(clazz, "NO_TEXTURE");
-            cache(clazz, "NO_CULL");
-            cache(clazz, "LEQUAL_DEPTH_TEST");
-            cache(clazz, "POSITION_COLOR_SHADER");
-            cache(clazz, "COLOR_DEPTH_WRITE");
+            // Map: obfuscated name → readable key
+            cache(clazz, "f_173076_", "RENDERTYPE_WATER_MASK_SHADER"); // water mask
+            cache(clazz, "f_110116_", "DEPTH_WRITE");                  // depth write
+            cache(clazz, "f_110147_", "NO_TEXTURE");                   // no texture
+            cache(clazz, "f_110110_", "NO_CULL");                      // no cull
+            cache(clazz, "f_110113_", "LEQUAL_DEPTH_TEST");            // lequal depth test
+            cache(clazz, "f_173104_", "POSITION_COLOR_SHADER");        // position color shader
+            cache(clazz, "f_110114_", "COLOR_DEPTH_WRITE");            // color depth write
 
             initialized = true;
             LOGGER.debug("RenderStateShardReflection initialized successfully.");
@@ -34,6 +37,7 @@ public final class RenderStateShardReflection {
             LOGGER.warn("RenderStateShardReflection failed during initialization: {}", t.toString());
         }
     }
+
     private static <T> T get(String name, Class<T> type) {
         if (!initialized) initializeSafe();
         Object value = CACHE.get(name);
@@ -42,6 +46,7 @@ public final class RenderStateShardReflection {
         }
         return type.cast(value);
     }
+
     public static RenderStateShard.ShaderStateShard waterMaskShader() {
         return get("RENDERTYPE_WATER_MASK_SHADER", RenderStateShard.ShaderStateShard.class);
     }
@@ -70,16 +75,13 @@ public final class RenderStateShardReflection {
         return get("COLOR_DEPTH_WRITE", RenderStateShard.WriteMaskStateShard.class);
     }
 
-    private static void cache(Class<?> clazz, String name) {
+    private static void cache(Class<?> clazz, String obfName, String readableKey) {
         try {
-            Field f = clazz.getDeclaredField(name);
-            f.setAccessible(true);
+            Field f = ObfuscationReflectionHelper.findField(clazz, obfName);
             Object value = f.get(null);
-            CACHE.put(name, value);
-        } catch (NoSuchFieldException nsf) {
-            LOGGER.warn("RenderStateShard does not define field {}", name);
-        } catch (Throwable t) {
-            LOGGER.warn("Failed to reflect field {}: {}", name, t.toString());
+            CACHE.put(readableKey, value);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to reflect RenderStateShard field {} ({}): {}", readableKey, obfName, e.toString());
         }
     }
 }

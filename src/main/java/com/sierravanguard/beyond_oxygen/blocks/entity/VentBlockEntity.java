@@ -63,7 +63,7 @@ public class VentBlockEntity extends BlockEntity {
         if (cap == ForgeCapabilities.FLUID_HANDLER) return tankLazyOptional.cast();
         return super.getCapability(cap, side);
     }
-
+    //TODO: Fix up vent consumption.
     private boolean consumeOxygen(int amount) {
         int current = tank.getFluidAmount();
         if (current < amount) return false;
