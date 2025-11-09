@@ -13,11 +13,11 @@
       "item": "mekanism:advanced_control_circuit"
     },
     "C": {
-      "item": "mekanism:basic_fluid_tank"
+      "item": "mekanism:rotary_condensentrator"
     }
   },
   "result": {
-    "item": "beyond_oxygen:bubble_generator",
+    "item": "beyond_oxygen:oxygen_harvester",
     "count": 1
   }
 }

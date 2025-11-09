@@ -29,17 +29,16 @@
   "tooltip.beyond_oxygen.oxygen": "Кислород: %s",
   "tooltip.beyond_oxygen.siphon_active": "Откачка активна",
   "tooltip.beyond_oxygen.refilling": "Заправка: %d ед./сек",
-  "tooltip.beyond_oxygen.needs_air": "Требуется дыхательная среда",
+  "tooltip.beyond_oxygen.needs_air": "Внимание! Непригодная атмосфера.",
   "tooltip.beyond_oxygen.full_suit_required": "Требуется полный комплект скафандра!",
   "tooltip.beyond_oxygen.warranty_warning": "Гарантия аннулируется при использовании на планетах уровня 3 и выше",
   "tooltip.beyond_oxygen.decompression_warning": "Способен выдержать декомпрессию. Но только один раз.",
   "tooltip.beyond_oxygen.meteoric_iron_free": "Теперь не содержит метеоритного железа!",
   "tooltip.beyond_oxygen.babys_first_air_tank": "Первый детский баллончик!",
   "message.cryo_bed.unassigned": "Вам больше не назначена криокапсула.",
-  "message.cryobed.assigned": "Криокапсула назначена",
+  "message.cryo_bed.assigned": "Криокапсула назначена",
   "item.beyond_oxygen.thermal_regulator": "Термо-Регулятор",
-  "item.beyond_oxygen.cryo_bed": "Криокапсула",
-  "message.cryo_bed.assigned": "Cryo-bed assigned!",
+  "block.beyond_oxygen.cryo_bed": "Криокапсула",
   "item.beyond_oxygen.cryo_suit_helmet": "Шлем Криокостюма",
   "item.beyond_oxygen.cryo_suit_chestplate": "Нагрудник Криокостюма",
   "item.beyond_oxygen.cryo_suit_leggings": "Штаны Криокостюма",
@@ -49,6 +48,7 @@
   "item.beyond_oxygen.thermal_suit_leggings": "Штаны Термокостюма",
   "item.beyond_oxygen.thermal_suit_boots": "Ботинки Термокостюма",
   "key.beyond_oxygen.toggle_helmet": "Поднять/Опустить Забрало",
-  "key.categories.beyond_oxygen": "Beyond Oxygen"
+  "key.categories.beyond_oxygen": "Beyond Oxygen",
+  "block.beyond_oxygen.oxygen_harvester" : "Сборщик кислорода"
 
 }

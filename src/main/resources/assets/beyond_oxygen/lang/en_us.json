@@ -38,8 +38,7 @@
   "message.cryo_bed.unassigned": "Cryo-bed assignment removed.",
   "message.cryo_bed.assigned" : "Cryo-bed assigned!",
   "item.beyond_oxygen.thermal_regulator": "Thermal Regulator",
-  "item.beyond_oxygen.cryo_bed": "Cryo Bed",
-  "message.cryobed.assigned": "Cryo-Bed Assigned",
+  "block.beyond_oxygen.cryo_bed": "Cryo Bed",
   "item.beyond_oxygen.cryo_suit_helmet": "Cryo Suit Helmet",
   "item.beyond_oxygen.cryo_suit_chestplate": "Cryo Suit Chestplate",
   "item.beyond_oxygen.cryo_suit_leggings": "Cryo Suit Leggings",
@@ -49,5 +48,6 @@
   "item.beyond_oxygen.thermal_suit_leggings": "Thermal Suit Leggings",
   "item.beyond_oxygen.thermal_suit_boots": "Thermal Suit Boots",
   "key.beyond_oxygen.toggle_helmet": "Toggle Helmet",
-  "key.categories.beyond_oxygen": "Beyond Oxygen"
+  "key.categories.beyond_oxygen": "Beyond Oxygen",
+  "block.beyond_oxygen.oxygen_harvester" : "Oxygen Harvester"
 }
