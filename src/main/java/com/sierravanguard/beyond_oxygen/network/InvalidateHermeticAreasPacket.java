@@ -6,21 +6,18 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-/**
- * Packet to clear or invalidate cached hermetic areas on the client.
- * Optional: include a specific shipId to only clear that one.
- */
+ 
 public class InvalidateHermeticAreasPacket {
-    private final long shipId;
+    private final long areaId;
     private final boolean clearAll;
 
-    public InvalidateHermeticAreasPacket(long shipId, boolean clearAll) {
-        this.shipId = shipId;
+    public InvalidateHermeticAreasPacket(long areaId, boolean clearAll) {
+        this.areaId = areaId;
         this.clearAll = clearAll;
     }
 
     public static void encode(InvalidateHermeticAreasPacket msg, FriendlyByteBuf buf) {
-        buf.writeLong(msg.shipId);
+        buf.writeLong(msg.areaId);
         buf.writeBoolean(msg.clearAll);
     }
 
@@ -31,18 +28,16 @@ public class InvalidateHermeticAreasPacket {
     public static void handle(InvalidateHermeticAreasPacket msg, Supplier<NetworkEvent.Context> ctx) {
         NetworkEvent.Context context = ctx.get();
         context.enqueueWork(() -> {
-
             if (context.getDirection().getReceptionSide().isClient()) {
                 if (msg.clearAll) {
                     HermeticAreaClientManager.clear();
                     System.out.println("[Beyond Oxygen] Cleared all client hermetic areas.");
                 } else {
-                    HermeticAreaClientManager.clearShip(msg.shipId);
-                    System.out.println("[Beyond Oxygen] Cleared client hermetic areas for ship " + msg.shipId);
+                    HermeticAreaClientManager.clearArea(msg.areaId);
+                    System.out.println("[Beyond Oxygen] Cleared client hermetic area for areaId " + msg.areaId);
                 }
             }
         });
         context.setPacketHandled(true);
     }
 }
-

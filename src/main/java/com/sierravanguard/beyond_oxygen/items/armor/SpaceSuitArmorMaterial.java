@@ -43,7 +43,7 @@ public enum SpaceSuitArmorMaterial implements ArmorMaterial {
         this.repairIngredient = repairIngredient;
     }
 
-    private static final int[] DURABILITY = {13, 15, 16, 11}; // boots, leggings, chestplate, helmet
+    private static final int[] DURABILITY = {13, 15, 16, 11}; 
     private static final int[] DEFENSE = {1, 3, 4, 2};
 
     @Override

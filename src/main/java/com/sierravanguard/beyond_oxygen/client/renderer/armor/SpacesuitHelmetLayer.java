@@ -31,7 +31,7 @@ public class SpacesuitHelmetLayer<T extends LivingEntity> extends RenderLayer<T,
 
         if (!(entity instanceof Player player)) return;
 
-        ItemStack helmet = player.getInventory().armor.get(3); // Helmet slot
+        ItemStack helmet = player.getInventory().armor.get(3);
         if (helmet.isEmpty()) return;
         if (!(helmet.getItem() instanceof SpacesuitArmorItem)) return;
 

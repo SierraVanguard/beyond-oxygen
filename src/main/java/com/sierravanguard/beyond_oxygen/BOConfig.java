@@ -30,7 +30,7 @@ public class BOConfig {
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SPACE_BOOTS = BUILDER.comment("List of item IDs that count as spacesuit boots").defineListAllowEmpty("space_boots", List.of("beyond_oxygen:spacesuit_boots", "beyond_oxygen:cryo_suit_boots", "beyond_oxygen:thermal_suit_boots"), s -> s instanceof String);
     private static final ForgeConfigSpec.ConfigValue<Integer> BUBBLE_MAX_RADIUS = BUILDER
             .comment("Maximum radius of bubble generators")
-            .defineInRange("bubbleMaxRadius", 5, 5, 20); // Default 5, min 1, max 20
+            .defineInRange("bubbleMaxRadius", 5, 5, 20); 
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
 

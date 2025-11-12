@@ -69,7 +69,7 @@ public class BubbleGeneratorBlockEntityRenderer implements net.minecraft.client.
                 RENDER_TYPE
         );
 
-        poseStack.popPose(); // POP LAST
+        poseStack.popPose(); 
     }
 
 

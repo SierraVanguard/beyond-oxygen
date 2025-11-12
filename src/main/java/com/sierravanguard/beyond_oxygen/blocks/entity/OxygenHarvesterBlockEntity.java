@@ -75,7 +75,7 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
         if (level.isClientSide || !(be instanceof OxygenHarvesterBlockEntity harvester)) return;
         ServerLevel serverLevel = (ServerLevel) level;
 
-        // Reassign vent if cooldown expired or area invalid
+ 
         if (harvester.assignmentCooldown-- <= 0 ||
                 harvester.cachedSealedArea == null ||
                 !harvester.cachedSealedArea.isHermetic() ||

@@ -15,7 +15,6 @@ public class OxygenHelper {
         if (!(player.level() instanceof ServerLevel serverLevel)) return true;
         if (player.isUnderWater()) return false;
         if (!BOConfig.unbreathableDimensions.contains(serverLevel.dimension().location())) return true;
-
         BlockPos pos = player.blockPosition();
         return isBlockPosInsideBreathableArea(serverLevel, pos);
     }

@@ -14,22 +14,19 @@ public final class RenderStateShardReflection {
     private static final Map<String, Object> CACHE = new HashMap<>();
     private static boolean initialized = false;
 
-    private RenderStateShardReflection() {} // utility class
+    private RenderStateShardReflection() {}
 
     public static synchronized void initializeSafe() {
         if (initialized) return;
         try {
-            // Class reference
             Class<RenderStateShard> clazz = RenderStateShard.class;
-
-            // Map: obfuscated name → readable key
-            cache(clazz, "f_173076_", "RENDERTYPE_WATER_MASK_SHADER"); // water mask
-            cache(clazz, "f_110116_", "DEPTH_WRITE");                  // depth write
-            cache(clazz, "f_110147_", "NO_TEXTURE");                   // no texture
-            cache(clazz, "f_110110_", "NO_CULL");                      // no cull
-            cache(clazz, "f_110113_", "LEQUAL_DEPTH_TEST");            // lequal depth test
-            cache(clazz, "f_173104_", "POSITION_COLOR_SHADER");        // position color shader
-            cache(clazz, "f_110114_", "COLOR_DEPTH_WRITE");            // color depth write
+            cache(clazz, "f_173076_", "RENDERTYPE_WATER_MASK_SHADER"); 
+            cache(clazz, "f_110116_", "DEPTH_WRITE"); 
+            cache(clazz, "f_110147_", "NO_TEXTURE"); 
+            cache(clazz, "f_110110_", "NO_CULL"); 
+            cache(clazz, "f_110113_", "LEQUAL_DEPTH_TEST"); 
+            cache(clazz, "f_173104_", "POSITION_COLOR_SHADER"); 
+            cache(clazz, "f_110114_", "COLOR_DEPTH_WRITE"); 
 
             initialized = true;
             LOGGER.debug("RenderStateShardReflection initialized successfully.");

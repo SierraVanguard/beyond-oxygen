@@ -16,9 +16,9 @@
   "item.beyond_oxygen.canned_potatoes": "Консервированная Картошка",
   "item.beyond_oxygen.canned_apple": "Консервированное Яблоко",
   "item.beyond_oxygen.canned_beef": "Говяжья Тушёнка",
-  "item.beyond_oxygen.canned_pork" : "Свиная Тушёнка",
+  "item.beyond_oxygen.canned_pork": "Свиная Тушёнка",
   "message.vent.oxygen_flow": "Потребление кислорода: %s мБ/т",
-  "message.vent.not_sealed": "Зона не герметична!",
+  "message.vent.not_sealed": "Отсек не герметичен!",
   "message.helmet.status": "Шлем: %s",
   "message.helmet.closed": "Закрыт",
   "message.helmet.open": "Открыт",
@@ -29,7 +29,7 @@
   "tooltip.beyond_oxygen.oxygen": "Кислород: %s",
   "tooltip.beyond_oxygen.siphon_active": "Откачка активна",
   "tooltip.beyond_oxygen.refilling": "Заправка: %d ед./сек",
-  "tooltip.beyond_oxygen.needs_air": "Внимание! Непригодная атмосфера.",
+  "tooltip.beyond_oxygen.needs_air": "Внимание! Низкое содержание кислорода. Непригодная для дыхания атмосфера",
   "tooltip.beyond_oxygen.full_suit_required": "Требуется полный комплект скафандра!",
   "tooltip.beyond_oxygen.warranty_warning": "Гарантия аннулируется при использовании на планетах уровня 3 и выше",
   "tooltip.beyond_oxygen.decompression_warning": "Способен выдержать декомпрессию. Но только один раз.",
@@ -49,6 +49,7 @@
   "item.beyond_oxygen.thermal_suit_boots": "Ботинки Термокостюма",
   "key.beyond_oxygen.toggle_helmet": "Поднять/Опустить Забрало",
   "key.categories.beyond_oxygen": "Beyond Oxygen",
-  "block.beyond_oxygen.oxygen_harvester" : "Сборщик кислорода"
-
+  "block.beyond_oxygen.oxygen_harvester": "Сборщик кислорода",
+  "message.cryo_bed.reassigned": "Криокапсула переназначена.",
+  "message.cryo_bed.already_assigned": "Вам уже назначена эта криокапсула!"
 }

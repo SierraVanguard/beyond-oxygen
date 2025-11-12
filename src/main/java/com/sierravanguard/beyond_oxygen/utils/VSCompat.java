@@ -16,25 +16,24 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.QueryableShipData;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.apigame.VSCore;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.api.ships.Ship;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class VSCompat {
-    public static final Map<Player, Set<HermeticArea>> playersInSealedAreas = new HashMap<>();
+    public static final Map<Player, Set<HermeticArea>> playersInSealedAreas = new ConcurrentHashMap<>();
 
     public static boolean applySealedEffects(ServerPlayer player, BlockPos pos, HermeticArea hermeticArea, VentBlockEntity entity) {
         ServerShip ship = (ServerShip) VSGameUtilsKt.getShipManagingPos(player.level(), pos);
         if (ship == null) return false;
-
         Vec3 eyePosition = player.getEyePosition();
         Vector3d shipPos = ship.getTransform().getWorldToShip().transformPosition(
                 new Vector3d(eyePosition.x, eyePosition.y, eyePosition.z)
@@ -44,24 +43,31 @@ public class VSCompat {
                 (int) Math.floor(shipPos.y),
                 (int) Math.floor(shipPos.z)
         );
-
+        System.out.println("[VSCompat] Player " + player.getName().getString()
+                + " inside area: " + (hermeticArea != null && hermeticArea.contains(shipBlockPos))
+                + ", hasAir: " + (hermeticArea != null && hermeticArea.hasAir()));
         if (hermeticArea.isHermetic() && hermeticArea.contains(shipBlockPos)) {
-            player.addEffect(new MobEffectInstance(
-                    BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false
-            ));
-            player.setAirSupply(player.getMaxAirSupply());
-            if (entity.temperatureRegulatorApplied) CompatLoader.setComfortableTemperature(player);
-
             addPlayerToHermeticArea(player, hermeticArea);
+            if (hermeticArea.hasAir()) {
+                player.addEffect(new MobEffectInstance(
+                        BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false
+                ));
+                player.setAirSupply(player.getMaxAirSupply());
+                if (entity != null){
+                    if (entity.temperatureRegulatorApplied) {
+                        CompatLoader.setComfortableTemperature(player);
+                    }
+                }
+            }
         } else {
             removePlayerFromHermeticArea(player, hermeticArea);
         }
-
         return false;
     }
 
+
     private static void addPlayerToHermeticArea(ServerPlayer player, HermeticArea area) {
-        Set<HermeticArea> areas = playersInSealedAreas.computeIfAbsent(player, k -> new HashSet<>());
+        Set<HermeticArea> areas = playersInSealedAreas.computeIfAbsent(player, k -> ConcurrentHashMap.newKeySet());
         boolean wasSealed = !areas.isEmpty();
         areas.add(area);
         if (!wasSealed) {
@@ -69,12 +75,12 @@ public class VSCompat {
         }
     }
 
-    private static void removePlayerFromHermeticArea(ServerPlayer player, HermeticArea area) {
+    static void removePlayerFromHermeticArea(ServerPlayer player, HermeticArea area) {
         Set<HermeticArea> areas = playersInSealedAreas.get(player);
         if (areas != null) {
             areas.remove(area);
             if (areas.isEmpty()) {
-                playersInSealedAreas.remove(player);
+                playersInSealedAreas.remove(player, areas);
                 NetworkHandler.sendSealedAreaStatusToClient(player, false);
             }
         }
@@ -82,13 +88,12 @@ public class VSCompat {
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-
-        for (Player player : playersInSealedAreas.keySet()) {
-            NetworkHandler.sendSealedAreaStatusToClient((ServerPlayer) player, true);
+        for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
+            Set<HermeticArea> areas = playersInSealedAreas.get(player);
+            boolean sealed = areas != null && !areas.isEmpty();
+            NetworkHandler.sendSealedAreaStatusToClient(player, sealed);
         }
     }
-
     public static boolean applyBubbleEffects(ServerPlayer player, BlockPos origin, float radius, BubbleGeneratorBlockEntity entity) {
         Level level = player.level();
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
@@ -114,8 +119,8 @@ public class VSCompat {
     }
 
     private static void removeAllHermeticAreasForPlayer(ServerPlayer player) {
-        if (playersInSealedAreas.containsKey(player)) {
-            playersInSealedAreas.remove(player);
+        Set<HermeticArea> areas = playersInSealedAreas.remove(player);
+        if (areas != null) {
             NetworkHandler.sendSealedAreaStatusToClient(player, false);
         }
     }
@@ -148,4 +153,26 @@ public class VSCompat {
         }
         return null;
     }
+    public static boolean isPlayerInHermeticArea(ServerPlayer player, HermeticArea area) {
+        if (player == null || area == null) return false;
+
+        Level level = player.level();
+        Vec3 eyePos = player.getEyePosition();
+        ServerShip areaShip = getShipById(area.getLevel(), area.getShipId());
+        if (areaShip != null) {
+            Vector3d shipLocal = areaShip.getTransform().getWorldToShip().transformPosition(
+                    new Vector3d(eyePos.x, eyePos.y, eyePos.z)
+            );
+            BlockPos localPos = new BlockPos(
+                    (int) Math.floor(shipLocal.x),
+                    (int) Math.floor(shipLocal.y),
+                    (int) Math.floor(shipLocal.z)
+            );
+            return area.contains(localPos);
+        } else {
+            BlockPos worldPos = new BlockPos((int) eyePos.x, (int) eyePos.y, (int) eyePos.z);
+            return area.contains(worldPos);
+        }
+    }
+
 }

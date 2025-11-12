@@ -49,5 +49,7 @@
   "item.beyond_oxygen.thermal_suit_boots": "Thermal Suit Boots",
   "key.beyond_oxygen.toggle_helmet": "Toggle Helmet",
   "key.categories.beyond_oxygen": "Beyond Oxygen",
-  "block.beyond_oxygen.oxygen_harvester" : "Oxygen Harvester"
+  "block.beyond_oxygen.oxygen_harvester" : "Oxygen Harvester",
+  "message.cryo_bed.reassigned": "Cryo Bed reassigned",
+  "message.cryo_bed.already_assigned": "This is already your assigned Cryo Bed"
 }

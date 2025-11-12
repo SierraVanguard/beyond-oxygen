@@ -52,7 +52,7 @@ public class ColdSweatCompat
         @Override
         public Function<Double, Double> calculate(LivingEntity entity, Trait trait)
         {
-            return currentTemp -> currentTemp + (1.0 - currentTemp); // move halfway to 1.0
+            return currentTemp -> currentTemp + (1.0 - currentTemp); 
         }
     }
 }

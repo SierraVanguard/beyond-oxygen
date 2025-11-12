@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,6 +32,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class CryoBedBlock extends Block implements EntityBlock {
     public static final VoxelShape SHAPE = Block.box(0, 1, 0, 15, 16, 15);
@@ -114,6 +118,7 @@ public class CryoBedBlock extends Block implements EntityBlock {
                 if (blockEntity instanceof CryoBedBlockEntity) {
                     dropResources(state, level, dropPos, blockEntity);
                     CryoBedManager.removeCryoBed(level.dimension(), dropPos);
+                    ((CryoBedBlockEntity) blockEntity).clearOwner();
                     level.removeBlockEntity(dropPos);
                 }
             }
@@ -122,8 +127,6 @@ public class CryoBedBlock extends Block implements EntityBlock {
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
-
-
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide) {
@@ -131,14 +134,28 @@ public class CryoBedBlock extends Block implements EntityBlock {
             BlockEntity blockEntity = level.getBlockEntity(basePos);
 
             if (blockEntity instanceof CryoBedBlockEntity cryoBed) {
-                player.displayClientMessage(Component.translatable("message.cryo_bed.assigned"), true);
-                cryoBed.updatePlayerCryoBed(player);
+                UUID playerUUID = player.getUUID();
+                if (CryoBedManager.isAssignedCryoBed(playerUUID, level.dimension(), basePos)) {
+                    player.displayClientMessage(Component.translatable("message.cryo_bed.already_assigned"), true);
+                } else {
+                    Optional<CryoBedManager.CryoBedReference> currentBed = CryoBedManager.getAssignedCryoBed(playerUUID);
+                    if (currentBed.isPresent()) {
+                        player.displayClientMessage(Component.translatable("message.cryo_bed.reassigned"), true);
+                    } else {
+                        player.displayClientMessage(Component.translatable("message.cryo_bed.assigned"), true);
+                    }
+
+                    cryoBed.updatePlayerCryoBed(player);
+                    if (player instanceof ServerPlayer) {
+                        ((ServerPlayer) player).setRespawnPosition(level.dimension(), basePos, 0.0f, true, false);
+                    }
+                }
                 return InteractionResult.SUCCESS;
             }
         }
-
         return InteractionResult.SUCCESS;
     }
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;

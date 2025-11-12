@@ -20,7 +20,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
     private static final int GUI_WIDTH = 176;
     private static final int GUI_HEIGHT = 166;
 
-    // Gauge
+ 
     private static final int GAUGE_X = 30;
     private static final int GAUGE_Y = 20;
     private static final int GAUGE_SIZE = 50;
@@ -32,7 +32,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
     private static final int NEEDLE_WIDTH = 8;
     private static final int NEEDLE_HEIGHT = 20;
 
-    // Power Bar
+ 
     private static final int POWER_BAR_X = 151;
     private static final int POWER_BAR_Y = 20;
     private static final int POWER_BAR_WIDTH = 16;
@@ -43,7 +43,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
     private static final int POWER_BAR_FILL_U = 140;
     private static final int POWER_BAR_FILL_V = 170;
 
-    // Heater slot + Buttons (texture coordinates fixed!)
+ 
     private static final int SLOT_X = 10;
     private static final int SLOT_Y = 80;
     private static final int SLOT_SIZE = 19;
@@ -63,7 +63,7 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
     private static final int BUTTON_MINUS_TEX_U = 38;
     private static final int BUTTON_MINUS_TEX_V = 220;
 
-    // Status screen (CRT)
+ 
     private static final int STATUS_X = 100;
     private static final int STATUS_Y = 80;
     private static final int STATUS_WIDTH = 70;

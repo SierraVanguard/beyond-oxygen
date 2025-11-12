@@ -22,7 +22,7 @@ public class BOCreativeTabs {
                     })
                     .displayItems((params, output) -> {
                         BOItems.ITEMS.getEntries().forEach(item -> {
-                            if (item != BOItems.TAB_ICON) { // Exclude the icon from the tab
+                            if (item != BOItems.TAB_ICON) {
                                 output.accept(item.get());
                             }
                         });

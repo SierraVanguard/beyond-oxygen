@@ -30,7 +30,7 @@ public class TextureButton extends Button {
     public void tick() {
         if (pressTicks > 0) pressTicks--;
     }
-    //TODO: Figure out ticking the button, so it doesn't mess up when rendering.
+ 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);

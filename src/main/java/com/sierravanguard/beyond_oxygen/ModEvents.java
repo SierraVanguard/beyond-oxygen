@@ -21,6 +21,7 @@ import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -122,6 +123,14 @@ public class ModEvents {
         ServerLevel level = (ServerLevel) event.getLevel();
         BlockPos pos = event.getPos();
         HermeticAreaServerManager.onBlockChanged(level, pos);
+    }
+    @SubscribeEvent
+    public static void onWorldLoad(LevelEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
+ 
+            HermeticAreaData.get(serverLevel);
+            System.out.printf("[DEBUG] Preloaded HermeticAreaData for %s\n", serverLevel.dimension().location());
+        }
     }
 
 

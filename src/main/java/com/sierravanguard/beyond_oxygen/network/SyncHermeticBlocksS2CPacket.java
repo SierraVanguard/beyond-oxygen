@@ -11,16 +11,21 @@ import java.util.function.Supplier;
 
 public class SyncHermeticBlocksS2CPacket {
 
-    private final long shipId; // use -1 for world-space blocks
+    private final long areaId;
+    private final Long shipId; 
     private final Set<Vec3> blocks;
 
-    public SyncHermeticBlocksS2CPacket(long shipId, Set<Vec3> blocks) {
-        this.shipId = shipId;
+    public SyncHermeticBlocksS2CPacket(long areaId, Set<Vec3> blocks, Long shipId) {
+        this.areaId = areaId;
         this.blocks = blocks;
+        this.shipId = shipId;
     }
 
     public static void encode(SyncHermeticBlocksS2CPacket pkt, FriendlyByteBuf buf) {
-        buf.writeLong(pkt.shipId);
+        buf.writeLong(pkt.areaId);
+        buf.writeBoolean(pkt.shipId != null);
+        if (pkt.shipId != null) buf.writeLong(pkt.shipId);
+
         buf.writeInt(pkt.blocks.size());
         for (Vec3 pos : pkt.blocks) {
             buf.writeDouble(pos.x);
@@ -30,27 +35,23 @@ public class SyncHermeticBlocksS2CPacket {
     }
 
     public static SyncHermeticBlocksS2CPacket decode(FriendlyByteBuf buf) {
-        long shipId = buf.readLong();
+        long areaId = buf.readLong();
+        Long shipId = buf.readBoolean() ? buf.readLong() : null;
+
         int size = buf.readInt();
         Set<Vec3> positions = new HashSet<>();
         for (int i = 0; i < size; i++) {
             positions.add(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
         }
-        return new SyncHermeticBlocksS2CPacket(shipId, positions);
+
+        return new SyncHermeticBlocksS2CPacket(areaId, positions, shipId);
     }
 
     public static void handle(SyncHermeticBlocksS2CPacket msg, Supplier<NetworkEvent.Context> ctxSupplier) {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
-            if (msg.shipId == -1) {
-                System.out.printf("[SyncHermeticBlocksS2CPacket] Received %d world-space blocks%n", msg.blocks.size());
-                HermeticAreaClientManager.setWorldHermeticBlocks(msg.blocks);
-            } else {
-                System.out.printf("[SyncHermeticBlocksS2CPacket] Received %d blocks for ship %d%n", msg.blocks.size(), msg.shipId);
-                HermeticAreaClientManager.setHermeticBlocksForShip(msg.shipId, msg.blocks);
-            }
+            HermeticAreaClientManager.registerHermeticBlocks(msg.areaId, msg.blocks, msg.shipId);
         });
-
         ctx.setPacketHandled(true);
     }
 }

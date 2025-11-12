@@ -72,18 +72,11 @@ public class NetworkHandler {
                 new SyncSealedAreaStatusPacket(player.getUUID(), isInSealedArea));
     }
 
-    public static void sendHermeticBlocksToPlayersInLevel(ServerLevel level, int shipId, Set<Vec3> blocks) {
-        SyncHermeticBlocksS2CPacket pkt = new SyncHermeticBlocksS2CPacket(shipId, blocks);
-        for (ServerPlayer player : level.players()) {
-            CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), pkt);
-        }
-    }
-
     public static void sendToAllPlayers(Object pkt) {
         CHANNEL.send(PacketDistributor.ALL.noArg(), pkt);
     }
-    public static void sendInvalidateHermeticAreas(long shipId, boolean clearAll) {
-        InvalidateHermeticAreasPacket pkt = new InvalidateHermeticAreasPacket(shipId, clearAll);
+    public static void sendInvalidateHermeticAreas(long areaId, boolean clearAll) {
+        InvalidateHermeticAreasPacket pkt = new InvalidateHermeticAreasPacket(areaId, clearAll);
         CHANNEL.send(PacketDistributor.ALL.noArg(), pkt);
     }
 

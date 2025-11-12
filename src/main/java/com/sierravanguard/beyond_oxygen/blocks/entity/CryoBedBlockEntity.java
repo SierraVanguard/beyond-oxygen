@@ -12,11 +12,12 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class CryoBedBlockEntity extends BlockEntity {
 
-    private UUID ownerUUID = null;  // Nullable owner UUID
+    private UUID ownerUUID = null;
 
     ServerShip cachedShip;
     Vector3d cachedShipLocalPos;
@@ -26,10 +27,19 @@ public class CryoBedBlockEntity extends BlockEntity {
     }
 
     public void setOwnerUUID(UUID uuid) {
+        if (this.ownerUUID != null && !this.ownerUUID.equals(uuid)) {
+            System.out.println("[DEBUG] Cryobed ownership changing from " + this.ownerUUID + " to " + uuid);
+        }
+
         this.ownerUUID = uuid;
         if (level != null && !level.isClientSide && uuid != null) {
-            CryoBedManager.assignCryoBed(uuid, level.dimension(), worldPosition);
+            if (cachedShip != null && cachedShipLocalPos != null) {
+                CryoBedManager.assignCryoBed(uuid, level.dimension(), worldPosition, cachedShip.getId(), cachedShipLocalPos);
+            } else {
+                CryoBedManager.assignCryoBed(uuid, level.dimension(), worldPosition);
+            }
         }
+        setChanged();
     }
 
     public UUID getOwnerUUID() {
@@ -37,7 +47,23 @@ public class CryoBedBlockEntity extends BlockEntity {
     }
 
     public void updatePlayerCryoBed(Player player) {
-        setOwnerUUID(player.getUUID());
+        UUID playerUUID = player.getUUID();
+        Optional<CryoBedManager.CryoBedReference> currentAssignment = CryoBedManager.getAssignedCryoBed(playerUUID);
+        if (currentAssignment.isPresent() && !currentAssignment.get().worldPos().equals(this.worldPosition)) {
+            System.out.println("[DEBUG] Player " + player.getName().getString() + " already has cryobed at " +
+                    currentAssignment.get().worldPos() + ", reassigning to " + this.worldPosition);
+        }
+
+        setOwnerUUID(playerUUID);
+    }
+
+    public void clearOwner() {
+        if (this.ownerUUID != null) {
+            System.out.println("[DEBUG] Clearing owner " + this.ownerUUID + " from cryobed at " + worldPosition);
+            CryoBedManager.removeCryoBed(level.dimension(), worldPosition);
+            this.ownerUUID = null;
+            setChanged();
+        }
     }
 
     @Override
@@ -72,12 +98,16 @@ public class CryoBedBlockEntity extends BlockEntity {
         } else {
             blockEntity.cachedShip = null;
             blockEntity.cachedShipLocalPos = null;
-
             CryoBedManager.updateCryoBedDimension(level, pos, level.dimension(), null);
         }
+
         if (blockEntity.getOwnerUUID() != null) {
-            CryoBedManager.assignCryoBed(blockEntity.getOwnerUUID(), level.dimension(), pos);
+            if (blockEntity.cachedShip != null && blockEntity.cachedShipLocalPos != null) {
+                CryoBedManager.assignCryoBed(blockEntity.getOwnerUUID(), level.dimension(), pos,
+                        blockEntity.cachedShip.getId(), blockEntity.cachedShipLocalPos);
+            } else {
+                CryoBedManager.assignCryoBed(blockEntity.getOwnerUUID(), level.dimension(), pos);
+            }
         }
     }
-
 }

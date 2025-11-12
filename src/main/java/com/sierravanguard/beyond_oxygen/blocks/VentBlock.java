@@ -81,13 +81,12 @@ public class VentBlock extends Block implements EntityBlock {
         boolean isEmptyHand = held.isEmpty();
         boolean isShift = player.isShiftKeyDown();
 
-        // Cooldown guard
         if (vent.temperatureRegulatorCooldown > 0) {
             player.displayClientMessage(Component.literal("Please wait before interacting again."), true);
             return InteractionResult.SUCCESS;
         }
 
-        // Remove thermal regulator
+ 
         if (isShift && isEmptyHand && vent.temperatureRegulatorApplied) {
             vent.temperatureRegulatorApplied = false;
             vent.temperatureRegulatorCooldown = 40;
@@ -111,7 +110,7 @@ public class VentBlock extends Block implements EntityBlock {
             return InteractionResult.SUCCESS;
         }
 
-        // Display vent info
+ 
         if (vent.getHermeticArea() == null) {
             player.displayClientMessage(Component.literal("Vent area not initialized yet."), true);
             return InteractionResult.SUCCESS;
