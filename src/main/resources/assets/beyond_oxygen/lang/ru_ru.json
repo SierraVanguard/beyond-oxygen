@@ -51,5 +51,8 @@
   "key.categories.beyond_oxygen": "Beyond Oxygen",
   "block.beyond_oxygen.oxygen_harvester": "Сборщик кислорода",
   "message.cryo_bed.reassigned": "Криокапсула переназначена.",
-  "message.cryo_bed.already_assigned": "Вам уже назначена эта криокапсула!"
+  "message.cryo_bed.already_assigned": "Вам уже назначена эта криокапсула!",
+  "death.attack.beyond_oxygen.vacuum": "%1$s не перенёс испытание вакуумом",
+  "death.attack.beyond_oxygen.freeze": "%1$s превратился в ледышку",
+  "death.attack.beyond_oxygen.burn": "Ммм... Чуешь? Печёный %1$s рано с утречка!!"
 }

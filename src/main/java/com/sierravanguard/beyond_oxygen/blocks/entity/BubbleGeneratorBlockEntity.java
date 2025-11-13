@@ -50,7 +50,6 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     public boolean temperatureRegulatorApplied = false;
     private final Set<Fluid> acceptedFluids = new HashSet<>();
     public float controlledMaxRadius = BOConfig.bubbleMaxRadius;
-
     public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
         for (ResourceLocation fluidId : fluidIds) {
             Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
@@ -103,7 +102,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
                 if (!success) {
                     Vec3 eyePos = player.getEyePosition();
                     if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2){
-                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.timeToImplode, 0, false, false));
                         if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
                     }
                 }

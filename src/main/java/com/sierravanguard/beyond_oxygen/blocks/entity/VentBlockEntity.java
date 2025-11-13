@@ -40,7 +40,7 @@ public class VentBlockEntity extends BlockEntity {
     public int temperatureRegulatorCooldown = 0;
     public boolean temperatureRegulatorApplied = false;
     private int reattachCooldown = 0;
-
+    int ventConsumption = Math.max(1, BOConfig.VENT_CONSUMPTION.get());
 
 
     private final Set<Fluid> acceptedFluids = new HashSet<>();
@@ -49,7 +49,7 @@ public class VentBlockEntity extends BlockEntity {
 
     public VentBlockEntity(BlockPos pos, BlockState state) {
         super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), pos, state);
-        loadAcceptedFluidsFromConfig(BOConfig.oxygenFluids);
+        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
     }
 
     private void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
@@ -137,7 +137,7 @@ public class VentBlockEntity extends BlockEntity {
 
 
     public float getCurrentOxygenRate() {
-        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOConfig.ventConsumption;
+        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOConfig.VENT_CONSUMPTION.get();
     }
 
     public boolean isBlockInsideSealedArea(BlockPos pos) {
@@ -180,7 +180,7 @@ public class VentBlockEntity extends BlockEntity {
             vent.temperatureRegulatorCooldown--;
         boolean hasAir = false;
         if (vent.hermeticArea.isHermetic()) {
-            int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / BOConfig.ventConsumption);
+            int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() * vent.ventConsumption);
             if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
             hasAir = vent.consumeOxygen(oxygenNeeded);
         }
@@ -191,7 +191,7 @@ public class VentBlockEntity extends BlockEntity {
             VSCompat.applySealedEffects(player, pos, vent.hermeticArea, vent);
 
             if (inside && hasAir) {
-                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.timeToImplode, 0, false, false));
                 if (vent.temperatureRegulatorApplied)
                     ColdSweatCompat.setComfortableTemp(player);
             }

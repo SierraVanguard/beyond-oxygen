@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
+import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.blocks.entity.BubbleGeneratorBlockEntity;
 import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
@@ -30,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class VSCompat {
     public static final Map<Player, Set<HermeticArea>> playersInSealedAreas = new ConcurrentHashMap<>();
-
     public static boolean applySealedEffects(ServerPlayer player, BlockPos pos, HermeticArea hermeticArea, VentBlockEntity entity) {
         ServerShip ship = (ServerShip) VSGameUtilsKt.getShipManagingPos(player.level(), pos);
         if (ship == null) return false;
@@ -50,7 +50,7 @@ public class VSCompat {
             addPlayerToHermeticArea(player, hermeticArea);
             if (hermeticArea.hasAir()) {
                 player.addEffect(new MobEffectInstance(
-                        BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false
+                        BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false
                 ));
                 player.setAirSupply(player.getMaxAirSupply());
                 if (entity != null){
@@ -109,7 +109,7 @@ public class VSCompat {
 
         double distanceSquared = shipEyePos.distanceSquared(shipBubbleCenter);
         if (distanceSquared <= radius * radius * 2) {
-            player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), 5, 0, false, false));
+            player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
             player.setAirSupply(player.getMaxAirSupply());
             if (entity.temperatureRegulatorApplied) CompatLoader.setComfortableTemperature(player);
             return true;
@@ -174,5 +174,13 @@ public class VSCompat {
             return area.contains(worldPos);
         }
     }
+    public static HermeticArea getHermeticAreaContaining(ServerPlayer player) {
+        Set<HermeticArea> areas = playersInSealedAreas.get(player);
+        if (areas == null || areas.isEmpty()) return null;
 
+        for (HermeticArea area : areas) {
+            if (isPlayerInHermeticArea(player, area)) return area;
+        }
+        return null;
+    }
 }

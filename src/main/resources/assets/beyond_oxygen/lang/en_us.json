@@ -51,5 +51,8 @@
   "key.categories.beyond_oxygen": "Beyond Oxygen",
   "block.beyond_oxygen.oxygen_harvester" : "Oxygen Harvester",
   "message.cryo_bed.reassigned": "Cryo Bed reassigned",
-  "message.cryo_bed.already_assigned": "This is already your assigned Cryo Bed"
+  "message.cryo_bed.already_assigned": "This is already your assigned Cryo Bed",
+  "death.attack.beyond_oxygen.vacuum": "%1$s didn't survive the vacuum chamber test",
+  "death.attack.beyond_oxygen.freeze": "%1$s got freeze-dried",
+  "death.attack.beyond_oxygen.burn": "Mmm... Smell that? Nothing like freshly baked %1$s in the morning!"
 }

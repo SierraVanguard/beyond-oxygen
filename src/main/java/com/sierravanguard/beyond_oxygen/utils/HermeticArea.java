@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -22,8 +23,8 @@ import java.util.*;
 
  
 public class HermeticArea {
-    private static final int LIMIT = BOConfig.ventRange;
-
+    private static final int LIMIT = Math.max(2048, BOConfig.VENT_RANGE.get());
+    private boolean hasActiveTemperatureRegulator = false;
     private final ServerLevel level;
     private final long id;
     private long shipId;
@@ -200,6 +201,7 @@ public class HermeticArea {
         }
 
         hermetic = queue.isEmpty();
+        recalcTemperatureRegulator();
         HermeticAreaServerManager.markDirty(level);
         recalcBounds();
         HermeticAreaData data = HermeticAreaData.get(level);
@@ -397,5 +399,21 @@ public class HermeticArea {
     public boolean isDormant() {
         return dormant;
     }
+
+    public boolean hasActiveTemperatureRegulator() {
+        return hasActiveTemperatureRegulator;
+    }
+
+    public void recalcTemperatureRegulator() {
+        hasActiveTemperatureRegulator = false;
+        for (BlockPos ventPos : activeVents) {
+            BlockEntity be = level.getBlockEntity(ventPos);
+            if (be instanceof VentBlockEntity vent && vent.temperatureRegulatorApplied) {
+                hasActiveTemperatureRegulator = true;
+                break;
+            }
+        }
+    }
+
 
 }

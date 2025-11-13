@@ -31,7 +31,7 @@ public class BOItems {
     public static final RegistryObject<Item> TAB_ICON = ITEMS.register("tab_icon",
             () -> new Item(new Item.Properties()) {
                 @Override public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-                    tooltip.add(Component.literal("Not Enough Oxygen").withStyle(ChatFormatting.BLUE));
+                    tooltip.add(Component.literal("Beyond Oxygen").withStyle(ChatFormatting.LIGHT_PURPLE));
                 }});
     public static final RegistryObject<Item> BUBBLE_GENERATOR = ITEMS.register("bubble_generator", () -> new BlockItem(BOBlocks.BUBBLE_GENERATOR.get(), new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_HELMET = ITEMS.register("spacesuit_helmet",

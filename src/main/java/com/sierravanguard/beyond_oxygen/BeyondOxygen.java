@@ -2,6 +2,8 @@ package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.capabilities.*;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
+import com.sierravanguard.beyond_oxygen.items.OxygenTank;
+import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.*;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
@@ -30,6 +32,7 @@ public class BeyondOxygen {
 
     public BeyondOxygen() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
         MinecraftForge.EVENT_BUS.register(VSCompat.class);
         BOBlocks.BLOCKS.register(modEventBus);
         BOBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
@@ -39,7 +42,6 @@ public class BeyondOxygen {
         BOCreativeTabs.TABS.register(modEventBus);
         BOCapabilities.init();
         NetworkHandler.register();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
         CompatLoader.init();
     }
 

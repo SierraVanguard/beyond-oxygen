@@ -196,8 +196,6 @@ dependencies {
     implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
     implementation fg.deobf("curse.maven:mekanism-268560:6552911")
 
-    implementation fg.deobf("curse.maven:cold-sweat-506194:7097419")
-
     implementation fg.deobf("curse.maven:ad-astra-635042:6262032")
     implementation fg.deobf("curse.maven:botarium-704113:5486070")
     implementation fg.deobf("curse.maven:resourceful-config-714059:6231176")
