@@ -27,50 +27,36 @@ public class OxygenManager {
     }
 
     public static void consumeOxygen(ServerPlayer player) {
-        System.out.println("[OxygenManager] Tick for player: " + player.getName().getString());
-
-        if (OxygenHelper.isInBreathableEnvironment(player)) {
-            System.out.println("[OxygenManager] Player is in breathable environment.");
-            return;
-        }
-
         if (!SpaceSuitHandler.isWearingFullSuit(player)) {
-            System.out.println("[OxygenManager] Player is NOT wearing full suit.");
             return;
-        } else {
-            System.out.println("[OxygenManager] Player is wearing full suit.");
         }
-
-        int oxygenPerMB = BOConfig.getOxygenConsumption(); // units per mB
-        int mbToDrain = 1; // always drain 1 mB per tick, convert internally to units
+        int oxygenPerMB = BOConfig.getOxygenConsumption();
+        int mbToDrain = 1;
         boolean hasOxygen = false;
 
-        // Inventory tanks first
+
         for (ItemStack stack : player.getInventory().items) {
             if (!(stack.getItem() instanceof OxygenTank)) continue;
             if (drainFluid(stack, mbToDrain)) {
                 hasOxygen = true;
-                System.out.println("[OxygenManager] Drained 1 mB from inventory tank: " + stack);
             }
         }
 
-        // Armor tanks if inventory didn't have oxygen
+
         if (!hasOxygen) {
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack armor = player.getItemBySlot(slot);
                 if (!(armor.getItem() instanceof OxygenStorageArmorItem)) continue;
                 if (drainFluid(armor, mbToDrain)) {
                     hasOxygen = true;
-                    System.out.println("[OxygenManager] Drained 1 mB from armor: " + armor + " at slot " + slot);
                 }
             }
         }
 
         int totalMB = getTotalOxygenMB(player);
-        System.out.println("[OxygenManager] Total oxygen mB remaining: " + totalMB);
 
         if (hasOxygen) {
-            // Apply effect based on oxygen units
+
             player.addEffect(new MobEffectInstance(
                     BOEffects.OXYGEN_SATURATION.get(),
                     BOConfig.getTimeToImplode(),
@@ -78,22 +64,20 @@ public class OxygenManager {
                     false,
                     false
             ));
-        } else {
-            System.out.println("[OxygenManager] No oxygen available to consume!");
         }
     }
 
     public static int getTotalOxygenMB(ServerPlayer player) {
         AtomicInteger total = new AtomicInteger(0);
 
-        // Inventory tanks
+
         for (ItemStack stack : player.getInventory().items) {
             stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
                 total.addAndGet(cap.getFluidInTank(0).getAmount());
             });
         }
 
-        // Armor tanks
+
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack armor = player.getItemBySlot(slot);
             armor.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
@@ -119,14 +103,14 @@ public class OxygenManager {
     public static int getTotalOxygenTicks(ServerPlayer player) {
         AtomicInteger total = new AtomicInteger(0);
 
-        // Inventory tanks
+
         for (ItemStack stack : player.getInventory().items) {
             stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
                 total.addAndGet(cap.getFluidInTank(0).getAmount());
             });
         }
 
-        // Armor tanks
+
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack armor = player.getItemBySlot(slot);
             armor.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {

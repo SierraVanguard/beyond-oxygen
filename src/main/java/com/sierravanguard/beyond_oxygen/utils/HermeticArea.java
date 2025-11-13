@@ -23,7 +23,6 @@ import java.util.*;
 
  
 public class HermeticArea {
-    private static final int LIMIT = Math.max(2048, BOConfig.VENT_RANGE.get());
     private boolean hasActiveTemperatureRegulator = false;
     private final ServerLevel level;
     private final long id;
@@ -124,8 +123,10 @@ public class HermeticArea {
 
  
     public boolean bake() {
+
         if (!dirty) return hermetic;
         dirty = false;
+        int LIMIT = Math.max(2048, BOConfig.VENT_RANGE.get());
 
         blocks.clear();
         boundaryBlocks.clear();

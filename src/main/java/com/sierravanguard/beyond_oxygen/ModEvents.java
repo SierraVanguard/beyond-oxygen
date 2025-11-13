@@ -82,7 +82,7 @@ public class ModEvents {
     @SubscribeEvent
     public static void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
-        if (!BOConfig.unbreathableDimensions.contains(level.dimension().location())) {
+        if (!BOConfig.getUnbreathableDimensions().contains(level.dimension().location())) {
             return;
         }
         BlockPos pos = event.getPos();
@@ -100,7 +100,6 @@ public class ModEvents {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         BlockPos pos = event.getPos();
         HermeticAreaServerManager.onBlockChanged(level, pos);
-        System.out.println("BlockChanged event fired!");
     }
 
     @SubscribeEvent

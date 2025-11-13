@@ -64,7 +64,7 @@ public class OxygenStorageArmorItem extends SpacesuitArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
-            // Only use fluid amount, remove the NBT "ticks" part
+
             int oxygenTicks = cap.getFluidInTank(0).getAmount();
             tooltip.add(Component.translatable("tooltip.beyond_oxygen.oxygen", formatTicksToTime(oxygenTicks))
                     .withStyle(ChatFormatting.AQUA));

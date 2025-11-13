@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
+
 @Mixin(ServerPlayer.class)
 public abstract class BOServerPlayerMixin {
     private static final String COLD_SWEAT_MODID = "cold_sweat";
@@ -32,14 +34,15 @@ public abstract class BOServerPlayerMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
+        if (beyond_oxygen$vacuumDamageCooldown > 0) {
+            beyond_oxygen$vacuumDamageCooldown--;
+        }
         ServerPlayer player = (ServerPlayer) (Object) this;
         ServerLevel level = this.serverLevel();
+        List<ResourceLocation> unbreathable = BOConfig.getUnbreathableDimensions();
 
         if (!player.hasEffect(BOEffects.OXYGEN_SATURATION.get())) {
-
-            // VACUUM DAMAGE
-            if (BOConfig.unbreathableDimensions != null
-                    && BOConfig.unbreathableDimensions.contains(level.dimension().location())
+                if (!unbreathable.isEmpty() && unbreathable.contains(level.dimension().location())
                     && !OxygenHelper.isInBreathableEnvironment(player)
                     && !player.isUnderWater()) {
                 if (beyond_oxygen$vacuumDamageCooldown <= 0) {
@@ -54,16 +57,16 @@ public abstract class BOServerPlayerMixin {
             ResourceLocation dim = level.dimension().location();
             var area = VSCompat.getHermeticAreaContaining(player);
             boolean blockedByThermalController = area != null && area.hasActiveTemperatureRegulator();
-
-            if (BOConfig.hotDimensions != null
-                    && BOConfig.hotDimensions.contains(dim)
+            List<ResourceLocation> hot = BOConfig.getHotDimensions();
+            if (hot != null
+                    && hot.contains(dim)
                     && !SpaceSuitHandler.isWearingFullThermalSuit(player)
                     && !blockedByThermalController) {
                 applyDamageWithMessage(player, BODamageSources.BURN, 5f);
             }
-
-            if (BOConfig.coldDimensions != null
-                    && BOConfig.coldDimensions.contains(dim)
+            List<ResourceLocation> cold = BOConfig.getColdDimensions();
+            if (cold != null
+                    && cold.contains(dim)
                     && !SpaceSuitHandler.isWearingFullCryoSuit(player)
                     && !blockedByThermalController) {
                 applyDamageWithMessage(player, BODamageSources.FREEZE, 5f);

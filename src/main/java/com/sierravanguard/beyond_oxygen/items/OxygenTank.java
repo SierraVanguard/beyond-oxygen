@@ -25,7 +25,6 @@ public class OxygenTank extends Item {
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         int capacity = BOConfig.getOxygenTankCapacity();
-        System.out.printf("Capacity: %d\n", capacity);
         return new OxygenTankCap(stack, capacity);
     }
 
@@ -54,7 +53,7 @@ public class OxygenTank extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(cap -> {
-            // Only use fluid amount, remove the NBT "ticks" part
+
             int totalTicks = cap.getFluidInTank(0).getAmount();
             tooltip.add(Component.literal(formatTicksToTime(totalTicks))
                     .withStyle(ChatFormatting.AQUA));

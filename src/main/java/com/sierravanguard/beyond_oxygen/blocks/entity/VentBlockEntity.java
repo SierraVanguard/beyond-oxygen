@@ -40,7 +40,8 @@ public class VentBlockEntity extends BlockEntity {
     public int temperatureRegulatorCooldown = 0;
     public boolean temperatureRegulatorApplied = false;
     private int reattachCooldown = 0;
-    int ventConsumption = Math.max(1, BOConfig.VENT_CONSUMPTION.get());
+    private int ventConsumption;
+    private static int timeToImplode;
 
 
     private final Set<Fluid> acceptedFluids = new HashSet<>();
@@ -76,7 +77,10 @@ public class VentBlockEntity extends BlockEntity {
         super.reviveCaps();
         tankCap = LazyOptional.of(() -> tank);
     }
-
+    public void refreshConfigValues() {
+        ventConsumption = Math.max(1, BOConfig.VENT_CONSUMPTION.get());
+        timeToImplode = BOConfig.getTimeToImplode();
+    }
     private boolean consumeOxygen(int amount) {
         int available = tank.getFluidAmount();
         if (available < amount) return false;
@@ -108,7 +112,7 @@ public class VentBlockEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
         if (level.isClientSide || !(level instanceof ServerLevel server)) return;
-
+        refreshConfigValues();
         ensureHermeticArea(server);
         initialized = true;
     }
@@ -119,7 +123,7 @@ public class VentBlockEntity extends BlockEntity {
         super.onChunkUnloaded();
         if (!(level instanceof ServerLevel server)) return;
         if (hermeticArea != null) {
-            hermeticArea.deactivateVent(worldPosition);
+            hermeticArea.removeVent(worldPosition, false);
 
         }
     }
@@ -191,7 +195,7 @@ public class VentBlockEntity extends BlockEntity {
             VSCompat.applySealedEffects(player, pos, vent.hermeticArea, vent);
 
             if (inside && hasAir) {
-                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.timeToImplode, 0, false, false));
+                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), timeToImplode, 0, false, false));
                 if (vent.temperatureRegulatorApplied)
                     ColdSweatCompat.setComfortableTemp(player);
             }

@@ -13,80 +13,45 @@ import java.util.List;
 
 public class SpaceSuitHandler {
 
-    /** Returns true if player wears any full spacesuit (thermal, cryo, or regular) */
+    
     public static boolean isWearingFullSuit(Player player) {
-        return isSlotValid(player, EquipmentSlot.HEAD) &&
-                isSlotValid(player, EquipmentSlot.CHEST) &&
-                isSlotValid(player, EquipmentSlot.LEGS) &&
-                isSlotValid(player, EquipmentSlot.FEET) &&
+        return isSlotValid(player, EquipmentSlot.HEAD, BOConfig.getSpaceHelmets()) &&
+                isSlotValid(player, EquipmentSlot.CHEST, BOConfig.getSpaceChestplates()) &&
+                isSlotValid(player, EquipmentSlot.LEGS, BOConfig.getSpaceLeggings()) &&
+                isSlotValid(player, EquipmentSlot.FEET, BOConfig.getSpaceBoots()) &&
                 isHelmetClosed(player);
     }
 
-    /** Returns true if player wears a full cryo suit */
+    
     public static boolean isWearingFullCryoSuit(Player player) {
-        return isWearingSpecificSuit(player, BOConfig.CRYO_HELMETS.get(),
-                BOConfig.CRYO_CHESTPLATES.get(),
-                BOConfig.CRYO_LEGGINGS.get(),
-                BOConfig.CRYO_BOOTS.get());
-    }
-
-    /** Returns true if player wears a full thermal suit */
-    public static boolean isWearingFullThermalSuit(Player player) {
-        return isWearingSpecificSuit(player, BOConfig.THERMAL_HELMETS.get(),
-                BOConfig.THERMAL_CHESTPLATES.get(),
-                BOConfig.THERMAL_LEGGINGS.get(),
-                BOConfig.THERMAL_BOOTS.get());
-    }
-
-    /** Checks a suit with explicit component lists */
-    private static boolean isWearingSpecificSuit(Player player,
-                                                 List<? extends String> helmets,
-                                                 List<? extends String> chestplates,
-                                                 List<? extends String> leggings,
-                                                 List<? extends String> boots) {
-        return isSlotMatchingAny(player, EquipmentSlot.HEAD, helmets) &&
-                isSlotMatchingAny(player, EquipmentSlot.CHEST, chestplates) &&
-                isSlotMatchingAny(player, EquipmentSlot.LEGS, leggings) &&
-                isSlotMatchingAny(player, EquipmentSlot.FEET, boots) &&
+        return isSlotValid(player, EquipmentSlot.HEAD, BOConfig.getCryoHelmets()) &&
+                isSlotValid(player, EquipmentSlot.CHEST, BOConfig.getCryoChestplates()) &&
+                isSlotValid(player, EquipmentSlot.LEGS, BOConfig.getCryoLeggings()) &&
+                isSlotValid(player, EquipmentSlot.FEET, BOConfig.getCryoBoots()) &&
                 isHelmetClosed(player);
     }
 
-    private static boolean isSlotMatchingAny(Player player, EquipmentSlot slot, List<? extends String> validIds) {
-        if (validIds == null || validIds.isEmpty()) return false;
+    
+    public static boolean isWearingFullThermalSuit(Player player) {
+        return isSlotValid(player, EquipmentSlot.HEAD, BOConfig.getThermalHelmets()) &&
+                isSlotValid(player, EquipmentSlot.CHEST, BOConfig.getThermalChestplates()) &&
+                isSlotValid(player, EquipmentSlot.LEGS, BOConfig.getThermalLeggings()) &&
+                isSlotValid(player, EquipmentSlot.FEET, BOConfig.getThermalBoots()) &&
+                isHelmetClosed(player);
+    }
+
+    
+    private static boolean isSlotValid(Player player, EquipmentSlot slot, List<ResourceLocation> validList) {
+        if (validList == null || validList.isEmpty()) return false;
 
         ItemStack stack = player.getItemBySlot(slot);
         if (stack.isEmpty()) return false;
 
         ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        return itemId != null && validIds.contains(itemId.toString());
+        return itemId != null && validList.contains(itemId);
     }
 
-    private static boolean isSlotValid(Player player, EquipmentSlot slot) {
-        ItemStack stack = player.getItemBySlot(slot);
-        if (stack.isEmpty()) return false;
-
-        ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        if (itemId == null) return false;
-        switch (slot) {
-            case HEAD -> {
-                return BOConfig.getSpaceHelmets().stream().anyMatch(id -> id.equals(itemId.toString()));
-            }
-            case CHEST -> {
-                return BOConfig.getSpaceChestplates().stream().anyMatch(id -> id.equals(itemId.toString()));
-            }
-            case LEGS -> {
-                return BOConfig.getSpaceLeggings().stream().anyMatch(id -> id.equals(itemId.toString()));
-            }
-            case FEET -> {
-                return BOConfig.getSpaceBoots().stream().anyMatch(id -> id.equals(itemId.toString()));
-            }
-            default -> {
-                return false;
-            }
-        }
-    }
-
-    /** Returns true if helmet is closed or non-openable */
+    
     public static boolean isHelmetClosed(Player player) {
         ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
         if (helmet.isEmpty()) return false;
@@ -97,4 +62,3 @@ public class SpaceSuitHandler {
                 .orElse(false);
     }
 }
-
