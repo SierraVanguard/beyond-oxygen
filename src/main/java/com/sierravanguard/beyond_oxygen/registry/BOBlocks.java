@@ -16,11 +16,11 @@ import net.minecraftforge.registries.RegistryObject;
 public class BOBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, BeyondOxygen.MODID);
 
-    public static final RegistryObject<Block> VENT = BLOCKS.register("vent",()->new VentBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(1.5f)));
-    public static final RegistryObject<Block> BUBBLE_GENERATOR = BLOCKS.register("bubble_generator", () -> new BubbleGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(1.5f).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> VENT = BLOCKS.register("vent",()->new VentBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(0.5f)));
+    public static final RegistryObject<Block> BUBBLE_GENERATOR = BLOCKS.register("bubble_generator", () -> new BubbleGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(0.5f)));
     public static final RegistryObject<Block> CRYO_BED = BLOCKS.register("cryo_bed",
             () -> new CryoBedBlock(Block.Properties.copy(Blocks.IRON_BLOCK).strength(0.5f)));
     public static final RegistryObject<Block> OXYGEN_HARVESTER = BLOCKS.register("oxygen_harvester",
-            () -> new OxygenHarvesterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(1.5f).requiresCorrectToolForDrops())
+            () -> new OxygenHarvesterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(0.5f))
     );
 }

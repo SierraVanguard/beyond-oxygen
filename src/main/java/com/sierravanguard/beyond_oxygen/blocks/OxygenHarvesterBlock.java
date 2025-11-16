@@ -75,16 +75,30 @@ public class OxygenHarvesterBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof OxygenHarvesterBlockEntity harvester) {
+                harvester.invalidateCaps();
+                if (!player.isCreative()) {
+                    dropResources(state, level, pos, blockEntity);
+                }
+            }
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof OxygenHarvesterBlockEntity harvester) {
                 harvester.invalidateCaps();
-                level.updateNeighbourForOutputSignal(pos, this);
             }
-            super.onRemove(state, level, pos, newState, isMoving);
         }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
+
     @Override
     public boolean isOcclusionShapeFullBlock(BlockState state, BlockGetter world, BlockPos pos) {
         return false;

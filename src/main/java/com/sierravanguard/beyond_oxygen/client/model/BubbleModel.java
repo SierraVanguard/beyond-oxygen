@@ -13,13 +13,11 @@ public class BubbleModel {
     @SubscribeEvent
     public static void onModelRegistry(ModelEvent.RegisterAdditional event) {
         event.register(new ResourceLocation("beyond_oxygen", "entity/bubble"));
-        System.out.println("Bubble model registered!");
     }
 
     @SubscribeEvent
     public static void onModelBake(ModelEvent.BakingCompleted event) {
         bubbleModel = event.getModelManager().getModel(new ResourceLocation("beyond_oxygen", "entity/bubble"));
-        System.out.println("Got bubble model, is it null?" + (bubbleModel == null));
     }
 
     public static BakedModel getBubbleModel() {

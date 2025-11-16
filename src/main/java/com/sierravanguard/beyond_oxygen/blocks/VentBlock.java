@@ -128,20 +128,34 @@ public class VentBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof VentBlockEntity vent) {
+                if (!player.isCreative()) {
+                    dropResources(state, level, pos, vent);
+                    if (vent.temperatureRegulatorApplied) {
+                        ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
+                        popResource(level, pos, regulator);
+                    }
+                }
+            }
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos,
                          BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof VentBlockEntity vent) {
-                if (vent.temperatureRegulatorApplied) {
-                    ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
-                    popResource(level, pos, regulator);
-                }
-                dropResources(state, level, pos, be);
-                level.removeBlockEntity(pos);
+                vent.invalidateCaps();
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
+
+
 
 }

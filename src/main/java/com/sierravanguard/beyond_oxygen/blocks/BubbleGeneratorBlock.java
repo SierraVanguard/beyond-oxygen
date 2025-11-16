@@ -27,14 +27,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class BubbleGeneratorBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new BubbleGeneratorBlockEntity(pos, state);
-    }
 
-    public BubbleGeneratorBlock(Properties p_49795_) {
-        super(p_49795_);
+    public BubbleGeneratorBlock(Properties properties) {
+        super(properties);
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.UP));
     }
 
@@ -46,6 +41,12 @@ public class BubbleGeneratorBlock extends Block implements EntityBlock {
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return this.defaultBlockState().setValue(FACING, ctx.getNearestLookingDirection().getOpposite());
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new BubbleGeneratorBlockEntity(pos, state);
     }
 
     @Nullable
@@ -64,7 +65,8 @@ public class BubbleGeneratorBlock extends Block implements EntityBlock {
                 boolean isShift = player.isShiftKeyDown();
                 if (generator.temperatureRegulatorCooldown > 0) {
                     player.displayClientMessage(
-                            net.minecraft.network.chat.Component.literal("Please wait before interacting again."), true);
+                            net.minecraft.network.chat.Component.literal("Please wait before interacting again."), true
+                    );
                     return InteractionResult.SUCCESS;
                 }
                 if (isShift && isEmptyHand && generator.temperatureRegulatorApplied) {
@@ -73,17 +75,14 @@ public class BubbleGeneratorBlock extends Block implements EntityBlock {
                     generator.setChanged();
 
                     ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
-                    if (!player.getInventory().add(regulator)) {
-                        player.drop(regulator, false);
-                    }
+                    if (!player.getInventory().add(regulator)) player.drop(regulator, false);
 
                     player.displayClientMessage(
-                            net.minecraft.network.chat.Component.literal("Thermal regulator removed."), true);
+                            net.minecraft.network.chat.Component.literal("Thermal regulator removed."), true
+                    );
                     return InteractionResult.SUCCESS;
                 }
-                if (!held.isEmpty() && held.is(BOItems.THERMAL_REGULATOR.get())) {
-                    return InteractionResult.PASS;
-                }
+                if (!held.isEmpty() && held.is(BOItems.THERMAL_REGULATOR.get())) return InteractionResult.PASS;
                 if (player instanceof ServerPlayer serverPlayer) {
                     NetworkHooks.openScreen(serverPlayer, generator, pos);
                 }
@@ -95,25 +94,32 @@ public class BubbleGeneratorBlock extends Block implements EntityBlock {
         return InteractionResult.PASS;
     }
 
-
-
+    @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof BubbleGeneratorBlockEntity generator) {
+                if (!player.isCreative()) {
+                    dropResources(state, level, pos, blockEntity);
+                    if (generator.temperatureRegulatorApplied) {
+                        ItemStack regulator = new ItemStack(BOItems.THERMAL_REGULATOR.get());
+                        popResource(level, pos, regulator);
+                    }
+                }
+            }
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof BubbleGeneratorBlockEntity generator) {
-                if (generator.temperatureRegulatorApplied) {
-                    ItemStack regulator = new ItemStack(com.sierravanguard.beyond_oxygen.registry.BOItems.THERMAL_REGULATOR.get());
-                    popResource(level, pos, regulator);
-                }
-                dropResources(state, level, pos, blockEntity);
-                level.removeBlockEntity(pos);
+                generator.invalidateCaps();
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
-
-
 
 }

@@ -103,6 +103,23 @@ public class CryoBedBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide) {
+            DoubleBlockHalf half = state.getValue(HALF);
+            BlockPos basePos = (half == DoubleBlockHalf.LOWER) ? pos : pos.below();
+            BlockEntity blockEntity = level.getBlockEntity(basePos);
+            if (blockEntity instanceof CryoBedBlockEntity cryoBed) {
+                CryoBedManager.removeCryoBed(level.dimension(), basePos);
+                cryoBed.clearOwner();
+                if (!player.isCreative()) {
+                    dropResources(state, level, pos, blockEntity);
+                }
+            }
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             DoubleBlockHalf half = state.getValue(HALF);
@@ -111,21 +128,18 @@ public class CryoBedBlock extends Block implements EntityBlock {
             if (otherState.getBlock() == this && otherState.getValue(HALF) != half) {
                 level.setBlock(otherPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 35);
             }
-            if (!level.isClientSide) {
-                BlockPos dropPos = (half == DoubleBlockHalf.LOWER) ? pos : pos.below();
-                BlockEntity blockEntity = level.getBlockEntity(dropPos);
-
-                if (blockEntity instanceof CryoBedBlockEntity) {
-                    dropResources(state, level, dropPos, blockEntity);
-                    CryoBedManager.removeCryoBed(level.dimension(), dropPos);
-                    ((CryoBedBlockEntity) blockEntity).clearOwner();
-                    level.removeBlockEntity(dropPos);
-                }
+            BlockPos basePos = (half == DoubleBlockHalf.LOWER) ? pos : pos.below();
+            BlockEntity blockEntity = level.getBlockEntity(basePos);
+            if (blockEntity instanceof CryoBedBlockEntity cryoBed) {
+                CryoBedManager.removeCryoBed(level.dimension(), basePos);
+                cryoBed.clearOwner();
+                level.removeBlockEntity(basePos);
             }
         }
-
         super.onRemove(state, level, pos, newState, isMoving);
     }
+
+
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
