@@ -6,7 +6,8 @@
   "refmap": "beyond_oxygen.refmap.json",
   "mixins": [
     "BOServerPlayerMixin",
-    "EntityMixin"
+    "EntityMixin",
+    "LivingEntityAirMixin"
   ],
   "client": [
     "CameraMixin"

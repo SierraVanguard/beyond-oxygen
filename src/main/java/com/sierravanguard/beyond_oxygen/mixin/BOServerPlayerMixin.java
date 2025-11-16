@@ -7,9 +7,11 @@ import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
 import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraftforge.fml.ModList;
@@ -40,7 +42,7 @@ public abstract class BOServerPlayerMixin {
         ServerPlayer player = (ServerPlayer) (Object) this;
         ServerLevel level = this.serverLevel();
         List<ResourceLocation> unbreathable = BOConfig.getUnbreathableDimensions();
-
+        var hermeticArea = VSCompat.getHermeticAreaContaining(player);
         if (!player.hasEffect(BOEffects.OXYGEN_SATURATION.get())) {
                 if (!unbreathable.isEmpty() && unbreathable.contains(level.dimension().location())
                     && !OxygenHelper.isInBreathableEnvironment(player)
