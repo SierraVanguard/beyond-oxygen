@@ -43,9 +43,6 @@ public class VSCompat {
                 (int) Math.floor(shipPos.y),
                 (int) Math.floor(shipPos.z)
         );
-        System.out.println("[VSCompat] Player " + player.getName().getString()
-                + " inside area: " + (hermeticArea != null && hermeticArea.contains(shipBlockPos))
-                + ", hasAir: " + (hermeticArea != null && hermeticArea.hasAir()));
         if (hermeticArea.isHermetic() && hermeticArea.contains(shipBlockPos)) {
             addPlayerToHermeticArea(player, hermeticArea);
             if (hermeticArea.hasAir()) {

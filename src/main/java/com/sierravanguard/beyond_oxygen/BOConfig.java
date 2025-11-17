@@ -1,6 +1,5 @@
     package com.sierravanguard.beyond_oxygen;
 
-    import com.sierravanguard.beyond_oxygen.compat.AdAstraConfigHelper;
     import net.minecraft.resources.ResourceLocation;
     import net.minecraftforge.common.ForgeConfigSpec;
     import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -84,68 +83,13 @@
         public static final ForgeConfigSpec.ConfigValue<List<? extends String>> COLD_DIMENSIONS =
                 BUILDER.comment("Dimensions that deal cold damage")
                         .defineListAllowEmpty("coldDimensions", List.of("minecraft:the_end"), s -> s instanceof String);
+        public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BREATHABLES =
+                BUILDER.comment("List of item IDs that the player can chug delicious air from (Be careful! Fluid config tweaking also required!")
+                        .defineListAllowEmpty("breathables",
+                                List.of("beyond_oxygen:oxygen_tank"),
+                                s -> s instanceof String);
 
-
-        public static int ventRange;
-        public static int oxygenConsumption;
-        public static int oxygenTankCapacity;
-        public static int ventConsumption;
-        public static List<ResourceLocation> oxygenFluids = new ArrayList<>();
-        public static ResourceLocation spaceRepairMaterial;
-        public static ResourceLocation cryoRepairMaterial;
-        public static ResourceLocation thermalRepairMaterial;
-        public static List<String> spaceHelmets;
-        public static List<String> spaceChestplates;
-        public static List<String> spaceLeggings;
-        public static List<String> spaceBoots;
-        public static float bubbleMaxRadius;
-        public static int timeToImplode;
-        public static List<ResourceLocation> unbreathableDimensions;
-        public static List<ResourceLocation> hotDimensions;
-        public static List<ResourceLocation> coldDimensions;
-        public static List<String> coldSuit;
-        public static List<String> hotSuit;
         static final ForgeConfigSpec SPEC = BUILDER.build();
-
-        @SubscribeEvent
-        static void onLoad(final ModConfigEvent event) {
-            if (!event.getConfig().getSpec().equals(SPEC)) return;
-            ventRange = VENT_RANGE.get();
-            oxygenTankCapacity = OXYGEN_TANK_CAPACITY.get();
-            oxygenConsumption = OXYGEN_CONSUMPTION.get();
-            ventConsumption = VENT_CONSUMPTION.get();
-            bubbleMaxRadius = BUBBLE_MAX_RADIUS.get();
-            timeToImplode = TIME_TO_IMPLODE.get();
-            oxygenFluids = toResourceLocationList(OXYGEN_FLUIDS.get());
-            unbreathableDimensions = toResourceLocationList(UNBREATHABLE_DIMENSIONS.get());
-            hotDimensions = toResourceLocationList(HOT_DIMENSIONS.get());
-            coldDimensions = toResourceLocationList(COLD_DIMENSIONS.get());
-            spaceRepairMaterial = toResourceLocation(SPACE_REPAIR_MATERIAL.get());
-            cryoRepairMaterial = toResourceLocation(CRYO_REPAIR_MATERIAL.get());
-            thermalRepairMaterial = toResourceLocation(THERMAL_REPAIR_MATERIAL.get());
-
-
-            spaceHelmets = new ArrayList<>(SPACE_HELMETS.get());
-            spaceChestplates = new ArrayList<>(SPACE_CHESTPLATES.get());
-            spaceLeggings = new ArrayList<>(SPACE_LEGGINGS.get());
-            spaceBoots = new ArrayList<>(SPACE_BOOTS.get());
-            coldSuit = new ArrayList<>();
-            coldSuit.addAll(CRYO_HELMETS.get());
-            coldSuit.addAll(CRYO_CHESTPLATES.get());
-            coldSuit.addAll(CRYO_LEGGINGS.get());
-            coldSuit.addAll(CRYO_BOOTS.get());
-
-
-            hotSuit = new ArrayList<>();
-            hotSuit.addAll(THERMAL_HELMETS.get());
-            hotSuit.addAll(THERMAL_CHESTPLATES.get());
-            hotSuit.addAll(THERMAL_LEGGINGS.get());
-            hotSuit.addAll(THERMAL_BOOTS.get());
-
-
-            AdAstraConfigHelper.injectAdAstraDimensions();
-        }
-
         private static ResourceLocation toResourceLocation(String id) {
             String[] parts = id.split(":");
             return new ResourceLocation(parts[0], parts[1]);
@@ -175,7 +119,7 @@
         }
 
         public static int getVentConsumption() {
-            return ventConsumption;
+            return VENT_CONSUMPTION.get();
         }
 
 
@@ -204,6 +148,12 @@
             if (COLD_DIMENSIONS == null) return List.of();
             List<ResourceLocation> result = new ArrayList<>();
             for (String id : COLD_DIMENSIONS.get()) result.add(toResourceLocation(id));
+            return result;
+        }
+        public static List<ResourceLocation> getBreathables() {
+            if (BREATHABLES == null) return List.of();
+            List<ResourceLocation> result = new ArrayList<>();
+            for (String id : BREATHABLES.get()) result.add(toResourceLocation(id));
             return result;
         }
 
@@ -267,7 +217,7 @@
         public static List<ResourceLocation> getThermalBoots() {
             return toResourceLocationList(THERMAL_BOOTS.get());
         }
-
+        public static int getBubbleMaxRadius(){return BUBBLE_MAX_RADIUS.get();}
 
         public static List<ResourceLocation> getColdSuit() {
             List<ResourceLocation> result = new ArrayList<>();

@@ -24,6 +24,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModEvents {
@@ -131,6 +132,4 @@ public class ModEvents {
             System.out.printf("[DEBUG] Preloaded HermeticAreaData for %s\n", serverLevel.dimension().location());
         }
     }
-
-
 }

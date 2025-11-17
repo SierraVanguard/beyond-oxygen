@@ -1,7 +1,9 @@
 package com.sierravanguard.beyond_oxygen.client.overlay;
 
 import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
+import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
 import com.sierravanguard.beyond_oxygen.utils.OxygenManager;
+import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +25,7 @@ public class OxygenTankOverlay {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null) return;
-
+        if (OxygenHelper.isInBreathableEnvironment(player) && !player.isUnderWater() && !SpaceSuitHandler.isWearingFullSuit(player)) return;
         int totalTicks = OxygenManager.getTotalOxygen(player);
         if (totalTicks <= 0) return;
 

@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.items.OxygenTank;
 import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,6 +15,9 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = "beyond_oxygen", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class OxygenManager {
@@ -29,14 +33,17 @@ public class OxygenManager {
     
     public static void consumeOxygen(Player player) {
         if (!SpaceSuitHandler.isWearingFullSuit(player)) return;
-
+        List<ResourceLocation> validOxygenItems = BOConfig.getBreathables();
         boolean hasOxygen = false;
         int mbToDrain = 1;
 
 
         for (ItemStack stack : player.getInventory().items) {
-            if (!(stack.getItem() instanceof OxygenTank)) continue;
-            if (drainFluid(stack, mbToDrain)) hasOxygen = true;
+            if (stack.isEmpty()) continue;
+            ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+            if (id != null && validOxygenItems.contains(id)) {
+                if (drainFluid(stack, mbToDrain)) hasOxygen = true;
+            }
         }
 
 
@@ -63,14 +70,19 @@ public class OxygenManager {
     
     public static int getTotalOxygen(Player player) {
         int total = 0;
-
+        List<ResourceLocation> validList = BOConfig.getBreathables();
 
         for (ItemStack stack : player.getInventory().items) {
-            total += getFluidAmount(stack);
+            if (validList == null || validList.isEmpty()) return 0;
+            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
+            if (itemId != null && validList.contains(itemId)){
+                total += getFluidAmount(stack);
+            }
         }
 
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) continue;
             total += getFluidAmount(player.getItemBySlot(slot));
         }
 

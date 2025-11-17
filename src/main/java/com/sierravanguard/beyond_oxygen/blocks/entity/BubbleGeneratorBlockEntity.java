@@ -49,7 +49,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     public int temperatureRegulatorCooldown = 0;
     public boolean temperatureRegulatorApplied = false;
     private final Set<Fluid> acceptedFluids = new HashSet<>();
-    public float controlledMaxRadius = BOConfig.bubbleMaxRadius;
+    public float controlledMaxRadius;
     public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
         for (ResourceLocation fluidId : fluidIds) {
             Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
@@ -62,16 +62,16 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     private final FluidTank tank = new FluidTank(1000, fluidStack -> acceptedFluids.contains(fluidStack.getFluid()));
     private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(() -> tank);
 
-    private final EnergyStorage energyStorage = new EnergyStorage(10000);
+    private final EnergyStorage energyStorage = new EnergyStorage(1000);
     private LazyOptional<EnergyStorage> energy = LazyOptional.of(() -> energyStorage);
 
     private int leftTicks = 0;
     public float currentRadius = 0.0f;
-    public float maxRadius = BOConfig.bubbleMaxRadius;
 
     public BubbleGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(BOBlockEntities.BUBBLE_GENERATOR.get(), pos, state);
-        loadAcceptedFluidsFromConfig(BOConfig.oxygenFluids);
+        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
+        controlledMaxRadius = currentRadius;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
@@ -82,13 +82,13 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
         }
 
         int energyRequired = 20;
-        float oxygenNeeded = BOConfig.ventConsumption * 2.0f;
-        boolean hasEnergy = entity.energyStorage.extractEnergy(energyRequired, false) == energyRequired;
+        int oxygenNeeded = (int) (Math.ceil(entity.currentRadius) * 2);
+        boolean hasEnergy = entity.energyStorage.getEnergyStored() >= energyRequired;
         boolean hasOxygen = entity.tank.getFluidAmount() >= oxygenNeeded;
 
         if (hasEnergy && hasOxygen) {
             entity.energyStorage.extractEnergy(energyRequired, false);
-            entity.consumeOxygen((int) oxygenNeeded);
+            entity.consumeOxygen(oxygenNeeded);
             if (entity.currentRadius < entity.controlledMaxRadius) {
                 entity.currentRadius = Math.min(entity.currentRadius + 0.01f, entity.controlledMaxRadius);
             } else if (entity.currentRadius > entity.controlledMaxRadius) {
@@ -102,7 +102,7 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
                 if (!success) {
                     Vec3 eyePos = player.getEyePosition();
                     if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2){
-                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.timeToImplode, 0, false, false));
+                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
                         if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
                     }
                 }

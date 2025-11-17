@@ -33,7 +33,7 @@ public class BubbleRadiusPacket {
             if (player != null && player.level().getBlockEntity(msg.pos) instanceof BubbleGeneratorBlockEntity be) {
                 float step = 0.5f;
                 float newRadius = be.controlledMaxRadius + (msg.increase ? step : -step);
-                newRadius = clamp(newRadius, 0.5f, BOConfig.bubbleMaxRadius);
+                newRadius = clamp(newRadius, 0.5f, BOConfig.getBubbleMaxRadius());
 
                 be.controlledMaxRadius = newRadius;
 
