@@ -1,33 +1,63 @@
 package com.sierravanguard.beyond_oxygen.registry;
 
-import net.minecraft.core.Holder;
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.*;
 import net.minecraft.world.entity.LivingEntity;
 
 public class BODamageSources {
-    public static final DamageSource VACUUM = create("beyond_oxygen.vacuum", 0.0f, DamageEffects.DROWNING);
-    public static final DamageSource FREEZE = create("beyond_oxygen.freeze", 0.5f, DamageEffects.FREEZING);
-    public static final DamageSource BURN = create("beyond_oxygen.burn", 0.5f, DamageEffects.BURNING);
-    public static final DamageSource HURT = create("beyond_oxygen.hurt", 0.0f, DamageEffects.HURT);
+    private static final ResourceKey<DamageType> VACUUM_KEY = key("vacuum");
+    private static final ResourceKey<DamageType> FREEZE_KEY = key("freeze");
+    private static final ResourceKey<DamageType> BURN_KEY = key("burn");
+    private static final ResourceKey<DamageType> HURT_KEY = key("vacuum");
 
-    private static DamageSource create(String msgId, float exhaustion, DamageEffects effects) {
-        DamageType type = new DamageType(
-                msgId,
-                DamageScaling.NEVER,
-                exhaustion,
-                effects,
-                DeathMessageType.DEFAULT
-        );
-        Holder<DamageType> holder = Holder.direct(type);
-        return new DamageSource(holder);
+    private static ResourceKey<DamageType> key(String id) {
+        return ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(BeyondOxygen.MODID, id));
+    }
+
+    private static DamageSource vacuum, freeze, burn, hurt;
+
+    public static DamageSource vacuum() {
+        return vacuum;
+    }
+
+    public static DamageSource freeze() {
+        return freeze;
+    }
+
+    public static DamageSource burn() {
+        return burn;
+    }
+
+    public static DamageSource hurt() {
+        return hurt;
+    }
+
+    public static void populateSources(RegistryAccess registryAccess) {
+        Registry<DamageType> registry = registryAccess.registryOrThrow(Registries.DAMAGE_TYPE);
+        vacuum = new DamageSource(registry.getHolderOrThrow(VACUUM_KEY));
+        freeze = new DamageSource(registry.getHolderOrThrow(FREEZE_KEY));
+        burn = new DamageSource(registry.getHolderOrThrow(BURN_KEY));
+        hurt = new DamageSource(registry.getHolderOrThrow(HURT_KEY));
+    }
+
+    public static void releaseSources() {
+        vacuum = null;
+        freeze = null;
+        burn = null;
+        hurt = null;
     }
 
     public static void applyCustomDamage(LivingEntity entity, DamageSource source, float amount) {
         if (!entity.level().isClientSide) {
             entity.hurt(source, amount);
-            if (source == BURN) {
+            if (source == burn) {
                 entity.setSecondsOnFire(2);
-            } else if (source == FREEZE) {
+            } else if (source == freeze) {
                 int freezeTicks = entity.getTicksFrozen() + 5;
                 entity.setTicksFrozen(freezeTicks);
             }

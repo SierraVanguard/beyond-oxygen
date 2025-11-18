@@ -1,6 +1,8 @@
 package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.utils.CryoBedManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,5 +21,10 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
 
+    }
+
+    @SubscribeEvent
+    public static void registerServerReloadListeners(AddReloadListenerEvent event) {
+        event.addListener((ResourceManagerReloadListener) manager -> BODamageSources.populateSources(event.getRegistryAccess()));
     }
 }
