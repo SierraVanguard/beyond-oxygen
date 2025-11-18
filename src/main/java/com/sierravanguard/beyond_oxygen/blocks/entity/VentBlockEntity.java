@@ -181,7 +181,7 @@ public class VentBlockEntity extends BlockEntity {
         if (vent.temperatureRegulatorCooldown > 0)
             vent.temperatureRegulatorCooldown--;
         boolean hasAir = false;
-        System.out.println("Area hermetic? " + vent.hermeticArea.isHermetic());
+        //System.out.println("Area hermetic? " + vent.hermeticArea.isHermetic());
         if (vent.hermeticArea.isHermetic()) {
             int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / vent.ventConsumption);
             if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
@@ -190,7 +190,7 @@ public class VentBlockEntity extends BlockEntity {
 
         vent.hermeticArea.setHasAir(hasAir);
         for (ServerPlayer player : server.players()) {
-            System.out.println("Area has air? " + hasAir);
+            //System.out.println("Area has air? " + hasAir);
             boolean inside = vent.isPlayerInsideHermeticArea(player);
             VSCompat.applySealedEffects(player, pos, vent.hermeticArea, vent);
 

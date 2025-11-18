@@ -19,7 +19,7 @@ public class OxygenTankCap extends FluidHandlerItemStack {
     public OxygenTankCap(@NotNull ItemStack container, int capacity) {
         super(container, capacity);
         loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
-        System.out.println("[Beyond Oxygen] Accepted oxygen fluids: " + acceptedFluids);
+        //System.out.println("[Beyond Oxygen] Accepted oxygen fluids: " + acceptedFluids);
     }
 
 
