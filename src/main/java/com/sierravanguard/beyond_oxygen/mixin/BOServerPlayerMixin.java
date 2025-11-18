@@ -48,7 +48,7 @@ public abstract class BOServerPlayerMixin {
                     && !OxygenHelper.isInBreathableEnvironment(player)
                     && !player.isUnderWater()) {
                 if (beyond_oxygen$vacuumDamageCooldown <= 0) {
-                    applyDamageWithMessage(player, BODamageSources.VACUUM, 5f);
+                    applyDamageWithMessage(player, BODamageSources.vacuum(), 5f);
                     beyond_oxygen$vacuumDamageCooldown = 20;
                 }
                 beyond_oxygen$vacuumDamageCooldown--;
@@ -64,14 +64,14 @@ public abstract class BOServerPlayerMixin {
                     && hot.contains(dim)
                     && !SpaceSuitHandler.isWearingFullThermalSuit(player)
                     && !blockedByThermalController) {
-                applyDamageWithMessage(player, BODamageSources.BURN, 5f);
+                applyDamageWithMessage(player, BODamageSources.burn(), 5f);
             }
             List<ResourceLocation> cold = BOConfig.getColdDimensions();
             if (cold != null
                     && cold.contains(dim)
                     && !SpaceSuitHandler.isWearingFullCryoSuit(player)
                     && !blockedByThermalController) {
-                applyDamageWithMessage(player, BODamageSources.FREEZE, 5f);
+                applyDamageWithMessage(player, BODamageSources.freeze(), 5f);
             }
         }
 
