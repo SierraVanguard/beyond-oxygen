@@ -19,7 +19,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class BubbleGeneratorBlockEntityRenderer implements net.minecraft.client.renderer.blockentity.BlockEntityRenderer<BubbleGeneratorBlockEntity> {
 
-    private static final RenderType RENDER_TYPE = RenderType.entityCutout(
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(
             new net.minecraft.resources.ResourceLocation("beyond_oxygen", "textures/entity/bubble.png")
     );
 

@@ -128,8 +128,8 @@ public class HermeticArea {
         dirty = false;
         int LIMIT = Math.max(2048, BOConfig.VENT_RANGE.get());
 
-        blocks.clear();
-        boundaryBlocks.clear();
+        Set<BlockPos> newBlocks = new HashSet<>();
+        Set<BlockPos> newBoundary = new HashSet<>();
 
         BlockPos centerVent = getCenterPos();
         if (centerVent.equals(BlockPos.ZERO)) {
@@ -151,16 +151,16 @@ public class HermeticArea {
             if (neighbor.equals(centerVent)) continue;
 
             boolean hermeticCheck = dir != ventFacing && HermeticUtils.isHermetic(level, neighbor, dir.getOpposite());
-            if (!hermeticCheck && !blocks.contains(neighbor)) {
-                blocks.add(neighbor);
+            if (!hermeticCheck && !newBlocks.contains(neighbor)) {
+                newBlocks.add(neighbor);
                 queue.add(new AirBlockData(neighbor).setSource(dir.getOpposite()));
             } else if (hermeticCheck) {
-                boundaryBlocks.add(neighbor);
+                newBoundary.add(neighbor);
             }
         }
 
         while (!queue.isEmpty()) {
-            if (blocks.size() >= LIMIT) {
+            if (newBlocks.size() >= LIMIT) {
                 clearAndNotifyPlayers();
                 return false;
             }
@@ -170,7 +170,7 @@ public class HermeticArea {
                 if (current.isSource(dir)) continue;
 
                 BlockPos neighbor = current.relative(dir);
-                if (blocks.contains(neighbor)) continue;
+                if (newBlocks.contains(neighbor)) continue;
 
                 BlockState neighborState = level.getBlockState(neighbor);
                 boolean isVent = neighborState.getBlock() instanceof com.sierravanguard.beyond_oxygen.blocks.VentBlock;
@@ -178,7 +178,7 @@ public class HermeticArea {
                 boolean canFlow = !hermeticWall && (isVent || HermeticUtils.canFlowTrough(level, current, current.getSource(), dir));
 
                 if (canFlow) {
-                    blocks.add(neighbor);
+                    newBlocks.add(neighbor);
                     queue.add(new AirBlockData(neighbor).setSource(dir.getOpposite()));
 
                     if (isVent) {
@@ -196,12 +196,16 @@ public class HermeticArea {
                         }
                     }
                 } else if (hermeticWall) {
-                    boundaryBlocks.add(neighbor);
+                    newBoundary.add(neighbor);
                 }
             }
         }
-
-        hermetic = queue.isEmpty();
+        boolean newHermetic = queue.isEmpty();
+        blocks.clear();
+        blocks.addAll(newBlocks);
+        boundaryBlocks.clear();
+        boundaryBlocks.addAll(newBoundary);
+        hermetic = true;
         this.lastComputedVolume = this.getBlocks().size();
         recalcTemperatureRegulator();
         HermeticAreaServerManager.markDirty(level);

@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Pseudo
 @Mixin(Camera.class)
 public abstract class CameraMixin {
-
+    @Unique private int neo$sealedGraceTicks = 0;
+    @Unique private static final int GRACE_PERIOD = 5;
     @Shadow private Vec3 position;
 
     @Unique private boolean neo$isInSealedArea = false;
@@ -28,15 +29,23 @@ public abstract class CameraMixin {
     private void onTick(CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.level() != null) {
-            neo$isInSealedArea = VSCompat.playersInSealedAreas.containsKey(player);
+            boolean currentlySealed = VSCompat.playersInSealedAreas.containsKey(player);
+
+            if (currentlySealed) {
+                neo$sealedGraceTicks = GRACE_PERIOD;
+            } else if (neo$sealedGraceTicks > 0) {
+                neo$sealedGraceTicks--;
+            }
         }
     }
 
+
     @WrapMethod(method = "getFluidInCamera")
     private FogType onGetFluidInCamera(Operation<FogType> original) {
-        if (neo$isInSealedArea) {
+        if (neo$sealedGraceTicks > 0) {
             return FogType.NONE;
         }
         return original.call();
     }
+
 }
