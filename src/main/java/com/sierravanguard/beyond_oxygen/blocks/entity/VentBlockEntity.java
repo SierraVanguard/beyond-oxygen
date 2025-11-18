@@ -41,7 +41,6 @@ public class VentBlockEntity extends BlockEntity {
     public boolean temperatureRegulatorApplied = false;
     private int reattachCooldown = 0;
     private int ventConsumption;
-    private static int timeToImplode;
 
 
     private final Set<Fluid> acceptedFluids = new HashSet<>();
@@ -79,7 +78,6 @@ public class VentBlockEntity extends BlockEntity {
     }
     public void refreshConfigValues() {
         ventConsumption = Math.max(1, BOConfig.VENT_CONSUMPTION.get());
-        timeToImplode = BOConfig.getTimeToImplode();
     }
     private boolean consumeOxygen(int amount) {
         int available = tank.getFluidAmount();
@@ -183,19 +181,21 @@ public class VentBlockEntity extends BlockEntity {
         if (vent.temperatureRegulatorCooldown > 0)
             vent.temperatureRegulatorCooldown--;
         boolean hasAir = false;
+        System.out.println("Area hermetic? " + vent.hermeticArea.isHermetic());
         if (vent.hermeticArea.isHermetic()) {
-            int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() * vent.ventConsumption);
+            int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / vent.ventConsumption);
             if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
             hasAir = vent.consumeOxygen(oxygenNeeded);
         }
 
         vent.hermeticArea.setHasAir(hasAir);
         for (ServerPlayer player : server.players()) {
+            System.out.println("Area has air? " + hasAir);
             boolean inside = vent.isPlayerInsideHermeticArea(player);
             VSCompat.applySealedEffects(player, pos, vent.hermeticArea, vent);
 
             if (inside && hasAir) {
-                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), timeToImplode, 0, false, false));
+                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
                 if (vent.temperatureRegulatorApplied)
                     ColdSweatCompat.setComfortableTemp(player);
             }

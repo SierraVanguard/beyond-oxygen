@@ -42,7 +42,7 @@ public class HermeticArea {
 
     private BlockPos centerVentPos = BlockPos.ZERO;
 
- 
+    double lastComputedVolume;
     private boolean dormant = false;
     private int dormantTicks = 0;
     private static final int DORMANT_TICK_LIMIT = 20 * 60 * 5; 
@@ -202,6 +202,7 @@ public class HermeticArea {
         }
 
         hermetic = queue.isEmpty();
+        this.lastComputedVolume = this.getBlocks().size();
         recalcTemperatureRegulator();
         HermeticAreaServerManager.markDirty(level);
         recalcBounds();
@@ -297,6 +298,7 @@ public class HermeticArea {
         tag.put("Vents", writePositions(knownVents));
         tag.put("Blocks", writePositions(blocks));
         tag.put("Boundary", writePositions(boundaryBlocks));
+        tag.putDouble("Volume", lastComputedVolume);
         return tag;
     }
 
@@ -309,6 +311,7 @@ public class HermeticArea {
         area.knownVents.addAll(readPositions(tag.getList("Vents", 10)));
         area.blocks.addAll(readPositions(tag.getList("Blocks", 10)));
         area.boundaryBlocks.addAll(readPositions(tag.getList("Boundary", 10)));
+        area.lastComputedVolume = tag.getDouble("Volume");
         return area;
     }
 
