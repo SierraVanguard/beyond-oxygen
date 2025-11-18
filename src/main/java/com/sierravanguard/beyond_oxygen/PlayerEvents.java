@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen;
 
+import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
 import com.sierravanguard.beyond_oxygen.utils.CryoBedManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;

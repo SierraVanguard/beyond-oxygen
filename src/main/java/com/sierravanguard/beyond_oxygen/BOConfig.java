@@ -12,7 +12,7 @@
     @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public class BOConfig {
         private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-        public static final ForgeConfigSpec.ConfigValue<Integer> VENT_RANGE = BUILDER.comment("Max range of vent, high value can cause lags").define("ventRange", 2048);
+        public static final ForgeConfigSpec.ConfigValue<Integer> VENT_RANGE = BUILDER.comment("Max range of vent, high value CAN AND WILL cause lag.").define("ventRange", 2048);
         public static final ForgeConfigSpec.ConfigValue<List<? extends String>> OXYGEN_FLUIDS = BUILDER.comment("List of fluids to accept as oxygen").defineListAllowEmpty("oxygenFluids", List.of("mekanism:oxygen"), s -> s instanceof String);
         public static final ForgeConfigSpec.ConfigValue<Integer> OXYGEN_TANK_CAPACITY = BUILDER.comment("Max amount of oxygen that oxygen tank can contain (in mb)").define("oxygenTankCapacity", 1200);
         public static final ForgeConfigSpec.ConfigValue<Integer> OXYGEN_CONSUMPTION = BUILDER.comment("How many oxygen units in 1 mb").define("oxygenConsumption", 10);
@@ -75,7 +75,7 @@
         public static final ForgeConfigSpec.ConfigValue<Integer> BUBBLE_MAX_RADIUS = BUILDER
                 .comment("Maximum radius of bubble generators")
                 .defineInRange("bubbleMaxRadius", 5, 5, 20);
-        public static final ForgeConfigSpec.ConfigValue<Integer> TIME_TO_IMPLODE = BUILDER.comment("How many ticks (1 second = 20 ticks) for someone to IMPLODE from lack of air?").define("timeToImplode", 10);
+        public static final ForgeConfigSpec.ConfigValue<Integer> TIME_TO_IMPLODE = BUILDER.comment("How many ticks (1 second ~ 20 ticks) for someone to IMPLODE from lack of air? Do not set lower than 15, or you may experience flicker.").define("timeToImplode", 10);
         public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HOT_DIMENSIONS =
                 BUILDER.comment("Dimensions that deal heat damage")
                         .defineListAllowEmpty("hotDimensions", List.of("minecraft:the_nether"), s -> s instanceof String);

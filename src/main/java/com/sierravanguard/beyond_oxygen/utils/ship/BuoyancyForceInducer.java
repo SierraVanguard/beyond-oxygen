@@ -17,7 +17,7 @@ public class BuoyancyForceInducer implements ShipForcesInducer {
     @Override
     public void applyForces(PhysShip physShip) {
         if (data.totalVolume <= 0) return;
-        float buoyance = (float) (1.0 + 0.1 * data.totalVolume);
+        float buoyance = (float) (0.1 * data.totalVolume);
         physShip.setBuoyantFactor(buoyance);
     }
     public static BuoyancyForceInducer tickOnShip(final LoadedServerShip ship, double sealedVolume) {
