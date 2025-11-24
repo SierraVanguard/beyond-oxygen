@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "mekanism:advanced_control_circuit"
+    },
+    "O": {
+      "tag": "c:ingots/refined_obsidian"
+    },
+    "S": {
+      "item": "beyond_oxygen:spacesuit_chestplate"
+    }
+  },
+  "pattern": [
+    "OCO",
+    "OCO",
+    " S "
+  ],
+  "result": {
+    "item": "beyond_oxygen:cryo_suit_chestplate"
+  },
+  "show_notification": true
+}

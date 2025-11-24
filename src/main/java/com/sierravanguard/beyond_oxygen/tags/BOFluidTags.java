@@ -7,4 +7,5 @@ import net.minecraft.world.level.material.Fluid;
 
 public class BOFluidTags {
     public static TagKey<Fluid> OXYGEN = FluidTags.create(new ResourceLocation("c", "oxygen"));
+    public static TagKey<Fluid> FORGE_OXYGEN = FluidTags.create(new ResourceLocation("forge", "oxygen"));
 }

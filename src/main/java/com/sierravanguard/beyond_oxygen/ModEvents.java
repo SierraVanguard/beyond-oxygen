@@ -3,14 +3,13 @@ package com.sierravanguard.beyond_oxygen;
 import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
 import com.sierravanguard.beyond_oxygen.items.CannedFoodItem;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
-import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
 import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -19,17 +18,17 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-@Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = BeyondOxygen.MODID)
 public class ModEvents {
     @SubscribeEvent
     public static void onRightClick(PlayerInteractEvent.RightClickItem event) {
@@ -140,5 +139,17 @@ public class ModEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         BODamageSources.releaseSources();
         BOFluids.releaseFluids();
+    }
+
+    @SubscribeEvent
+    public static void registerServerReloadListeners(AddReloadListenerEvent event) {
+        event.addListener((ResourceManagerReloadListener) manager -> BODamageSources.populateSources(event.getRegistryAccess()));
+    }
+
+    @SubscribeEvent
+    public static void onTagsUpdated(TagsUpdatedEvent event) {
+        if (event.shouldUpdateStaticData()) {
+            BOFluids.populateFluids(event.getRegistryAccess());
+        }
     }
 }

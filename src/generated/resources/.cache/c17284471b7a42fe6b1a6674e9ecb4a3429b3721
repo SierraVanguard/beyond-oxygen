@@ -1,0 +1,13 @@
+// 1.20.1	2025-11-24T17:20:22.2193813	Tags for minecraft:item mod id beyond_oxygen
+f69cba6ba3aa1776744116504c58f6461bf74154 data/c/tags/items/crops/potato.json
+2c42f0749711b7c466075eb0b2531ff12864f994 data/c/tags/items/dusts/redstone.json
+0bdc999a7f653eecbb3c513a0baf1b963a2587ab data/c/tags/items/foods/bread.json
+e20c82f0bc0b86d316827904e1e7d1813aff2a8b data/c/tags/items/glass_blocks.json
+9e56613f312d75044efda5eabdd2b507b4ff64d0 data/c/tags/items/ingots/refined_glowstone.json
+f3bb2c5ef67cf78dab8cf36820fc516082f2813d data/c/tags/items/ingots/refined_obsidian.json
+facbc39e1cb9a216ec6512eb9352b67901872a03 data/c/tags/items/ingots/steel.json
+83cd15a09ec409cb885a73d1e14751996527eafc data/c/tags/items/nuggets/iron.json
+918d98cd11f1b2deb5b18b78e67ca00a9230939b data/forge/tags/items/armors/boots.json
+85478a6ae496e8df196fa7a4be588b3728232806 data/forge/tags/items/armors/chestplates.json
+29918703b1bf9207447c7841671cbc278af96fbc data/forge/tags/items/armors/helmets.json
+4c4a3811456bfc58268110c6cdb9d40b3d783098 data/forge/tags/items/armors/leggings.json

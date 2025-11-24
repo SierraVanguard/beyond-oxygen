@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "mekanism:basic_control_circuit"
+    },
+    "S": {
+      "tag": "c:ingots/steel"
+    }
+  },
+  "pattern": [
+    "CSC",
+    "S S",
+    "S S"
+  ],
+  "result": {
+    "item": "beyond_oxygen:spacesuit_leggings"
+  },
+  "show_notification": true
+}
