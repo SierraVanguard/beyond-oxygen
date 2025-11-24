@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,20 +44,11 @@ public class VentBlockEntity extends BlockEntity {
     private int ventConsumption;
 
 
-    private final Set<Fluid> acceptedFluids = new HashSet<>();
-    private final FluidTank tank = new FluidTank(1000, stack -> acceptedFluids.contains(stack.getFluid()));
+    private final FluidTank tank = new FluidTank(1000, BOFluids::isOxygen);
     private LazyOptional<FluidTank> tankCap = LazyOptional.of(() -> tank);
 
     public VentBlockEntity(BlockPos pos, BlockState state) {
         super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), pos, state);
-        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
-    }
-
-    private void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
-        for (ResourceLocation id : fluidIds) {
-            Fluid f = ForgeRegistries.FLUIDS.getValue(id);
-            if (f != null) acceptedFluids.add(f);
-        }
     }
 
     @Override

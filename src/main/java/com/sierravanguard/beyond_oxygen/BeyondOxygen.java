@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 public class BeyondOxygen {
 
     public static final String MODID = "beyond_oxygen";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public BeyondOxygen() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

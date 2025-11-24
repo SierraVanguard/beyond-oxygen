@@ -1,9 +1,11 @@
 package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.CryoBedManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -27,5 +29,12 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void registerServerReloadListeners(AddReloadListenerEvent event) {
         event.addListener((ResourceManagerReloadListener) manager -> BODamageSources.populateSources(event.getRegistryAccess()));
+    }
+
+    @SubscribeEvent
+    public static void onTagsUpdated(TagsUpdatedEvent event) {
+        if (event.shouldUpdateStaticData()) {
+            BOFluids.populateFluids(event.getRegistryAccess());
+        }
     }
 }
