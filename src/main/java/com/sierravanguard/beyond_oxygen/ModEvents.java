@@ -5,6 +5,7 @@ import com.sierravanguard.beyond_oxygen.items.CannedFoodItem;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -138,5 +139,6 @@ public class ModEvents {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         BODamageSources.releaseSources();
+        BOFluids.releaseFluids();
     }
 }

@@ -13,7 +13,6 @@
     public class BOConfig {
         private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
         public static final ForgeConfigSpec.ConfigValue<Integer> VENT_RANGE = BUILDER.comment("Max range of vent, high value CAN AND WILL cause lag.").define("ventRange", 2048);
-        public static final ForgeConfigSpec.ConfigValue<List<? extends String>> OXYGEN_FLUIDS = BUILDER.comment("List of fluids to accept as oxygen").defineListAllowEmpty("oxygenFluids", List.of("mekanism:oxygen"), s -> s instanceof String);
         public static final ForgeConfigSpec.ConfigValue<Integer> OXYGEN_TANK_CAPACITY = BUILDER.comment("Max amount of oxygen that oxygen tank can contain (in mb)").define("oxygenTankCapacity", 1200);
         public static final ForgeConfigSpec.ConfigValue<Integer> OXYGEN_CONSUMPTION = BUILDER.comment("How many oxygen units in 1 mb").define("oxygenConsumption", 10);
         public static final ForgeConfigSpec.ConfigValue<List<? extends String>> UNBREATHABLE_DIMENSIONS = BUILDER.comment("List of unbreathable dimensions").defineListAllowEmpty("unbreathableDimensions", List.of("minecraft:the_end"), s -> s instanceof String);
@@ -122,13 +121,6 @@
             return VENT_CONSUMPTION.get();
         }
 
-
-        public static List<ResourceLocation> getOxygenFluids() {
-            if (OXYGEN_FLUIDS == null) return List.of();
-            List<ResourceLocation> fluids = new ArrayList<>();
-            for (String id : OXYGEN_FLUIDS.get()) fluids.add(toResourceLocation(id));
-            return fluids;
-        }
 
         public static List<ResourceLocation> getUnbreathableDimensions() {
             if (UNBREATHABLE_DIMENSIONS == null) return List.of();

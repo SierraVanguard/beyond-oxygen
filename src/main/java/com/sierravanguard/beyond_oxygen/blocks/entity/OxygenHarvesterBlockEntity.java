@@ -2,6 +2,7 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
 import com.sierravanguard.beyond_oxygen.utils.HermeticAreaData;
 import com.sierravanguard.beyond_oxygen.utils.HermeticAreaServerManager;
@@ -41,12 +42,11 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
 
     private HermeticArea cachedSealedArea = null;
     private Iterator<BlockPos> scanIterator = null;
-    private final Set<Fluid> acceptedFluids = new HashSet<>();
 
     private final FluidTank oxygenTank = new FluidTank(10000) {
         @Override
         public boolean isFluidValid(FluidStack stack) {
-            return acceptedFluids.contains(stack.getFluid());
+            return BOFluids.isOxygen(stack);
         }
 
         @Override
@@ -80,21 +80,11 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
 
     public OxygenHarvesterBlockEntity(BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
         super(BOBlockEntities.OXYGEN_HARVESTER.get(), pos, state);
-        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
-    }
-
-    private void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
-        acceptedFluids.clear();
-        for (ResourceLocation fluidId : fluidIds) {
-            Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
-            if (fluid != null) acceptedFluids.add(fluid);
-        }
     }
 
     public static void tick(Level level, BlockPos pos, net.minecraft.world.level.block.state.BlockState state, BlockEntity be) {
         if (level.isClientSide || !(be instanceof OxygenHarvesterBlockEntity harvester)) return;
         ServerLevel serverLevel = (ServerLevel) level;
-
 
         if (harvester.cachedSealedArea == null) {
             if (harvester.savedAreaId != -1) {
@@ -157,24 +147,25 @@ public class OxygenHarvesterBlockEntity extends BlockEntity {
             isInHarvestCycle = true;
         }
 
-        Fluid oxygenFluid = acceptedFluids.stream().findFirst().orElse(null);
-        if (oxygenFluid == null) return;
+        Optional<Fluid> oxygenFluid = BOFluids.getOxygenFluid();
 
         int oxygenHarvested = 0;
         int scanned = 0;
 
-        while (scanIterator.hasNext() && scanned < MAX_SCAN_PER_TICK &&
-                getOxygenTankSpace() >= OXYGEN_PER_PLANT &&
-                energyStorage.getEnergyStored() >= ENERGY_COST_PER_HARVEST) {
+        if (oxygenFluid.isPresent()) {
+            while (scanIterator.hasNext() && scanned < MAX_SCAN_PER_TICK &&
+                    getOxygenTankSpace() >= OXYGEN_PER_PLANT &&
+                    energyStorage.getEnergyStored() >= ENERGY_COST_PER_HARVEST) {
 
-            BlockPos checkPos = scanIterator.next();
-            var state = serverLevel.getBlockState(checkPos);
-            if (state.is(BlockTags.LEAVES) || state.is(BlockTags.CROPS)) {
-                int filled = oxygenTank.fill(new FluidStack(oxygenFluid, OXYGEN_PER_PLANT), IFluidHandler.FluidAction.EXECUTE);
-                if (filled > 0) energyStorage.extractEnergy(ENERGY_COST_PER_HARVEST, false);
-                oxygenHarvested += filled;
+                BlockPos checkPos = scanIterator.next();
+                var state = serverLevel.getBlockState(checkPos);
+                if (state.is(BlockTags.LEAVES) || state.is(BlockTags.CROPS)) {
+                    int filled = oxygenTank.fill(new FluidStack(oxygenFluid.get(), OXYGEN_PER_PLANT), IFluidHandler.FluidAction.EXECUTE);
+                    if (filled > 0) energyStorage.extractEnergy(ENERGY_COST_PER_HARVEST, false);
+                    oxygenHarvested += filled;
+                }
+                scanned++;
             }
-            scanned++;
         }
 
         if (!scanIterator.hasNext()) {
