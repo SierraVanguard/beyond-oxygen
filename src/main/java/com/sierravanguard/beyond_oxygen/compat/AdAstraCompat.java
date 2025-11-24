@@ -8,14 +8,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.fml.ModList;
 
 public class AdAstraCompat {
+    private static final String AD_ASTRA_MODID = "ad_astra";
 
     private static boolean initialized = false;
 
     public static void init() {
-        if (!ModList.get().isLoaded("adastra")) return;
+        if (!ModList.get().isLoaded(AD_ASTRA_MODID)) return;
         AdAstraEvents.EntityOxygenEvent.register(AdAstraCompat::onEntityOxygenCheck);
         initialized = true;
-        BeyondOxygen.LOGGER.info("Beyond Oxygen Ad Astra compatability loaded");
+        BeyondOxygen.LOGGER.info("Beyond Oxygen Ad Astra compatibility loaded");
     }
 
     private static Boolean onEntityOxygenCheck(Entity entity, Boolean hasOxygen) {

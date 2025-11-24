@@ -2,6 +2,7 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.registry.BOFluids;
@@ -189,7 +190,7 @@ public class VentBlockEntity extends BlockEntity {
             if (inside && hasAir) {
                 player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
                 if (vent.temperatureRegulatorApplied)
-                    ColdSweatCompat.setComfortableTemp(player);
+                    CompatLoader.setComfortableTemperature(player);
             }
         }
 
