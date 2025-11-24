@@ -119,9 +119,9 @@ public class BubbleGeneratorScreen extends AbstractContainerScreen<BubbleGenerat
 
         graphics.blit(TEXTURE, leftPos + GAUGE_X, topPos + GAUGE_Y, GAUGE_TEX_U, GAUGE_TEX_V, GAUGE_SIZE, GAUGE_SIZE);
         float oxygenRatio = Math.min((float) menu.getOxygenRatio(), 1.0f);
-        float startAngle = 185f;
-        float sweepAngle = 340f;
-        float angle = (startAngle + oxygenRatio * sweepAngle) % 360f;
+        float startAngle = 225;
+        float sweepAngle = 270;
+        float angle = (startAngle + oxygenRatio * sweepAngle) % 360;
 
         graphics.pose().pushPose();
         int pivotX = leftPos + GAUGE_X + GAUGE_SIZE / 2;
