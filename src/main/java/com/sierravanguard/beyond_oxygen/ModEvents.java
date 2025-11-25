@@ -4,7 +4,10 @@ import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
 import com.sierravanguard.beyond_oxygen.items.CannedFoodItem;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
+import com.sierravanguard.beyond_oxygen.registry.BODimensions;
 import com.sierravanguard.beyond_oxygen.registry.BOFluids;
+import com.sierravanguard.beyond_oxygen.registry.BOItems;
+import com.sierravanguard.beyond_oxygen.tags.BOItemTags;
 import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -36,7 +39,7 @@ public class ModEvents {
         ItemStack stack = event.getItemStack();
 
         if (stack.getItem().isEdible() &&
-                !(stack.getItem() instanceof CannedFoodItem) &&
+                !stack.is(BOItemTags.SPACE_SUIT_EATABLE) &&
                 SpaceSuitHandler.isWearingFullSuit(player)) {
 
             if (!player.level().isClientSide) {
@@ -85,7 +88,7 @@ public class ModEvents {
     @SubscribeEvent
     public static void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
-        if (!BOConfig.getUnbreathableDimensions().contains(level.dimension().location())) {
+        if (!BODimensions.isUnbreathable(level)) {
             return;
         }
         BlockPos pos = event.getPos();
@@ -139,6 +142,7 @@ public class ModEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         BODamageSources.releaseSources();
         BOFluids.releaseFluids();
+        BODimensions.releaseDimensions();
     }
 
     @SubscribeEvent
@@ -150,6 +154,7 @@ public class ModEvents {
     public static void onTagsUpdated(TagsUpdatedEvent event) {
         if (event.shouldUpdateStaticData()) {
             BOFluids.populateFluids(event.getRegistryAccess());
+            BODimensions.populateDimensions(event.getRegistryAccess());
         }
     }
 }

@@ -1,54 +1,51 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
-import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
-import net.minecraft.resources.ResourceLocation;
+import com.sierravanguard.beyond_oxygen.tags.BOItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.List;
 
 public class SpaceSuitHandler {
 
     
     public static boolean isWearingFullSuit(Player player) {
-        return isSlotValid(player, EquipmentSlot.HEAD, BOConfig.getSpaceHelmets()) &&
-                isSlotValid(player, EquipmentSlot.CHEST, BOConfig.getSpaceChestplates()) &&
-                isSlotValid(player, EquipmentSlot.LEGS, BOConfig.getSpaceLeggings()) &&
-                isSlotValid(player, EquipmentSlot.FEET, BOConfig.getSpaceBoots()) &&
+        return isWearing(player,
+                BOItemTags.SPACE_SUIT_HELMETS,
+                BOItemTags.SPACE_SUIT_CHESTPLATES,
+                BOItemTags.SPACE_SUIT_LEGGINGS,
+                BOItemTags.SPACE_SUIT_BOOTS) &&
                 isHelmetClosed(player);
     }
 
     
     public static boolean isWearingFullCryoSuit(Player player) {
-        return isSlotValid(player, EquipmentSlot.HEAD, BOConfig.getCryoHelmets()) &&
-                isSlotValid(player, EquipmentSlot.CHEST, BOConfig.getCryoChestplates()) &&
-                isSlotValid(player, EquipmentSlot.LEGS, BOConfig.getCryoLeggings()) &&
-                isSlotValid(player, EquipmentSlot.FEET, BOConfig.getCryoBoots()) &&
+        return isWearing(player,
+                BOItemTags.CRYO_HELMETS,
+                BOItemTags.CRYO_CHESTPLATES,
+                BOItemTags.CRYO_LEGGINGS,
+                BOItemTags.CRYO_BOOTS) &&
                 isHelmetClosed(player);
     }
 
     
     public static boolean isWearingFullThermalSuit(Player player) {
-        return isSlotValid(player, EquipmentSlot.HEAD, BOConfig.getThermalHelmets()) &&
-                isSlotValid(player, EquipmentSlot.CHEST, BOConfig.getThermalChestplates()) &&
-                isSlotValid(player, EquipmentSlot.LEGS, BOConfig.getThermalLeggings()) &&
-                isSlotValid(player, EquipmentSlot.FEET, BOConfig.getThermalBoots()) &&
+        return isWearing(player,
+                BOItemTags.THERMAL_HELMETS,
+                BOItemTags.THERMAL_CHESTPLATES,
+                BOItemTags.THERMAL_LEGGINGS,
+                BOItemTags.THERMAL_BOOTS) &&
                 isHelmetClosed(player);
     }
 
-    
-    private static boolean isSlotValid(Player player, EquipmentSlot slot, List<ResourceLocation> validList) {
-        if (validList == null || validList.isEmpty()) return false;
-
-        ItemStack stack = player.getItemBySlot(slot);
-        if (stack.isEmpty()) return false;
-
-        ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        return itemId != null && validList.contains(itemId);
+    public static boolean isWearing(Player player, TagKey<Item> head, TagKey<Item> chest, TagKey<Item> legs, TagKey<Item> feet) {
+        return player.getItemBySlot(EquipmentSlot.HEAD).is(head) &&
+                player.getItemBySlot(EquipmentSlot.CHEST).is(chest) &&
+                player.getItemBySlot(EquipmentSlot.LEGS).is(legs) &&
+                player.getItemBySlot(EquipmentSlot.FEET).is(feet);
     }
 
     

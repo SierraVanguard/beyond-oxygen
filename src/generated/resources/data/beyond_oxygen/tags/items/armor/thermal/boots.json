@@ -1,0 +1,9 @@
+{
+  "values": [
+    "beyond_oxygen:thermal_suit_boots",
+    {
+      "id": "ad_astra:netherite_space_boots",
+      "required": false
+    }
+  ]
+}

@@ -2,6 +2,7 @@ package com.sierravanguard.beyond_oxygen.items.armor;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.tags.BOItemTags;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
@@ -13,13 +14,13 @@ import java.util.function.Supplier;
 
 public enum SpaceSuitArmorMaterial implements ArmorMaterial {
     SPACESUIT("spacesuit", 10, new int[]{4, 6, 4, 3}, 22, SoundEvents.ARMOR_EQUIP_LEATHER, 0f, 0f,
-            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.getSpaceRepairMaterial()))),
+            () -> Ingredient.of(BOItemTags.SPACE_SUIT_REPAIR_MATERIAL)),
 
     CRYO_SUIT("cryo_suit", 12, new int[]{5, 7, 5, 3}, 25, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0f, 0.1f,
-            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.getCryoRepairMaterial()))),
+            () -> Ingredient.of(BOItemTags.CRYO_REPAIR_MATERIAL)),
 
     THERMAL_SUIT("thermal_suit", 13, new int[]{5, 7, 5, 3}, 25, SoundEvents.ARMOR_EQUIP_GOLD, 1.0f, 0.1f,
-            () -> Ingredient.of(ForgeRegistries.ITEMS.getValue(BOConfig.getThermalRepairMaterial())));
+            () -> Ingredient.of(BOItemTags.THERMAL_REPAIR_MATERIAL));
 
     private final String name;
     private final int durabilityMultiplier;

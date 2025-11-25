@@ -1,0 +1,73 @@
+{
+  "values": [
+    "minecraft:the_end",
+    {
+      "id": "cosmos:alpha_system",
+      "required": false
+    },
+    {
+      "id": "cosmos:b_1400_centauri",
+      "required": false
+    },
+    {
+      "id": "cosmos:earth_moon",
+      "required": false
+    },
+    {
+      "id": "cosmos:europa_lands",
+      "required": false
+    },
+    {
+      "id": "cosmos:gaia_bh_1",
+      "required": false
+    },
+    {
+      "id": "cosmos:glacio_lands",
+      "required": false
+    },
+    {
+      "id": "cosmos:jupiterlands",
+      "required": false
+    },
+    {
+      "id": "cosmos:j_1407blands",
+      "required": false
+    },
+    {
+      "id": "cosmos:j_1900",
+      "required": false
+    },
+    {
+      "id": "cosmos:marslands",
+      "required": false
+    },
+    {
+      "id": "cosmos:mercury_wasteland",
+      "required": false
+    },
+    {
+      "id": "cosmos:neptune_lands",
+      "required": false
+    },
+    {
+      "id": "cosmos:plutowastelands",
+      "required": false
+    },
+    {
+      "id": "cosmos:saturn_lands",
+      "required": false
+    },
+    {
+      "id": "cosmos:solar_system",
+      "required": false
+    },
+    {
+      "id": "cosmos:uranus_lands",
+      "required": false
+    },
+    {
+      "id": "cosmos:venuslands",
+      "required": false
+    }
+  ]
+}

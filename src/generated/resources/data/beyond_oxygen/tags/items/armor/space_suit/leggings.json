@@ -1,0 +1,15 @@
+{
+  "values": [
+    "beyond_oxygen:spacesuit_leggings",
+    "beyond_oxygen:cryo_suit_leggings",
+    "beyond_oxygen:thermal_suit_leggings",
+    {
+      "id": "ad_astra:space_pants",
+      "required": false
+    },
+    {
+      "id": "ad_astra:netherite_space_pants",
+      "required": false
+    }
+  ]
+}

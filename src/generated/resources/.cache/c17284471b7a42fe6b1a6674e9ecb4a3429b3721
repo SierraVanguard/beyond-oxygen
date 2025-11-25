@@ -1,4 +1,21 @@
-// 1.20.1	2025-11-24T17:20:22.2193813	Tags for minecraft:item mod id beyond_oxygen
+// 1.20.1	2025-11-24T19:16:52.2753619	Tags for minecraft:item mod id beyond_oxygen
+209b051e366675e862011916dd9f3213279326b1 data/beyond_oxygen/tags/items/armor/cryo/boots.json
+e3502e5615c317403c4ee658be297cafd1f49c4c data/beyond_oxygen/tags/items/armor/cryo/chestplates.json
+d01e1bec1d4a9578b064dc39137c34928d1df57e data/beyond_oxygen/tags/items/armor/cryo/helmets.json
+c42be3a6cf851d9dc6cc5fdd33144454b1635aad data/beyond_oxygen/tags/items/armor/cryo/leggings.json
+abdf301126fea8685a6ccc0cb31d83e88d7b483d data/beyond_oxygen/tags/items/armor/space_suit/boots.json
+910b2527f5606280d21242a8565b42c151742f7d data/beyond_oxygen/tags/items/armor/space_suit/chestplates.json
+03da25f7fb5ba0f72280b488b9d0ee937dffbd9b data/beyond_oxygen/tags/items/armor/space_suit/helmets.json
+bc2df349b0e7aa150c9b739e414f256042c79072 data/beyond_oxygen/tags/items/armor/space_suit/leggings.json
+e5083fa08c0d71a0ce4924766dcaf4011f89a155 data/beyond_oxygen/tags/items/armor/thermal/boots.json
+60f15691d5161f63128a6d84d1680d3d18741a95 data/beyond_oxygen/tags/items/armor/thermal/chestplates.json
+50c7179035dadac813fe88035aec880dd24f607d data/beyond_oxygen/tags/items/armor/thermal/helmets.json
+b96667668838d121cdda95de07572fdd63b6319a data/beyond_oxygen/tags/items/armor/thermal/leggings.json
+c3b92fa426d6823b5a6d65bbffcf36eaad43ad13 data/beyond_oxygen/tags/items/breathables.json
+96470b523b56cd9a49809b3782016eb8a0cf9578 data/beyond_oxygen/tags/items/repair_item/cryo.json
+01bb771f7c7ff38f724efccbe5e00c87a48b27b7 data/beyond_oxygen/tags/items/repair_item/space_suit.json
+7b3558cb9705d9e0e528dbe512cd4e9dab2acdca data/beyond_oxygen/tags/items/repair_item/thermal.json
+603f31917494839df13210cbf5aee98e37f09b59 data/beyond_oxygen/tags/items/space_suit_eatable.json
 f69cba6ba3aa1776744116504c58f6461bf74154 data/c/tags/items/crops/potato.json
 2c42f0749711b7c466075eb0b2531ff12864f994 data/c/tags/items/dusts/redstone.json
 0bdc999a7f653eecbb3c513a0baf1b963a2587ab data/c/tags/items/foods/bread.json

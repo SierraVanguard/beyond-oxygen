@@ -1,0 +1,15 @@
+{
+  "values": [
+    "beyond_oxygen:spacesuit_helmet",
+    "beyond_oxygen:cryo_suit_helmet",
+    "beyond_oxygen:thermal_suit_helmet",
+    {
+      "id": "ad_astra:space_helmet",
+      "required": false
+    },
+    {
+      "id": "ad_astra:netherite_space_helmet",
+      "required": false
+    }
+  ]
+}
