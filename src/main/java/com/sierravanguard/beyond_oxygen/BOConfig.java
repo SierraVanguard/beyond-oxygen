@@ -22,6 +22,16 @@
                 .defineInRange("bubbleMaxRadius", 5, 5, 20);
         public static final ForgeConfigSpec.ConfigValue<Integer> TIME_TO_IMPLODE = BUILDER.comment("How many ticks (1 second ~ 20 ticks) for someone to IMPLODE from lack of air? Do not set lower than 15, or you may experience flicker.").define("timeToImplode", 10);
 
+        public static final ForgeConfigSpec.BooleanValue UNBNREATHABLE_DIMENSIONS = BUILDER
+                .comment("Enable Beyond Oxygen unbreathable dimensions")
+                .define("unbreathable_dimensions", true);
+        public static final ForgeConfigSpec.BooleanValue COLD_DIMENSIONS = BUILDER
+                .comment("Enable Beyond Oxygen cold dimensions")
+                .define("cold_dimensions", true);
+        public static final ForgeConfigSpec.BooleanValue HOT_DIMENSIONS = BUILDER
+                .comment("Enable Beyond Oxygen hot dimensions")
+                .define("hot_dimensions", true);
+
         static final ForgeConfigSpec SPEC = BUILDER.build();
         private static ResourceLocation toResourceLocation(String id) {
             String[] parts = id.split(":");

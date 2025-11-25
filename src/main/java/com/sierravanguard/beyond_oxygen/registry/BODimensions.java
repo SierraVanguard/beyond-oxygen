@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.registry;
 
+import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.tags.BODimensionTags;
 import net.minecraft.core.*;
@@ -44,14 +45,14 @@ public class BODimensions {
     }
 
     public static boolean isUnbreathable(Level level) {
-        return unbreathable.contains(level.dimension());
+        return BOConfig.UNBNREATHABLE_DIMENSIONS.get() && unbreathable.contains(level.dimension());
     }
 
     public static boolean isCold(Level level) {
-        return cold.contains(level.dimension());
+        return BOConfig.COLD_DIMENSIONS.get() && cold.contains(level.dimension());
     }
 
     public static boolean isHot(Level level) {
-        return hot.contains(level.dimension());
+        return BOConfig.HOT_DIMENSIONS.get() && hot.contains(level.dimension());
     }
 }
