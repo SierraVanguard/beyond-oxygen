@@ -4,6 +4,7 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.items.OxygenTank;
 import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
+import com.sierravanguard.beyond_oxygen.tags.BOItemTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -33,15 +34,12 @@ public class OxygenManager {
     
     public static void consumeOxygen(Player player) {
         if (!SpaceSuitHandler.isWearingFullSuit(player)) return;
-        List<ResourceLocation> validOxygenItems = BOConfig.getBreathables();
         boolean hasOxygen = false;
         int mbToDrain = 1;
 
 
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.isEmpty()) continue;
-            ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-            if (id != null && validOxygenItems.contains(id)) {
+            if (stack.is(BOItemTags.BREATHABLES)) {
                 if (drainFluid(stack, mbToDrain)) hasOxygen = true;
             }
         }
@@ -70,12 +68,9 @@ public class OxygenManager {
     
     public static int getTotalOxygen(Player player) {
         int total = 0;
-        List<ResourceLocation> validList = BOConfig.getBreathables();
 
         for (ItemStack stack : player.getInventory().items) {
-            if (validList == null || validList.isEmpty()) return 0;
-            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
-            if (itemId != null && validList.contains(itemId)){
+            if (stack.is(BOItemTags.BREATHABLES)) {
                 total += getFluidAmount(stack);
             }
         }

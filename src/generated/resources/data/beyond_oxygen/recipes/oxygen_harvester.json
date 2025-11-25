@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": {
+      "item": "mekanism:advanced_control_circuit"
+    },
+    "C": {
+      "item": "mekanism:rotary_condensentrator"
+    },
+    "V": {
+      "item": "beyond_oxygen:vent"
+    }
+  },
+  "pattern": [
+    " V ",
+    "ACA",
+    " V "
+  ],
+  "result": {
+    "item": "beyond_oxygen:oxygen_harvester"
+  },
+  "show_notification": true
+}

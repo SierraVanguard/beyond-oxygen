@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "mekanism:advanced_control_circuit"
+    },
+    "L": {
+      "item": "beyond_oxygen:spacesuit_leggings"
+    },
+    "O": {
+      "tag": "c:ingots/refined_obsidian"
+    }
+  },
+  "pattern": [
+    "COC",
+    " L "
+  ],
+  "result": {
+    "item": "beyond_oxygen:cryo_suit_leggings"
+  },
+  "show_notification": true
+}

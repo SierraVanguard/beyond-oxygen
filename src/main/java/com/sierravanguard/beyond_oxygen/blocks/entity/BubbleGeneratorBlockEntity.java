@@ -6,6 +6,7 @@ import com.sierravanguard.beyond_oxygen.client.menu.BubbleGeneratorMenu;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.BubbleGeneratorTracker;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import net.minecraft.core.BlockPos;
@@ -48,18 +49,9 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
     private int lastSentOxygen = -1;
     public int temperatureRegulatorCooldown = 0;
     public boolean temperatureRegulatorApplied = false;
-    private final Set<Fluid> acceptedFluids = new HashSet<>();
     public float controlledMaxRadius;
-    public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
-        for (ResourceLocation fluidId : fluidIds) {
-            Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
-            if (fluid != null) {
-                acceptedFluids.add(fluid);
-            }
-        }
-    }
 
-    private final FluidTank tank = new FluidTank(1000, fluidStack -> acceptedFluids.contains(fluidStack.getFluid()));
+    private final FluidTank tank = new FluidTank(1000, BOFluids::isOxygen);
     private LazyOptional<FluidTank> tankLazyOptional = LazyOptional.of(() -> tank);
 
     private final EnergyStorage energyStorage = new EnergyStorage(1000);
@@ -70,7 +62,6 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
 
     public BubbleGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(BOBlockEntities.BUBBLE_GENERATOR.get(), pos, state);
-        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
         controlledMaxRadius = currentRadius;
     }
 

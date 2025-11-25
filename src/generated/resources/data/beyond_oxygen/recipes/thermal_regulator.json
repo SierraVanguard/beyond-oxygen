@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "mekanism:advanced_control_circuit"
+    },
+    "I": {
+      "tag": "c:ingots/refined_obsidian"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    }
+  },
+  "pattern": [
+    "IRI",
+    "RCR",
+    "IRI"
+  ],
+  "result": {
+    "item": "beyond_oxygen:thermal_regulator"
+  },
+  "show_notification": true
+}

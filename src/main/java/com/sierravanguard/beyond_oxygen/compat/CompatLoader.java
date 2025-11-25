@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.compat;
 
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.fml.ModList;
 
@@ -9,42 +10,26 @@ public class CompatLoader
     private static final String AD_ASTRA_MODID = "ad_astra";
     public static void init()
     {
-        if (ModList.get().isLoaded(COLD_SWEAT_MODID))
+        try
         {
-            try
-            {
-                ColdSweatCompat.init();
-            }
-            catch (Throwable t)
-            {
-                System.err.println("[Beyond Oxygen] Failed to initialize Cold Sweat compat: " + t.getMessage());
-            }
+            ColdSweatCompat.init();
         }
-        if (ModList.get().isLoaded(AD_ASTRA_MODID))
+        catch (Throwable t)
         {
-            try
-            {
-                AdAstraCompat.init();
-            }
-            catch (Throwable t)
-            {
-                System.err.println("[Beyond Oxygen] Failed to initialize Ad Astra compat: " + t.getMessage());
-            }
+            BeyondOxygen.LOGGER.error("Failed to initialize Cold Sweat compat", t);
+        }
+        try
+        {
+            AdAstraCompat.init();
+        }
+        catch (Throwable t)
+        {
+            BeyondOxygen.LOGGER.error("Failed to initialize Ad Astra compat", t);
         }
     }
 
     public static void setComfortableTemperature(LivingEntity entity)
     {
-        if (ModList.get().isLoaded(COLD_SWEAT_MODID))
-        {
-            try
-            {
-                ColdSweatCompat.setComfortableTemp(entity);
-            }
-            catch (Throwable t)
-            {
-                System.err.println("[Beyond Oxygen] Failed to set comfortable temperature: " + t.getMessage());
-            }
-        }
+        ColdSweatCompat.setComfortableTemp(entity);
     }
 }

@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.cap;
 
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
@@ -18,24 +19,10 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 public class OxygenTankCap extends FluidHandlerItemStack {
     public OxygenTankCap(@NotNull ItemStack container, int capacity) {
         super(container, capacity);
-        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
-        System.out.println("[Beyond Oxygen] Accepted oxygen fluids: " + acceptedFluids);
-    }
-
-
-    private final Set<Fluid> acceptedFluids = new HashSet<>();
-
-    public void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
-        for (ResourceLocation fluidId : fluidIds) {
-            Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
-            if (fluid != null) {
-                acceptedFluids.add(fluid);
-            }
-        }
     }
 
     @Override
     public boolean canFillFluidType(FluidStack fluid) {
-        return acceptedFluids.contains(fluid.getFluid());
+        return BOFluids.isOxygen(fluid);
     }
 }

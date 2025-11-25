@@ -2,8 +2,10 @@ package com.sierravanguard.beyond_oxygen.blocks.entity;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,20 +45,11 @@ public class VentBlockEntity extends BlockEntity {
     private int ventConsumption;
 
 
-    private final Set<Fluid> acceptedFluids = new HashSet<>();
-    private final FluidTank tank = new FluidTank(1000, stack -> acceptedFluids.contains(stack.getFluid()));
+    private final FluidTank tank = new FluidTank(1000, BOFluids::isOxygen);
     private LazyOptional<FluidTank> tankCap = LazyOptional.of(() -> tank);
 
     public VentBlockEntity(BlockPos pos, BlockState state) {
         super(BOBlockEntities.VENT_BLOCK_ENTITY.get(), pos, state);
-        loadAcceptedFluidsFromConfig(BOConfig.getOxygenFluids());
-    }
-
-    private void loadAcceptedFluidsFromConfig(List<ResourceLocation> fluidIds) {
-        for (ResourceLocation id : fluidIds) {
-            Fluid f = ForgeRegistries.FLUIDS.getValue(id);
-            if (f != null) acceptedFluids.add(f);
-        }
     }
 
     @Override
@@ -181,7 +174,7 @@ public class VentBlockEntity extends BlockEntity {
         if (vent.temperatureRegulatorCooldown > 0)
             vent.temperatureRegulatorCooldown--;
         boolean hasAir = false;
-        System.out.println("Area hermetic? " + vent.hermeticArea.isHermetic());
+        //System.out.println("Area hermetic? " + vent.hermeticArea.isHermetic());
         if (vent.hermeticArea.isHermetic()) {
             int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / vent.ventConsumption);
             if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
@@ -190,14 +183,14 @@ public class VentBlockEntity extends BlockEntity {
 
         vent.hermeticArea.setHasAir(hasAir);
         for (ServerPlayer player : server.players()) {
-            System.out.println("Area has air? " + hasAir);
+            //System.out.println("Area has air? " + hasAir);
             boolean inside = vent.isPlayerInsideHermeticArea(player);
             VSCompat.applySealedEffects(player, pos, vent.hermeticArea, vent);
 
             if (inside && hasAir) {
                 player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
                 if (vent.temperatureRegulatorApplied)
-                    ColdSweatCompat.setComfortableTemp(player);
+                    CompatLoader.setComfortableTemperature(player);
             }
         }
 

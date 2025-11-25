@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "N": {
+      "tag": "c:nuggets/iron"
+    }
+  },
+  "pattern": [
+    "N N",
+    " N "
+  ],
+  "result": {
+    "count": 4,
+    "item": "beyond_oxygen:empty_can"
+  },
+  "show_notification": true
+}
