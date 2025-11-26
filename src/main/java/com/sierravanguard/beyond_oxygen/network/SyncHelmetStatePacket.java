@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen.network;
 
+import com.sierravanguard.beyond_oxygen.capabilities.HelmetState;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -32,7 +33,7 @@ public class SyncHelmetStatePacket {
         context.enqueueWork(() -> {
             var player = net.minecraft.client.Minecraft.getInstance().player;
             if (player == null) return;
-            player.getCapability(com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities.HELMET_STATE).ifPresent(state -> {
+            HelmetState.get(player).ifPresent(state -> {
                 state.setOpen(pkt.open);
             });
         });

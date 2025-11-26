@@ -2,7 +2,7 @@ package com.sierravanguard.beyond_oxygen.client.renderer.armor;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
+import com.sierravanguard.beyond_oxygen.capabilities.HelmetState;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.items.armor.SpacesuitArmorItem;
 import net.minecraft.client.Minecraft;
@@ -14,8 +14,8 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class SpacesuitHelmetLayer<T extends LivingEntity> extends RenderLayer<T, HumanoidModel<T>> {
@@ -29,13 +29,11 @@ public class SpacesuitHelmetLayer<T extends LivingEntity> extends RenderLayer<T,
                        T entity, float limbSwing, float limbSwingAmount,
                        float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 
-        if (!(entity instanceof Player player)) return;
-
-        ItemStack helmet = player.getInventory().armor.get(3);
+        ItemStack helmet = entity.getItemBySlot(EquipmentSlot.HEAD);
         if (helmet.isEmpty()) return;
         if (!(helmet.getItem() instanceof SpacesuitArmorItem)) return;
 
-        player.getCapability(BOCapabilities.HELMET_STATE).ifPresent(state -> {
+        HelmetState.get(entity).ifPresent(state -> {
             String textureBaseName = "spacesuit_helmet";
 
             if (helmet.getItem() instanceof OpenableSpacesuitHelmetItem openableHelmet) {
