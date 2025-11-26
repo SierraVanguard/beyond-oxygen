@@ -48,7 +48,7 @@ public class HelmetState implements ICapabilitySerializable<CompoundTag> {
             if (!owner.level().isClientSide()) {
                 NetworkHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> owner),
                         new SyncEntityHelmetStatePacket(owner.getId(), open));
-                if (syncSelf && owner instanceof ServerPlayer serverPlayer) {
+                if (syncSelf && owner instanceof ServerPlayer serverPlayer && serverPlayer.connection != null) {
                     NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new SyncHelmetStatePacket(open));
                 }
