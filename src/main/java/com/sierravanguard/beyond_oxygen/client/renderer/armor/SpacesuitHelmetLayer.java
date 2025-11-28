@@ -2,12 +2,13 @@ package com.sierravanguard.beyond_oxygen.client.renderer.armor;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.capabilities.HelmetState;
+import com.sierravanguard.beyond_oxygen.client.model.OpenableHelmetModel;
 import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
-import com.sierravanguard.beyond_oxygen.items.armor.SpacesuitArmorItem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -17,11 +18,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class SpacesuitHelmetLayer<T extends LivingEntity> extends RenderLayer<T, HumanoidModel<T>> {
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondOxygen.MODID, "armor"), "openable_helmet");
+    public final OpenableHelmetModel<T> model;
 
-    public SpacesuitHelmetLayer(RenderLayerParent<T, HumanoidModel<T>> parent) {
+    public SpacesuitHelmetLayer(RenderLayerParent<T, HumanoidModel<T>> parent, EntityModelSet modelSet) {
         super(parent);
+        this.model = new OpenableHelmetModel<>(modelSet.bakeLayer(LAYER_LOCATION));
     }
 
     @Override
@@ -30,25 +35,15 @@ public class SpacesuitHelmetLayer<T extends LivingEntity> extends RenderLayer<T,
                        float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 
         ItemStack helmet = entity.getItemBySlot(EquipmentSlot.HEAD);
-        if (helmet.isEmpty()) return;
-        if (!(helmet.getItem() instanceof SpacesuitArmorItem)) return;
-
+        if (helmet.isEmpty() || !(helmet.getItem() instanceof OpenableSpacesuitHelmetItem helmetItem)) return;
+        LazyOptional<HelmetState> lazyState = HelmetState.get(entity);
+        if (lazyState.isPresent() && lazyState.resolve().get().isOpen()) return;
         HelmetState.get(entity).ifPresent(state -> {
-            String textureBaseName = "spacesuit_helmet";
-
-            if (helmet.getItem() instanceof OpenableSpacesuitHelmetItem openableHelmet) {
-                textureBaseName = openableHelmet.getTextureName();
-            }
-            String texturePath = "textures/models/armor/" + textureBaseName + (state.isOpen() ? "_transparent.png" : ".png");
-            ResourceLocation texture = new ResourceLocation("beyond_oxygen", texturePath);
-
-            HumanoidModel<T> armorModel = new HumanoidModel<>(
-                    Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)
-            );
-            armorModel.head.copyFrom(getParentModel().head);
-            armorModel.head.visible = true;
+            ResourceLocation texture = helmetItem.getHelmetTexture(helmet, entity);
+            model.helmet.copyFrom(getParentModel().head);
+            model.helmet.visible = getParentModel().head.visible;
             VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucentCull(texture));
-            armorModel.head.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         });
     }
 }

@@ -35,7 +35,7 @@ public class BOItems {
                 }});
     public static final RegistryObject<Item> BUBBLE_GENERATOR = ITEMS.register("bubble_generator", () -> new BlockItem(BOBlocks.BUBBLE_GENERATOR.get(), new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_HELMET = ITEMS.register("spacesuit_helmet",
-            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.HELMET, new Item.Properties(), "spacesuit_helmet"));
+            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.HELMET, new Item.Properties()));
     public static final RegistryObject<Item> SPACESUIT_CHESTPLATE = ITEMS.register("spacesuit_chestplate",
             () -> new OxygenStorageArmorItem(
                     SpaceSuitArmorMaterial.SPACESUIT,
@@ -51,7 +51,7 @@ public class BOItems {
     public static final RegistryObject<Item> SPACESUIT_BOOTS = ITEMS.register("spacesuit_boots",
             () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.SPACESUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
     public static final RegistryObject<Item> CRYO_SUIT_HELMET = ITEMS.register("cryo_suit_helmet",
-            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.HELMET, new Item.Properties(), "cryo_suit_helmet"));
+            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.HELMET, new Item.Properties()));
     public static final RegistryObject<Item> CRYO_SUIT_CHESTPLATE = ITEMS.register("cryo_suit_chestplate",
             () -> new OxygenStorageArmorItem(
                     SpaceSuitArmorMaterial.CRYO_SUIT,
@@ -67,7 +67,7 @@ public class BOItems {
     public static final RegistryObject<Item> CRYO_SUIT_BOOTS = ITEMS.register("cryo_suit_boots",
             () -> new SpacesuitArmorItem(SpaceSuitArmorMaterial.CRYO_SUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
     public static final RegistryObject<Item> THERMAL_HELMET = ITEMS.register("thermal_suit_helmet",
-            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.THERMAL_SUIT, ArmorItem.Type.HELMET, new Item.Properties(), "thermal_suit_helmet"));
+            () -> new OpenableSpacesuitHelmetItem(SpaceSuitArmorMaterial.THERMAL_SUIT, ArmorItem.Type.HELMET, new Item.Properties()));
 
     public static final RegistryObject<Item> THERMAL_CHESTPLATE = ITEMS.register("thermal_suit_chestplate",
             () -> new OxygenStorageArmorItem(
