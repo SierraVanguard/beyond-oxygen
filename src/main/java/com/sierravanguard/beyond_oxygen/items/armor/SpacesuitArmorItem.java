@@ -8,14 +8,4 @@ public class SpacesuitArmorItem extends ArmorItem {
     public SpacesuitArmorItem(ArmorMaterial material, Type type, Item.Properties properties) {
         super(material, type, properties);
     }
-
-    public boolean isHelmet() {
-        return this.getType() == Type.HELMET;
-    }
-    public boolean canOpenHelmet() {
-        return false;
-    }
-    public boolean isOpenableHelmet() {
-        return this instanceof OpenableSpacesuitHelmetItem;
-    }
 }

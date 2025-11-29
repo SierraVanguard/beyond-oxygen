@@ -10,7 +10,7 @@ import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -52,13 +52,13 @@ public class BeyondOxygen {
 
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        event.register(IHelmetState.class);
+        event.register(HelmetState.class);
     }
 
     @SubscribeEvent
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player player) {
-            event.addCapability(new ResourceLocation(MODID, "helmet_state"), new HelmetStateProvider(player));
+        if (event.getObject() instanceof LivingEntity entity) {
+            event.addCapability(HelmetState.ID, new HelmetState(entity));
         }
     }
 

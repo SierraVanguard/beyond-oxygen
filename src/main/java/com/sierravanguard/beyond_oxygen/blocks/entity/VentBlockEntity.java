@@ -14,6 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,8 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.sierravanguard.beyond_oxygen.utils.VSCompat.isPlayerInHermeticArea;
 
 public class VentBlockEntity extends BlockEntity {
     private boolean pendingAreaClear = false;
@@ -79,8 +79,8 @@ public class VentBlockEntity extends BlockEntity {
         return true;
     }
 
-    private boolean isPlayerInsideHermeticArea(ServerPlayer player) {
-        return hermeticArea != null && isPlayerInHermeticArea(player, hermeticArea);
+    private boolean isEntityInsideHermeticArea(LivingEntity entity) {
+        return hermeticArea != null && VSCompat.isEntityInHermeticArea(entity, hermeticArea);
     }
 
     @Override
@@ -173,26 +173,27 @@ public class VentBlockEntity extends BlockEntity {
         }
         if (vent.temperatureRegulatorCooldown > 0)
             vent.temperatureRegulatorCooldown--;
-        boolean hasAir = false;
+        boolean hasAir;
         //System.out.println("Area hermetic? " + vent.hermeticArea.isHermetic());
         if (vent.hermeticArea.isHermetic()) {
             int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / vent.ventConsumption);
             if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
             hasAir = vent.consumeOxygen(oxygenNeeded);
-        }
+        } else hasAir = false;
 
         vent.hermeticArea.setHasAir(hasAir);
-        for (ServerPlayer player : server.players()) {
-            //System.out.println("Area has air? " + hasAir);
-            boolean inside = vent.isPlayerInsideHermeticArea(player);
-            VSCompat.applySealedEffects(player, pos, vent.hermeticArea, vent);
+        //System.out.println("Area has air? " + hasAir);
+        level.getEntities((Entity) null, vent.hermeticArea.getBounds(), e -> e instanceof LivingEntity).forEach(entity -> {
+            LivingEntity living = (LivingEntity) entity;
+            boolean inside = vent.isEntityInsideHermeticArea(living);
+            VSCompat.applySealedEffects(living, pos, vent.hermeticArea, vent);
 
             if (inside && hasAir) {
-                player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
+                living.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
                 if (vent.temperatureRegulatorApplied)
-                    CompatLoader.setComfortableTemperature(player);
+                    CompatLoader.setComfortableTemperature(living);
             }
-        }
+        });
 
  
         if (vent.pendingAreaClear) {

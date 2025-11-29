@@ -1,0 +1,17 @@
+{
+  "values": [
+    "#minecraft:skeletons",
+    "minecraft:skeleton_horse",
+    "minecraft:enderman",
+    "minecraft:endermite",
+    "minecraft:ender_dragon",
+    "minecraft:shulker",
+    "minecraft:iron_golem",
+    "minecraft:snow_golem",
+    "minecraft:wither",
+    {
+      "id": "#ad_astra:lives_without_oxygen",
+      "required": false
+    }
+  ]
+}

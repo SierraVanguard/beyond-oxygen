@@ -2,18 +2,14 @@ package com.sierravanguard.beyond_oxygen.network;
 
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-import java.util.Set;
-
 public class NetworkHandler {
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "2";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BeyondOxygen.MODID, "network"),
             () -> PROTOCOL_VERSION,
@@ -27,15 +23,20 @@ public class NetworkHandler {
     }
 
     public static void register() {
-        CHANNEL.registerMessage(nextID(), ToggleHelmetPacket.class,
-                ToggleHelmetPacket::encode,
-                ToggleHelmetPacket::decode,
-                ToggleHelmetPacket::handle);
+        CHANNEL.registerMessage(nextID(), SetHelmetOpenPacket.class,
+                SetHelmetOpenPacket::encode,
+                SetHelmetOpenPacket::decode,
+                SetHelmetOpenPacket::handle);
 
         CHANNEL.registerMessage(nextID(), SyncHelmetStatePacket.class,
                 SyncHelmetStatePacket::encode,
                 SyncHelmetStatePacket::decode,
                 SyncHelmetStatePacket::handle);
+
+        CHANNEL.registerMessage(nextID(), SyncEntityHelmetStatePacket.class,
+                SyncEntityHelmetStatePacket::encode,
+                SyncEntityHelmetStatePacket::decode,
+                SyncEntityHelmetStatePacket::handle);
 
         CHANNEL.registerMessage(nextID(), SyncSealedAreaStatusPacket.class,
                 SyncSealedAreaStatusPacket::encode,
@@ -63,12 +64,12 @@ public class NetworkHandler {
                 InvalidateHermeticAreasPacket::handle);
     }
 
-    public static void sendToggleHelmetPacket() {
-        CHANNEL.sendToServer(new ToggleHelmetPacket());
+    public static void sendSetHelmetOpenPacket(boolean open) {
+        CHANNEL.sendToServer(new SetHelmetOpenPacket(open));
     }
 
-    public static void sendSealedAreaStatusToClient(Player player, boolean isInSealedArea) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+    public static void sendSealedAreaStatusToClient(ServerPlayer player, boolean isInSealedArea) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                 new SyncSealedAreaStatusPacket(player.getUUID(), isInSealedArea));
     }
 

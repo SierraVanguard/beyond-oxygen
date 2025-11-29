@@ -5,6 +5,7 @@ import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -47,8 +48,8 @@ public abstract class EntityMixin {
 
     @Inject(method = "baseTick", at = @At("HEAD"))
     private void onBaseTick(CallbackInfo ci) {
-        if ((Object) this instanceof Player player && !level.isClientSide) {
-            neo$isInSealedArea = VSCompat.playersInSealedAreas.containsKey(player);
+        if ((Object) this instanceof ServerPlayer player && !level.isClientSide) {
+            neo$isInSealedArea = VSCompat.entitiesInSealedAreas.containsKey(player);
             NetworkHandler.sendSealedAreaStatusToClient(player, neo$isInSealedArea);
         }
     }

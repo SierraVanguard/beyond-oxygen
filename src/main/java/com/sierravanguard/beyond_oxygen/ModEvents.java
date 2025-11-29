@@ -1,12 +1,11 @@
 package com.sierravanguard.beyond_oxygen;
 
-import com.sierravanguard.beyond_oxygen.capabilities.BOCapabilities;
-import com.sierravanguard.beyond_oxygen.items.CannedFoodItem;
-import com.sierravanguard.beyond_oxygen.items.armor.OpenableSpacesuitHelmetItem;
+import com.sierravanguard.beyond_oxygen.capabilities.HelmetState;
+import com.sierravanguard.beyond_oxygen.extensions.ILivingEntityExtension;
+import com.sierravanguard.beyond_oxygen.items.armor.IOpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
 import com.sierravanguard.beyond_oxygen.registry.BODimensions;
 import com.sierravanguard.beyond_oxygen.registry.BOFluids;
-import com.sierravanguard.beyond_oxygen.registry.BOItems;
 import com.sierravanguard.beyond_oxygen.tags.BOItemTags;
 import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
@@ -14,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,7 +23,9 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
@@ -69,18 +71,17 @@ public class ModEvents {
     }
     @SubscribeEvent
     public static void onHelmetChange(LivingEquipmentChangeEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-
         if (event.getSlot() != EquipmentSlot.HEAD) return;
+        LivingEntity entity = event.getEntity();
 
         ItemStack from = event.getFrom();
         ItemStack to = event.getTo();
 
-        boolean wasOpenableHelmet = from.getItem() instanceof OpenableSpacesuitHelmetItem;
-        boolean isOpenableHelmetNow = to.getItem() instanceof OpenableSpacesuitHelmetItem;
+        boolean wasOpenableHelmet = from.getItem() instanceof IOpenableSpacesuitHelmetItem wasOpenableItem && wasOpenableItem.canOpenHelmet(entity, from);
+        boolean isOpenableHelmetNow = to.getItem() instanceof IOpenableSpacesuitHelmetItem isOpenableItem && isOpenableItem.canOpenHelmet(entity, to);
 
         if (wasOpenableHelmet && !isOpenableHelmetNow) {
-            player.getCapability(BOCapabilities.HELMET_STATE).ifPresent(state -> {
+            HelmetState.get(entity).ifPresent(state -> {
                 state.setOpen(false);
             });
         }
@@ -156,5 +157,10 @@ public class ModEvents {
             BOFluids.populateFluids(event.getRegistryAccess());
             BODimensions.populateDimensions(event.getRegistryAccess());
         }
+    }
+
+    @SubscribeEvent
+    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+        ((ILivingEntityExtension) event.getEntity()).beyond_oxygen$tick();
     }
 }

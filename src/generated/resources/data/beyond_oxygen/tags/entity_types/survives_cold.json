@@ -1,0 +1,16 @@
+{
+  "values": [
+    "#minecraft:skeletons",
+    "minecraft:skeleton_horse",
+    "minecraft:enderman",
+    "minecraft:endermite",
+    "minecraft:ender_dragon",
+    "minecraft:shulker",
+    "minecraft:iron_golem",
+    "#minecraft:freeze_immune_entity_types",
+    {
+      "id": "#ad_astra:can_survive_extreme_cold",
+      "required": false
+    }
+  ]
+}

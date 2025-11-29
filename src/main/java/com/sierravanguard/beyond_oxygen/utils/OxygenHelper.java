@@ -6,17 +6,18 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.registry.BODimensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 
 public class OxygenHelper {
 
-    public static boolean isInBreathableEnvironment(Player player) {
-        if (!(player.level() instanceof ServerLevel serverLevel)) return true;
-        if (player.isUnderWater()) return false;
+    public static boolean isInBreathableEnvironment(LivingEntity entity) {
+        if (!(entity.level() instanceof ServerLevel serverLevel)) return true;
+        if (entity.isUnderWater()) return false;
         if (!BODimensions.isUnbreathable(serverLevel)) return true;
-        BlockPos pos = player.blockPosition();
+        BlockPos pos = entity.blockPosition();
         return isBlockPosInsideBreathableArea(serverLevel, pos);
     }
     public static boolean isBlockPosInsideBreathableArea(ServerLevel level, BlockPos pos) {

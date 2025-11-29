@@ -7,13 +7,8 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class BOCapabilities {
-    public static Capability<IHelmetState> HELMET_STATE;
-
+    //class deliberately left for future capabilities that would be API-related
     public static void init() {
-        HELMET_STATE = CapabilityManager.get(new CapabilityToken<>(){});
-    }
-    public static LazyOptional<IHelmetState> getHelmetState(Player player) {
-        return player.getCapability(HELMET_STATE);
     }
 
 }

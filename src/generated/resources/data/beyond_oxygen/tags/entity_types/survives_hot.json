@@ -1,0 +1,20 @@
+{
+  "values": [
+    "#minecraft:skeletons",
+    "minecraft:skeleton_horse",
+    "minecraft:blaze",
+    "minecraft:ender_dragon",
+    "minecraft:ghast",
+    "minecraft:hoglin",
+    "minecraft:husk",
+    "minecraft:magma_cube",
+    "minecraft:piglin",
+    "minecraft:piglin_brute",
+    "minecraft:zombified_piglin",
+    "minecraft:zoglin",
+    {
+      "id": "#ad_astra:can_survive_extreme_heat",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+// 1.20.1	2025-11-28T19:00:54.2650009	Tags for minecraft:entity_type mod id beyond_oxygen
+87bd5bf617b62727b050873fd323a006cac724d3 data/beyond_oxygen/tags/entity_types/survives_cold.json
+5fca37c49398217e3b8ef95b65df61bb9e9451e6 data/beyond_oxygen/tags/entity_types/survives_hot.json
+aeb5afe54da0537a0db0a388be931f215542e37b data/beyond_oxygen/tags/entity_types/survives_vacuum.json

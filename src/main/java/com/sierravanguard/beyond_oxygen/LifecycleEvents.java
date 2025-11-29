@@ -1,5 +1,6 @@
 package com.sierravanguard.beyond_oxygen;
 
+import com.sierravanguard.beyond_oxygen.data.BOEntityTypeTagsProvider;
 import com.sierravanguard.beyond_oxygen.data.BOFluidTagsProvider;
 import com.sierravanguard.beyond_oxygen.data.BOItemTagsProvider;
 import com.sierravanguard.beyond_oxygen.data.BORecipesProvider;
@@ -19,6 +20,11 @@ public class LifecycleEvents {
                     event.getExistingFileHelper()
             ));
             event.getGenerator().addProvider(true, (DataProvider.Factory<BOFluidTagsProvider>) output -> new BOFluidTagsProvider(
+                    output,
+                    event.getLookupProvider(),
+                    event.getExistingFileHelper()
+            ));
+            event.getGenerator().addProvider(true, (DataProvider.Factory<BOEntityTypeTagsProvider>) output -> new BOEntityTypeTagsProvider(
                     output,
                     event.getLookupProvider(),
                     event.getExistingFileHelper()
