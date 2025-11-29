@@ -3,7 +3,6 @@ package com.sierravanguard.beyond_oxygen.items.armor;
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.cap.OxygenTankCap;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
-import com.sierravanguard.beyond_oxygen.utils.OxygenManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -78,12 +77,6 @@ public class OxygenStorageArmorItem extends SpacesuitArmorItem {
         }
 
         super.appendHoverText(stack, level, tooltip, flag);
-    }
-
-    @Override
-    public void onArmorTick(ItemStack stack, Level level, Player player) {
-        if (level.isClientSide || !(player instanceof ServerPlayer serverPlayer)) return;
-        OxygenManager.consumeOxygen(serverPlayer);
     }
 
     public static String formatTicksToTime(int ticks) {

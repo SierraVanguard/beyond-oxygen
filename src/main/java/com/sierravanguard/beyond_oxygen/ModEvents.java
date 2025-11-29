@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.capabilities.HelmetState;
+import com.sierravanguard.beyond_oxygen.extensions.ILivingEntityExtension;
 import com.sierravanguard.beyond_oxygen.items.armor.IOpenableSpacesuitHelmetItem;
 import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
 import com.sierravanguard.beyond_oxygen.registry.BODimensions;
@@ -22,7 +23,9 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
@@ -154,5 +157,10 @@ public class ModEvents {
             BOFluids.populateFluids(event.getRegistryAccess());
             BODimensions.populateDimensions(event.getRegistryAccess());
         }
+    }
+
+    @SubscribeEvent
+    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+        ((ILivingEntityExtension) event.getEntity()).beyond_oxygen$tick();
     }
 }

@@ -11,6 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -30,11 +32,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class VSCompat {
-    public static final Map<Player, Set<HermeticArea>> playersInSealedAreas = new ConcurrentHashMap<>();
-    public static boolean applySealedEffects(ServerPlayer player, BlockPos pos, HermeticArea hermeticArea, VentBlockEntity entity) {
-        ServerShip ship = (ServerShip) VSGameUtilsKt.getShipManagingPos(player.level(), pos);
+    public static final Map<LivingEntity, Set<HermeticArea>> entitiesInSealedAreas = new ConcurrentHashMap<>();
+    public static boolean applySealedEffects(LivingEntity living, BlockPos pos, HermeticArea hermeticArea, VentBlockEntity entity) {
+        ServerShip ship = (ServerShip) VSGameUtilsKt.getShipManagingPos(living.level(), pos);
         if (ship == null) return false;
-        Vec3 eyePosition = player.getEyePosition();
+        Vec3 eyePosition = living.getEyePosition();
         Vector3d shipPos = ship.getTransform().getWorldToShip().transformPosition(
                 new Vector3d(eyePosition.x, eyePosition.y, eyePosition.z)
         );
@@ -44,41 +46,43 @@ public class VSCompat {
                 (int) Math.floor(shipPos.z)
         );
         if (hermeticArea.isHermetic() && hermeticArea.contains(shipBlockPos)) {
-            addPlayerToHermeticArea(player, hermeticArea);
+            addEntityToHermeticArea(living, hermeticArea);
             if (hermeticArea.hasAir()) {
-                player.addEffect(new MobEffectInstance(
+                living.addEffect(new MobEffectInstance(
                         BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false
                 ));
-                player.setAirSupply(player.getMaxAirSupply());
+                living.setAirSupply(living.getMaxAirSupply());
                 if (entity != null){
                     if (entity.temperatureRegulatorApplied) {
-                        CompatLoader.setComfortableTemperature(player);
+                        CompatLoader.setComfortableTemperature(living);
                     }
                 }
             }
         } else {
-            removePlayerFromHermeticArea(player, hermeticArea);
+            removeEntityFromHermeticArea(living, hermeticArea);
         }
         return false;
     }
 
 
-    private static void addPlayerToHermeticArea(ServerPlayer player, HermeticArea area) {
-        Set<HermeticArea> areas = playersInSealedAreas.computeIfAbsent(player, k -> ConcurrentHashMap.newKeySet());
+    private static void addEntityToHermeticArea(LivingEntity entity, HermeticArea area) {
+        Set<HermeticArea> areas = entitiesInSealedAreas.computeIfAbsent(entity, k -> ConcurrentHashMap.newKeySet());
         boolean wasSealed = !areas.isEmpty();
         areas.add(area);
-        if (!wasSealed) {
+        if (!wasSealed && entity instanceof ServerPlayer player) {
             NetworkHandler.sendSealedAreaStatusToClient(player, true);
         }
     }
 
-    static void removePlayerFromHermeticArea(ServerPlayer player, HermeticArea area) {
-        Set<HermeticArea> areas = playersInSealedAreas.get(player);
+    static void removeEntityFromHermeticArea(LivingEntity entity, HermeticArea area) {
+        Set<HermeticArea> areas = entitiesInSealedAreas.get(entity);
         if (areas != null) {
             areas.remove(area);
             if (areas.isEmpty()) {
-                playersInSealedAreas.remove(player, areas);
-                NetworkHandler.sendSealedAreaStatusToClient(player, false);
+                entitiesInSealedAreas.remove(entity, areas);
+                if (entity instanceof ServerPlayer player) {
+                    NetworkHandler.sendSealedAreaStatusToClient(player, false);
+                }
             }
         }
     }
@@ -86,38 +90,39 @@ public class VSCompat {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
-            Set<HermeticArea> areas = playersInSealedAreas.get(player);
+            Set<HermeticArea> areas = entitiesInSealedAreas.get(player);
             boolean sealed = areas != null && !areas.isEmpty();
             NetworkHandler.sendSealedAreaStatusToClient(player, sealed);
         }
     }
-    public static boolean applyBubbleEffects(ServerPlayer player, BlockPos origin, float radius, BubbleGeneratorBlockEntity entity) {
-        Level level = player.level();
+
+    public static boolean applyBubbleEffects(LivingEntity living, BlockPos origin, float radius, BubbleGeneratorBlockEntity entity) {
+        Level level = living.level();
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
         if (ship == null) {
-            removeAllHermeticAreasForPlayer(player);
+            removeAllHermeticAreasForEntity(living);
             return false;
         }
 
-        Vec3 eyePos = player.getEyePosition();
+        Vec3 eyePos = living.getEyePosition();
         Vector3d shipEyePos = ship.getTransform().getWorldToShip().transformPosition(
                 new Vector3d(eyePos.x, eyePos.y, eyePos.z));
         Vector3d shipBubbleCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
 
         double distanceSquared = shipEyePos.distanceSquared(shipBubbleCenter);
         if (distanceSquared <= radius * radius * 2) {
-            player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
-            player.setAirSupply(player.getMaxAirSupply());
-            if (entity.temperatureRegulatorApplied) CompatLoader.setComfortableTemperature(player);
+            living.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
+            living.setAirSupply(living.getMaxAirSupply());
+            if (entity.temperatureRegulatorApplied) CompatLoader.setComfortableTemperature(living);
             return true;
         } else {
             return false;
         }
     }
 
-    private static void removeAllHermeticAreasForPlayer(ServerPlayer player) {
-        Set<HermeticArea> areas = playersInSealedAreas.remove(player);
-        if (areas != null) {
+    private static void removeAllHermeticAreasForEntity(LivingEntity entity) {
+        Set<HermeticArea> areas = entitiesInSealedAreas.remove(entity);
+        if (areas != null && entity instanceof ServerPlayer player) {
             NetworkHandler.sendSealedAreaStatusToClient(player, false);
         }
     }
@@ -150,11 +155,11 @@ public class VSCompat {
         }
         return null;
     }
-    public static boolean isPlayerInHermeticArea(ServerPlayer player, HermeticArea area) {
-        if (player == null || area == null) return false;
+    public static boolean isEntityInHermeticArea(LivingEntity entity, HermeticArea area) {
+        if (entity == null || area == null) return false;
 
-        Level level = player.level();
-        Vec3 eyePos = player.getEyePosition();
+        Level level = entity.level();
+        Vec3 eyePos = entity.getEyePosition();
         ServerShip areaShip = getShipById(area.getLevel(), area.getShipId());
         if (areaShip != null) {
             Vector3d shipLocal = areaShip.getTransform().getWorldToShip().transformPosition(
@@ -171,12 +176,12 @@ public class VSCompat {
             return area.contains(worldPos);
         }
     }
-    public static HermeticArea getHermeticAreaContaining(ServerPlayer player) {
-        Set<HermeticArea> areas = playersInSealedAreas.get(player);
+    public static HermeticArea getHermeticAreaContaining(LivingEntity entity) {
+        Set<HermeticArea> areas = entitiesInSealedAreas.get(entity);
         if (areas == null || areas.isEmpty()) return null;
 
         for (HermeticArea area : areas) {
-            if (isPlayerInHermeticArea(player, area)) return area;
+            if (isEntityInHermeticArea(entity, area)) return area;
         }
         return null;
     }

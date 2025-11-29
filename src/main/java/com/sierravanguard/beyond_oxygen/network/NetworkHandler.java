@@ -68,8 +68,8 @@ public class NetworkHandler {
         CHANNEL.sendToServer(new SetHelmetOpenPacket(open));
     }
 
-    public static void sendSealedAreaStatusToClient(Player player, boolean isInSealedArea) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+    public static void sendSealedAreaStatusToClient(ServerPlayer player, boolean isInSealedArea) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                 new SyncSealedAreaStatusPacket(player.getUUID(), isInSealedArea));
     }
 

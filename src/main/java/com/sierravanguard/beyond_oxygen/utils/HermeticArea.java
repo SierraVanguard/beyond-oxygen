@@ -11,6 +11,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -268,15 +269,17 @@ public class HermeticArea {
         knownVents.clear();
 
  
-        List<Player> toRemove = new ArrayList<>();
-        for (Map.Entry<Player, Set<HermeticArea>> entry : VSCompat.playersInSealedAreas.entrySet()) {
+        List<LivingEntity> toRemove = new ArrayList<>();
+        for (Map.Entry<LivingEntity, Set<HermeticArea>> entry : VSCompat.entitiesInSealedAreas.entrySet()) {
             Set<HermeticArea> areas = entry.getValue();
             if (areas.remove(this) && areas.isEmpty()) {
                 toRemove.add(entry.getKey());
-                NetworkHandler.sendSealedAreaStatusToClient(entry.getKey(), false);
+                if (entry.getKey() instanceof ServerPlayer player) {
+                    NetworkHandler.sendSealedAreaStatusToClient(player, false);
+                }
             }
         }
-        for (Player p : toRemove) VSCompat.playersInSealedAreas.remove(p);
+        toRemove.forEach(VSCompat.entitiesInSealedAreas::remove);
 
  
         HermeticAreaServerManager.removeAreaDeferred(level, id);

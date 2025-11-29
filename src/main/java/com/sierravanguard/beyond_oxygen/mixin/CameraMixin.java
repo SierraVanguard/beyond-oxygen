@@ -29,7 +29,7 @@ public abstract class CameraMixin {
     private void onTick(CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.level() != null) {
-            boolean currentlySealed = VSCompat.playersInSealedAreas.containsKey(player);
+            boolean currentlySealed = VSCompat.entitiesInSealedAreas.containsKey(player);
 
             if (currentlySealed) {
                 neo$sealedGraceTicks = GRACE_PERIOD;
