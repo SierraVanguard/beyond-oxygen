@@ -35,19 +35,8 @@ public class OxygenManager {
         int mbToDrain = 1;
 
 
-        //we drain armor first
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.isArmor()) {
-                ItemStack armor = entity.getItemBySlot(slot);
-                if (!(armor.getItem() instanceof OxygenStorageArmorItem)) continue;
-                if (drainFluid(armor, mbToDrain)) {
-                    hasOxygen = true;
-                    break;
-                }
-            }
-        }
 
-        //then we drain held items
+        //we drain held items first
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (!slot.isArmor()) {
                 ItemStack held = entity.getItemBySlot(slot);
@@ -61,7 +50,7 @@ public class OxygenManager {
         }
 
         //then we drain inventory
-        if (entity instanceof Player player) {
+        if (!hasOxygen) if (entity instanceof Player player) {
             Inventory inventory = player.getInventory();
             List<ItemStack> items = inventory.items;
             int selected = Inventory.isHotbarSlot(inventory.selected) ? inventory.selected : -1;
@@ -74,6 +63,18 @@ public class OxygenManager {
                             break;
                         }
                     }
+                }
+            }
+        }
+
+        //then we drain armor
+        if (!hasOxygen) for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.isArmor()) {
+                ItemStack armor = entity.getItemBySlot(slot);
+                if (!(armor.getItem() instanceof OxygenStorageArmorItem)) continue;
+                if (drainFluid(armor, mbToDrain)) {
+                    hasOxygen = true;
+                    break;
                 }
             }
         }
