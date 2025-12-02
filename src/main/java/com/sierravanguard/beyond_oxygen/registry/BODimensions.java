@@ -45,14 +45,14 @@ public class BODimensions {
     }
 
     public static boolean isUnbreathable(Level level) {
-        return BOConfig.UNBNREATHABLE_DIMENSIONS.get() && unbreathable.contains(level.dimension());
+        return BOConfig.enableUnbreathableDimensions() && unbreathable.contains(level.dimension());
     }
 
     public static boolean isCold(Level level) {
-        return BOConfig.COLD_DIMENSIONS.get() && cold.contains(level.dimension());
+        return BOConfig.enableColdDimensions() && cold.contains(level.dimension());
     }
 
     public static boolean isHot(Level level) {
-        return BOConfig.HOT_DIMENSIONS.get() && hot.contains(level.dimension());
+        return BOConfig.enableHotDimensions() && hot.contains(level.dimension());
     }
 }

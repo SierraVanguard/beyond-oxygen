@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen.blocks.entity;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
+import com.sierravanguard.beyond_oxygen.BOServerConfig;
 import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
@@ -70,7 +71,7 @@ public class VentBlockEntity extends BlockEntity {
         tankCap = LazyOptional.of(() -> tank);
     }
     public void refreshConfigValues() {
-        ventConsumption = Math.max(1, BOConfig.VENT_CONSUMPTION.get());
+        ventConsumption = Math.max(1, BOServerConfig.getVentConsumption());
     }
     private boolean consumeOxygen(int amount) {
         int available = tank.getFluidAmount();
@@ -132,7 +133,7 @@ public class VentBlockEntity extends BlockEntity {
 
 
     public float getCurrentOxygenRate() {
-        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOConfig.VENT_CONSUMPTION.get();
+        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOServerConfig.getVentConsumption();
     }
 
     public boolean isBlockInsideSealedArea(BlockPos pos) {
