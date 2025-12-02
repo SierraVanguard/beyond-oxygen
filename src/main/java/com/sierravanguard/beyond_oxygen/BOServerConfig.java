@@ -1,17 +1,10 @@
 package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.registry.BOOxygenSources;
-import com.sierravanguard.beyond_oxygen.utils.OxygenManager;
-import com.sierravanguard.beyond_oxygen.utils.OxygenSource;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.registries.IForgeRegistry;
-
-import java.util.*;
 
 //config values that should be automatically synchronized to the client.
 @Mod.EventBusSubscriber(modid = BeyondOxygen.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -56,7 +49,7 @@ public class BOServerConfig {
     private static int oxygenTankCapacity;
     private static int ventConsumption;
 
-    //we load all of the config values into more friendly versions here, and can process custom syntax issues.
+    //we load all the config values into more friendly versions here, and can process custom syntax issues.
     public static void loadConfig() {
         BOOxygenSources.HELD_ITEMS.get().setPriority(HELD_ITEMS_OXYGEN_PRIORITY.get());
         BOOxygenSources.INVENTORY.get().setPriority(INVENTORY_OXYGEN_PRIORITY.get());

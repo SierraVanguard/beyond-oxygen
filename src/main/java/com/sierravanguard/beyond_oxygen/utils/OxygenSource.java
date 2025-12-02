@@ -32,8 +32,10 @@ public abstract class OxygenSource<T> implements Comparable<OxygenSource<?>> {
     }
 
     public void setPriority(int priority) {
-        this.priority = priority;
-        BOOxygenSources.markDirty();
+        if (priority != this.priority) {
+            this.priority = priority;
+            BOOxygenSources.markDirty();
+        }
     }
 
     public boolean enabled() {

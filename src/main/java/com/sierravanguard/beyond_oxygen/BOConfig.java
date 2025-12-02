@@ -64,7 +64,7 @@
         private static boolean enableColdDimensions;
         private static boolean enableHotDimensions;
 
-        //we load all of the config values into more friendly versions here, and can process custom syntax issues.
+        //we load all the config values into more friendly versions here, and can process custom syntax issues.
         public static void loadConfig() {
             ventRange = VENT_RANGE.get();
             oxygenConsumption = OXYGEN_CONSUMPTION.get();
