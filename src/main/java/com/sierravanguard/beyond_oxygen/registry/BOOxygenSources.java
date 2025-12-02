@@ -17,7 +17,6 @@ import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
