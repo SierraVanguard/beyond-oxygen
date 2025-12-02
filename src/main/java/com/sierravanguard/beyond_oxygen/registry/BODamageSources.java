@@ -59,7 +59,7 @@ public class BODamageSources {
                 entity.setSecondsOnFire(2);
             } else if (source == freeze) {
                 int freezeTicks = entity.getTicksFrozen() + 5;
-                if (freezeTicks > 20) freezeTicks = 20;
+                if (freezeTicks > 100) freezeTicks = 100;
                 entity.setTicksFrozen(freezeTicks);
             }
         }

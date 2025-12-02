@@ -32,7 +32,9 @@ public class BeyondOxygen {
 
     public BeyondOxygen() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
+        ModLoadingContext context = ModLoadingContext.get();
+        context.registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
+        context.registerConfig(ModConfig.Type.SERVER, BOServerConfig.SPEC);
         MinecraftForge.EVENT_BUS.register(VSCompat.class);
         BOBlocks.BLOCKS.register(modEventBus);
         BOBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
@@ -40,9 +42,10 @@ public class BeyondOxygen {
         BOEffects.EFFECTS.register(modEventBus);
         BOMenus.MENUS.register(modEventBus);
         BOCreativeTabs.TABS.register(modEventBus);
+        BOOxygenSources.register(modEventBus);
         BOCapabilities.init();
         NetworkHandler.register();
-        CompatLoader.init();
+        CompatLoader.init(context, modEventBus);
     }
 
     public static class ModsLoaded{

@@ -127,7 +127,7 @@ public class HermeticArea {
 
         if (!dirty) return hermetic;
         dirty = false;
-        int LIMIT = Math.max(2048, BOConfig.VENT_RANGE.get());
+        int LIMIT = Math.max(2048, BOConfig.getVentRange());
 
         Set<BlockPos> newBlocks = new HashSet<>();
         Set<BlockPos> newBoundary = new HashSet<>();

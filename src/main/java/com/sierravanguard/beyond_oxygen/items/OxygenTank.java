@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen.items;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
+import com.sierravanguard.beyond_oxygen.BOServerConfig;
 import com.sierravanguard.beyond_oxygen.cap.OxygenTankCap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +25,7 @@ public class OxygenTank extends Item {
 
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        int capacity = BOConfig.getOxygenTankCapacity();
+        int capacity = BOServerConfig.getOxygenTankCapacity();
         return new OxygenTankCap(stack, capacity);
     }
 
@@ -43,7 +44,7 @@ public class OxygenTank extends Item {
     public int getBarWidth(ItemStack stack) {
         AtomicInteger width = new AtomicInteger();
         stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
-            int rawWidth = Math.round((float) handler.getFluidInTank(0).getAmount() * 13f / BOConfig.getOxygenTankCapacity());
+            int rawWidth = Math.round((float) handler.getFluidInTank(0).getAmount() * 13f / BOServerConfig.getOxygenTankCapacity());
             width.set(Math.max(0, Math.min(rawWidth, 13)));
         });
         return width.get();

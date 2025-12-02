@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-24T19:16:52.2753619	Tags for minecraft:item mod id beyond_oxygen
+// 1.20.1	2025-12-02T11:44:11.4212732	Tags for minecraft:item mod id beyond_oxygen
 209b051e366675e862011916dd9f3213279326b1 data/beyond_oxygen/tags/items/armor/cryo/boots.json
 e3502e5615c317403c4ee658be297cafd1f49c4c data/beyond_oxygen/tags/items/armor/cryo/chestplates.json
 d01e1bec1d4a9578b064dc39137c34928d1df57e data/beyond_oxygen/tags/items/armor/cryo/helmets.json
@@ -16,6 +16,7 @@ c3b92fa426d6823b5a6d65bbffcf36eaad43ad13 data/beyond_oxygen/tags/items/breathabl
 01bb771f7c7ff38f724efccbe5e00c87a48b27b7 data/beyond_oxygen/tags/items/repair_item/space_suit.json
 7b3558cb9705d9e0e528dbe512cd4e9dab2acdca data/beyond_oxygen/tags/items/repair_item/thermal.json
 603f31917494839df13210cbf5aee98e37f09b59 data/beyond_oxygen/tags/items/space_suit_eatable.json
+c3b92fa426d6823b5a6d65bbffcf36eaad43ad13 data/curios/tags/items/back.json
 f69cba6ba3aa1776744116504c58f6461bf74154 data/c/tags/items/crops/potato.json
 2c42f0749711b7c466075eb0b2531ff12864f994 data/c/tags/items/dusts/redstone.json
 0bdc999a7f653eecbb3c513a0baf1b963a2587ab data/c/tags/items/foods/bread.json

@@ -1,0 +1,13 @@
+{
+  "values": [
+    "beyond_oxygen:oxygen_tank",
+    {
+      "id": "ad_astra:gas_tank",
+      "required": false
+    },
+    {
+      "id": "ad_astra:large_gas_tank",
+      "required": false
+    }
+  ]
+}
