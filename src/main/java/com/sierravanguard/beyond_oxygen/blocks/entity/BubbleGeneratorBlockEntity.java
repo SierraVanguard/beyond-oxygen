@@ -4,28 +4,29 @@ import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.client.menu.BubbleGeneratorMenu;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.registry.BOFluids;
 import com.sierravanguard.beyond_oxygen.utils.BubbleGeneratorTracker;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
+import com.sierravanguard.beyond_oxygen.utils.HermeticAreaManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -33,13 +34,9 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvider{
     private float lastSentRadius = -1f;
@@ -87,17 +84,18 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
             } else {
                 entity.currentRadius = entity.controlledMaxRadius;
             }
+            Vec3 center = CompatUtils.getCenter(level, pos);
 
-            for (ServerPlayer player : ((ServerLevel) level).players()) {
-                boolean success = BeyondOxygen.ModsLoaded.VS && VSCompat.applyBubbleEffects(player, pos, entity.currentRadius, entity);
-                if (!success) {
-                    Vec3 eyePos = player.getEyePosition();
-                    if (eyePos.distanceTo(Vec3.atCenterOf(pos)) <= entity.currentRadius * 2){
-                        player.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
-                        if (entity.GetRegulator()) CompatLoader.setComfortableTemperature(player);
-                    }
+            float checkRadius = 2 * entity.currentRadius + 1;
+            float checkRadiusSqr = 4 * entity.currentRadius * entity.currentRadius;
+            level.getEntities((Entity) null, AABB.ofSize(center, checkRadius, checkRadius, checkRadius), e -> e instanceof LivingEntity).forEach(e -> {
+                LivingEntity living = (LivingEntity) e;
+                Vec3 eyePos = living.getEyePosition();
+                if (eyePos.distanceToSqr(center) <= checkRadiusSqr){
+                    living.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
+                    if (entity.GetRegulator()) CompatUtils.setComfortableTemperature(living);
                 }
-            }
+            });
         } else {
             entity.currentRadius = Math.max(0, entity.currentRadius - 0.1f);
         }
@@ -259,4 +257,9 @@ public class BubbleGeneratorBlockEntity extends BlockEntity implements MenuProvi
 
 
 
+    @Override
+    public AABB getRenderBoundingBox() {
+        float rad = currentRadius * 2;
+        return AABB.ofSize(Vec3.atCenterOf(getBlockPos()), rad, rad, rad);
+    }
 }

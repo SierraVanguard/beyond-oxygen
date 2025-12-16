@@ -1,11 +1,7 @@
-package com.sierravanguard.beyond_oxygen.utils.ship;
-import net.minecraft.core.BlockPos;
-import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
+package com.sierravanguard.beyond_oxygen.compat.valkyrienskies;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
-import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 public class BuoyancyForceInducer implements ShipForcesInducer {
 

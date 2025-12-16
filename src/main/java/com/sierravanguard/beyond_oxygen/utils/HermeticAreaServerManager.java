@@ -1,16 +1,13 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
-import com.sierravanguard.beyond_oxygen.utils.ship.BuoyancyForceInducer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.valkyrienskies.core.api.ships.*;
-import org.valkyrienskies.core.apigame.world.VSPipeline;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,17 +65,7 @@ public class HermeticAreaServerManager {
             volumePerShip.merge(area.getShipId(), area.lastComputedVolume, Double::sum);
         }
         if (!volumePerShip.isEmpty()) {
-            QueryableShipData<LoadedShip> shipData = VSGameUtilsKt.getShipWorldNullable(level).getLoadedShips();
-            for (Map.Entry<Long, Double> entry : volumePerShip.entrySet()) {
-                long shipId = entry.getKey();
-                double totalVolume = entry.getValue();
-
-                Ship ship = shipData.getById(entry.getKey());
-                if (ship instanceof LoadedServerShip serverShip) {
-                    System.out.printf("Applying buoyant force to ship %d; Volume: %f\n", shipId, totalVolume);
-                    BuoyancyForceInducer.tickOnShip(serverShip, totalVolume);
-                }
-            }
+            CompatUtils.applyBouyancy(level, volumePerShip);
         }
         for (Long id : toRemove) {
             NetworkHandler.sendInvalidateHermeticAreas(id, false);

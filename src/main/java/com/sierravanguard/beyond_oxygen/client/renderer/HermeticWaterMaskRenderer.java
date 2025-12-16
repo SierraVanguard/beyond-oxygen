@@ -3,6 +3,9 @@ package com.sierravanguard.beyond_oxygen.client.renderer;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.compat.valkyrienskies.VSClientCompat;
+import com.sierravanguard.beyond_oxygen.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -59,20 +62,15 @@ public final class HermeticWaterMaskRenderer {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
+        if (!BeyondOxygen.ModsLoaded.VS || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
 
         Minecraft mc = Minecraft.getInstance();
         Level level = mc.level;
         if (level == null) return;
 
         Camera camera = event.getCamera();
-        if (camera == null) return;
-
         MultiBufferSource.BufferSource buffer = mc.renderBuffers().bufferSource();
-        if (buffer == null) return;
-
         VertexConsumer consumer = buffer.getBuffer(WATER_MASK);
-        if (consumer == null) return;
 
         Matrix4f poseMatrix = event.getPoseStack().last().pose();
         Vec3 cameraPos = camera.getPosition();
@@ -89,7 +87,7 @@ public final class HermeticWaterMaskRenderer {
             Long shipId = HermeticAreaClientManager.getShipIdForAABB(aabb);
             if (shipId == null) continue;
 
-            Ship ship = HermeticAreaClientManager.getClientShipById(shipId, level);
+            Ship ship = VSClientCompat.getClientShipById(shipId, level);
             if (ship == null) continue;
 
             Matrix4dc shipToWorld = null;

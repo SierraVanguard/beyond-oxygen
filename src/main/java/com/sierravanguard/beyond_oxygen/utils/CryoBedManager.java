@@ -1,6 +1,7 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.blocks.CryoBedBlock;
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -13,7 +14,6 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.*;
 
@@ -98,36 +98,7 @@ public class CryoBedManager {
             CryoBedReference ref = entry.getValue();
 
             if (!ref.dimension().equals(dimKey)) continue;
-
-            ServerShip ship = (ServerShip) VSCompat.getShipAtPosition(serverLevel, ref.worldPos);
-            if (ship != null) {
-                var shipTransform = ship.getTransform();
-
-                Vector3d worldCenterPos = new Vector3d(
-                        ref.worldPos.getX() + 0.5,
-                        ref.worldPos.getY() + 1.0,
-                        ref.worldPos.getZ() + 0.5
-                );
-
-                Vector3d shipLocalPos = shipTransform.getWorldToShip().transformPosition(worldCenterPos);
-
-                CryoBedReference updatedRef = new CryoBedReference(
-                        ref.dimension(),
-                        ref.worldPos,
-                        ship.getId(),
-                        shipLocalPos
-                );
-
-                entry.setValue(updatedRef);
-            } else if (ref.shipId != null) {
-                CryoBedReference updatedRef = new CryoBedReference(
-                        ref.dimension(),
-                        ref.worldPos,
-                        null,
-                        null
-                );
-                entry.setValue(updatedRef);
-            }
+            CompatUtils.updateCryoBedReference(serverLevel, ref, entry::setValue);
         }
     }
 

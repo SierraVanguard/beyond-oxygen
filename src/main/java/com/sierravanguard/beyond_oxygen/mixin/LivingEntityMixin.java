@@ -5,13 +5,11 @@ import com.sierravanguard.beyond_oxygen.registry.BODamageSources;
 import com.sierravanguard.beyond_oxygen.registry.BODimensions;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.tags.BOEntityTypeTags;
+import com.sierravanguard.beyond_oxygen.utils.HermeticAreaManager;
 import com.sierravanguard.beyond_oxygen.utils.OxygenHelper;
 import com.sierravanguard.beyond_oxygen.utils.OxygenManager;
 import com.sierravanguard.beyond_oxygen.utils.SpaceSuitHandler;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -45,7 +43,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
         if (beyond_oxygen$vacuumDamageCooldown > 0) {
             beyond_oxygen$vacuumDamageCooldown--;
         }
-        var hermeticArea = VSCompat.getHermeticAreaContaining(entity);
+        var hermeticArea = HermeticAreaManager.getHermeticAreaContaining(entity);
         if (!entity.hasEffect(BOEffects.OXYGEN_SATURATION.get())) {
             if (BODimensions.isUnbreathable(level())
                     && !entity.getType().is(BOEntityTypeTags.SURVIVES_VACUUM)
@@ -60,7 +58,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
         }
 
         if (!ModList.get().isLoaded(COLD_SWEAT_MODID)) {
-            var area = VSCompat.getHermeticAreaContaining(entity);
+            var area = HermeticAreaManager.getHermeticAreaContaining(entity);
             boolean blockedByThermalController = area != null && area.hasActiveTemperatureRegulator();
             if (BODimensions.isHot(level())
                     && !entity.getType().is(BOEntityTypeTags.SURVIVES_HOT)
@@ -94,7 +92,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
     @Inject(method = "increaseAirSupply", at = @At("HEAD"), cancellable = true)
     private void beyondoxygen$preventAirRefillInVacuum(int airIncrement, CallbackInfoReturnable<Integer> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
-        var area = VSCompat.getHermeticAreaContaining(self);
+        var area = HermeticAreaManager.getHermeticAreaContaining(self);
         if (area == null || area.hasAir() || self.hasEffect(BOEffects.OXYGEN_SATURATION.get())) return;
         BlockPos headPos = BlockPos.containing(self.getX(), self.getEyeY(), self.getZ());
         boolean headInWater = self.level().getFluidState(headPos).is(FluidTags.WATER);
@@ -106,7 +104,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
     @Inject(method = "baseTick", at = @At("HEAD"))
     private void beyondoxygen$decrementAirInVacuum(CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
-        var area = VSCompat.getHermeticAreaContaining(self);
+        var area = HermeticAreaManager.getHermeticAreaContaining(self);
         if (area == null || area.hasAir() || self.hasEffect(BOEffects.OXYGEN_SATURATION.get())) return;
         int air = self.getAirSupply() - 1;
         self.setAirSupply(air);

@@ -2,7 +2,7 @@ package com.sierravanguard.beyond_oxygen.mixin;
 
 import com.sierravanguard.beyond_oxygen.client.ClientSealedAreaState;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
+import com.sierravanguard.beyond_oxygen.utils.HermeticAreaManager;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,8 +20,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.valkyrienskies.core.apigame.collision.EntityPolygonCollider;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
 import java.util.Set;
 
@@ -41,15 +39,12 @@ public abstract class EntityMixin {
     @Shadow public abstract boolean isInWater();
 
     @Unique
-    private static EntityPolygonCollider beyond_oxygen$collider = null;
-
-    @Unique
     private boolean neo$isInSealedArea = false;
 
     @Inject(method = "baseTick", at = @At("HEAD"))
     private void onBaseTick(CallbackInfo ci) {
         if ((Object) this instanceof ServerPlayer player && !level.isClientSide) {
-            neo$isInSealedArea = VSCompat.entitiesInSealedAreas.containsKey(player);
+            neo$isInSealedArea = HermeticAreaManager.entitiesInSealedAreas.containsKey(player);
             NetworkHandler.sendSealedAreaStatusToClient(player, neo$isInSealedArea);
         }
     }
@@ -93,13 +88,5 @@ public abstract class EntityMixin {
     private boolean onIsInBubbleColumn(Operation<Boolean> original) {
         if (beyond_oxygen$isInSealedArea()) return false;
         return original.call();
-    }
-
-    @Unique
-    private static EntityPolygonCollider getCollider() {
-        if (beyond_oxygen$collider == null) {
-            beyond_oxygen$collider = ValkyrienSkiesMod.vsCore.getEntityPolygonCollider();
-        }
-        return beyond_oxygen$collider;
     }
 }

@@ -2,6 +2,8 @@ package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.network.SyncHermeticBlocksS2CPacket;
 import net.minecraft.core.BlockPos;
@@ -12,13 +14,10 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
 
@@ -57,8 +56,7 @@ public class HermeticArea {
 
     public HermeticArea(ServerLevel level, BlockPos start, long id) {
         this.level = level;
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, start);
-        this.shipId = (ship == null) ? -1L : ship.getId();
+        this.shipId = CompatUtils.getShipId(level, start);
         this.id = id;
         this.dirty = true;
     }
@@ -270,7 +268,7 @@ public class HermeticArea {
 
  
         List<LivingEntity> toRemove = new ArrayList<>();
-        for (Map.Entry<LivingEntity, Set<HermeticArea>> entry : VSCompat.entitiesInSealedAreas.entrySet()) {
+        for (Map.Entry<LivingEntity, Set<HermeticArea>> entry : HermeticAreaManager.entitiesInSealedAreas.entrySet()) {
             Set<HermeticArea> areas = entry.getValue();
             if (areas.remove(this) && areas.isEmpty()) {
                 toRemove.add(entry.getKey());
@@ -279,7 +277,7 @@ public class HermeticArea {
                 }
             }
         }
-        toRemove.forEach(VSCompat.entitiesInSealedAreas::remove);
+        toRemove.forEach(HermeticAreaManager.entitiesInSealedAreas::remove);
 
  
         HermeticAreaServerManager.removeAreaDeferred(level, id);
