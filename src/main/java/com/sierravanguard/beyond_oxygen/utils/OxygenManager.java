@@ -40,15 +40,15 @@ public class OxygenManager {
         int mbToDrain = 1;
         IntReference needs = new IntReference(mbToDrain);
         IntReference drained = new IntReference(0);
-        getSourcePairs(entity).filter(oxygenSourcePair -> {
+        getSourcePairs(entity).takeWhile(oxygenSourcePair -> {
             int thisDrained = oxygenSourcePair.consumeOxygen(entity, needs.value, IFluidHandler.FluidAction.EXECUTE);
             if (thisDrained > 0) {
                 needs.value -= thisDrained;
                 drained.value += thisDrained;
-                if (needs.value <= 0) return true;
+                return needs.value > 0;
             }
-            return false;
-        }).findFirst(); //combined with filter() allows us to terminate the stream early once we have consumed enough oxygen
+            return true;
+        }).findFirst(); //combined with takeWhile() allows us to terminate the stream early once we have consumed enough oxygen
 
 
         if (needs.value <= 0) { //TODO what to do if we got some but not enough?

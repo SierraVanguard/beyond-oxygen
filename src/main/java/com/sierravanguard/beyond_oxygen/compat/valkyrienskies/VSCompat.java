@@ -10,11 +10,16 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class VSCompat {
+    public static void init() {
+        ValkyrienSkiesMod.getApi().registerAttachment(BuoyancyForceInducer.class);
+    }
+
     public static Vec3 getCenter(Level level, BlockPos blockPos) {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, blockPos);
         if (ship == null) return Vec3.atCenterOf(blockPos);

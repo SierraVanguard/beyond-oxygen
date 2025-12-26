@@ -1,6 +1,5 @@
 package com.sierravanguard.beyond_oxygen.compat;
 
-import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import com.sierravanguard.beyond_oxygen.compat.valkyrienskies.VSCompat;
 import com.sierravanguard.beyond_oxygen.utils.CryoBedManager;
 import com.sierravanguard.beyond_oxygen.utils.HermeticArea;
@@ -25,21 +24,21 @@ public class CompatUtils {
     }
 
     public static Vec3 getAreaPos(Vec3 pos, HermeticArea area) {
-        if (BeyondOxygen.ModsLoaded.VS) {
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) {
             return VSCompat.getAreaPos(pos, area);
         }
         return pos;
     }
 
     public static long getShipId(ServerLevel serverLevel, BlockPos blockPos) {
-        if (BeyondOxygen.ModsLoaded.VS) {
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) {
             return VSCompat.getShipId(serverLevel, blockPos);
         }
         return -1L;
     }
 
     public static Vec3 getCenter(Level level, BlockPos blockPos) {
-        if (BeyondOxygen.ModsLoaded.VS) {
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) {
             return VSCompat.getCenter(level, blockPos);
         }
         return Vec3.atCenterOf(blockPos);
@@ -51,11 +50,11 @@ public class CompatUtils {
     }
 
     public static void applyBouyancy(ServerLevel level, Map<Long, Double> volumePerShip) {
-        if (BeyondOxygen.ModsLoaded.VS) VSCompat.applyBouyancy(level, volumePerShip);
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) VSCompat.applyBouyancy(level, volumePerShip);
     }
 
     public static void updateCryoBedReference(ServerLevel serverLevel, CryoBedManager.CryoBedReference reference, Consumer<CryoBedManager.CryoBedReference> setUpdatedReference) {
-        if (BeyondOxygen.ModsLoaded.VS) {
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) {
             VSCompat.updateCryoBedReference(serverLevel, reference, setUpdatedReference);
         } else {
             if (reference.shipId() != null) {
@@ -71,12 +70,12 @@ public class CompatUtils {
     }
 
     public static Pair<Long, Vector3d> getCryoBedShipAndPosition(ServerLevel level, BlockPos pos) {
-        if (BeyondOxygen.ModsLoaded.VS) return VSCompat.getCryoBedShipAndPosition(level, pos);
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) return VSCompat.getCryoBedShipAndPosition(level, pos);
         else return Pair.of(null, null);
     }
 
     public static BlockPos getCryoBedRespawnPosition(ServerLevel level, CryoBedManager.CryoBedReference cryoBed) {
-        if (BeyondOxygen.ModsLoaded.VS) return VSCompat.getCryoBedRespawnPosition(level, cryoBed);
+        if (CompatLoader.VALKYRIEN_SKIES.isLoaded()) return VSCompat.getCryoBedRespawnPosition(level, cryoBed);
         return cryoBed.worldPos();
     }
 }

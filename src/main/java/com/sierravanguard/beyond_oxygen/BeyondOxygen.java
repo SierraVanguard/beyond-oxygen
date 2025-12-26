@@ -13,7 +13,6 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -43,11 +42,6 @@ public class BeyondOxygen {
         BOCapabilities.init();
         NetworkHandler.register();
         CompatLoader.init(context, modEventBus);
-    }
-
-    public static class ModsLoaded{
-        public static final boolean VS = ModList.get().isLoaded("valkyrienskies");
-        public static final boolean CS = ModList.get().isLoaded("coldsweat");
     }
 
     @SubscribeEvent

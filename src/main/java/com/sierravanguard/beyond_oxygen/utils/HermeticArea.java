@@ -2,7 +2,6 @@ package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
 import com.sierravanguard.beyond_oxygen.blocks.entity.VentBlockEntity;
-import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.network.SyncHermeticBlocksS2CPacket;

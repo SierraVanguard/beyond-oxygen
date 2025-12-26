@@ -3,9 +3,8 @@ package com.sierravanguard.beyond_oxygen.client.renderer;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.sierravanguard.beyond_oxygen.BeyondOxygen;
+import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
 import com.sierravanguard.beyond_oxygen.compat.valkyrienskies.VSClientCompat;
-import com.sierravanguard.beyond_oxygen.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -62,7 +61,7 @@ public final class HermeticWaterMaskRenderer {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (!BeyondOxygen.ModsLoaded.VS || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
+        if (!CompatLoader.VALKYRIEN_SKIES.isLoaded() || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
 
         Minecraft mc = Minecraft.getInstance();
         Level level = mc.level;
