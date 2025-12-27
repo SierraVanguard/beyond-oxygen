@@ -1,15 +1,15 @@
 package com.sierravanguard.beyond_oxygen.blocks.entity;
 
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import com.sierravanguard.beyond_oxygen.utils.CryoBedManager;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.ServerShip;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 
 import java.util.Optional;
@@ -19,7 +19,7 @@ public class CryoBedBlockEntity extends BlockEntity {
 
     private UUID ownerUUID = null;
 
-    ServerShip cachedShip;
+    Long cachedShipId;
     Vector3d cachedShipLocalPos;
 
     public CryoBedBlockEntity(BlockPos pos, BlockState state) {
@@ -33,8 +33,8 @@ public class CryoBedBlockEntity extends BlockEntity {
 
         this.ownerUUID = uuid;
         if (level != null && !level.isClientSide && uuid != null) {
-            if (cachedShip != null && cachedShipLocalPos != null) {
-                CryoBedManager.assignCryoBed(uuid, level.dimension(), worldPosition, cachedShip.getId(), cachedShipLocalPos);
+            if (cachedShipId != null && cachedShipLocalPos != null) {
+                CryoBedManager.assignCryoBed(uuid, level.dimension(), worldPosition, cachedShipId, cachedShipLocalPos);
             } else {
                 CryoBedManager.assignCryoBed(uuid, level.dimension(), worldPosition);
             }
@@ -85,26 +85,15 @@ public class CryoBedBlockEntity extends BlockEntity {
     }
 
     public static <T extends CryoBedBlockEntity> void tick(ServerLevel level, BlockPos pos, BlockState state, T blockEntity) {
-        ServerShip ship = VSCompat.getShipAtPosition(level, pos);
-        if (ship != null) {
-            var transform = ship.getTransform();
-            Vector3d worldPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
-            Vector3d shipLocal = transform.getWorldToShip().transformPosition(worldPos);
-
-            blockEntity.cachedShip = ship;
-            blockEntity.cachedShipLocalPos = shipLocal;
-
-            CryoBedManager.updateCryoBedDimension(level, pos, level.dimension(), shipLocal);
-        } else {
-            blockEntity.cachedShip = null;
-            blockEntity.cachedShipLocalPos = null;
-            CryoBedManager.updateCryoBedDimension(level, pos, level.dimension(), null);
-        }
+        Pair<Long, Vector3d> shipAndPos = CompatUtils.getCryoBedShipAndPosition(level, pos);
+        blockEntity.cachedShipId = shipAndPos.getLeft();
+        blockEntity.cachedShipLocalPos = shipAndPos.getRight();
+        CryoBedManager.updateCryoBedDimension(level, pos, level.dimension(), shipAndPos.getRight());
 
         if (blockEntity.getOwnerUUID() != null) {
-            if (blockEntity.cachedShip != null && blockEntity.cachedShipLocalPos != null) {
+            if (blockEntity.cachedShipId != null && blockEntity.cachedShipLocalPos != null) {
                 CryoBedManager.assignCryoBed(blockEntity.getOwnerUUID(), level.dimension(), pos,
-                        blockEntity.cachedShip.getId(), blockEntity.cachedShipLocalPos);
+                        blockEntity.cachedShipId, blockEntity.cachedShipLocalPos);
             } else {
                 CryoBedManager.assignCryoBed(blockEntity.getOwnerUUID(), level.dimension(), pos);
             }

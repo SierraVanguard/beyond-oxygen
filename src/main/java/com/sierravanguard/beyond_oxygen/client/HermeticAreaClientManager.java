@@ -3,8 +3,6 @@ package com.sierravanguard.beyond_oxygen.client;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
 
@@ -50,16 +48,5 @@ public class HermeticAreaClientManager {
 
     public static Long getShipIdForAABB(AABB aabb) {
         return aabbToShipId.get(aabb);
-    }
-
-    public static Ship getClientShipById(long shipId, Level level) {
-        try {
-            var ships = VSGameUtilsKt.getShipObjectWorld(level).getAllShips();
-            if (ships == null) return null;
-            return ships.getById(shipId);
-        } catch (Exception e) {
-            System.out.printf("[HermeticAreaClientManager] Exception for shipId %d: %s%n", shipId, e);
-            return null;
-        }
     }
 }

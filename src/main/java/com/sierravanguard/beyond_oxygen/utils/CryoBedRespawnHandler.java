@@ -1,15 +1,13 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameRules;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -37,30 +35,13 @@ public class CryoBedRespawnHandler {
         ServerLevel targetLevel = server.getLevel(cryoBed.dimension());
         if (targetLevel == null) return;
 
-        BlockPos respawnPos = calculateRespawnPosition(targetLevel, cryoBed);
+        BlockPos respawnPos = CompatUtils.getCryoBedRespawnPosition(targetLevel, cryoBed);
 
         player.setRespawnPosition(targetLevel.dimension(), respawnPos, 0.0f, true, false);
 
         if (!player.level().dimension().equals(targetLevel.dimension())) {
             handleCrossDimensionRespawn(player, targetLevel, respawnPos);
         }
-    }
-
-    private static BlockPos calculateRespawnPosition(ServerLevel level, CryoBedManager.CryoBedReference cryoBed) {
-        if (cryoBed.shipId() != null && cryoBed.shipLocalPos() != null) {
-            ServerShip ship = VSCompat.getShipById(level, cryoBed.shipId());
-            if (ship != null) {
-                var shipTransform = ship.getTransform();
-                Vector3d worldPos = shipTransform.getShipToWorld().transformPosition(cryoBed.shipLocalPos());
-                return new BlockPos(
-                        (int) Math.floor(worldPos.x),
-                        (int) Math.floor(worldPos.y),
-                        (int) Math.floor(worldPos.z)
-                );
-            }
-        }
-
-        return cryoBed.worldPos();
     }
 
     private static void handleCrossDimensionRespawn(ServerPlayer player, ServerLevel targetLevel, BlockPos respawnPos) {
@@ -87,7 +68,7 @@ public class CryoBedRespawnHandler {
                 if (server != null) {
                     ServerLevel targetLevel = server.getLevel(cryoBed.dimension());
                     if (targetLevel != null) {
-                        BlockPos respawnPos = calculateRespawnPosition(targetLevel, cryoBed);
+                        BlockPos respawnPos = CompatUtils.getCryoBedRespawnPosition(targetLevel, cryoBed);
                         newPlayer.setRespawnPosition(targetLevel.dimension(), respawnPos, 0.0f, true, false);
                         if (!newPlayer.level().dimension().equals(targetLevel.dimension())) {
                             server.execute(() -> {

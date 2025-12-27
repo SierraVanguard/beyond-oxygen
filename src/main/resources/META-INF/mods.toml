@@ -61,6 +61,7 @@ mandatory=false
 versionRange="[2.0.0,)"
 ordering="NONE"
 side="BOTH"
+comment="Optional compatibility with Valkyrien Skies!"
 
 [[dependencies."${mod_id}"]]
 modId="vsch"

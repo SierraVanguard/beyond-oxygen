@@ -178,6 +178,11 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    //curios
+    maven {
+        name = "Illusive Soulworks maven"
+        url = "https://maven.theillusivec4.top/"
+    }
 }
 
 dependencies {
@@ -189,12 +194,11 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation         ("org.valkyrienskies.core:api:${vs_core_version}")
     implementation         ("org.valkyrienskies.core:impl:${vs_core_version}")
-    implementation         ("org.valkyrienskies.core:api-game:${vs_core_version}")
     implementation         ("org.valkyrienskies.core:util:${vs_core_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}")
 
     implementation fg.deobf("curse.maven:kotlin-for-forge-351264:5402061")
-    implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
+    //implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
     implementation fg.deobf("curse.maven:mekanism-268560:6552911")
 
     implementation fg.deobf("curse.maven:ad-astra-635042:6262032")
@@ -204,6 +208,11 @@ dependencies {
 
 
     implementation fg.deobf("curse.maven:jei-238222:7037120")
+
+    // Compile against only the API artifact
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+    // Use the full Curios API jar at runtime
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")

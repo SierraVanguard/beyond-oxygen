@@ -2,7 +2,7 @@ package com.sierravanguard.beyond_oxygen.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
+import com.sierravanguard.beyond_oxygen.utils.HermeticAreaManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -29,7 +29,7 @@ public abstract class CameraMixin {
     private void onTick(CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.level() != null) {
-            boolean currentlySealed = VSCompat.entitiesInSealedAreas.containsKey(player);
+            boolean currentlySealed = HermeticAreaManager.entitiesInSealedAreas.containsKey(player);
 
             if (currentlySealed) {
                 neo$sealedGraceTicks = GRACE_PERIOD;

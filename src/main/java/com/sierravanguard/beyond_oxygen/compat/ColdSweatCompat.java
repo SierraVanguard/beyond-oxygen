@@ -6,12 +6,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class ColdSweatCompat {
-    private static final String COLD_SWEAT_MODID = "cold_sweat";
-
     private static boolean initialized = false;
 
     public static void init() {
-        if (!ModList.get().isLoaded(COLD_SWEAT_MODID)) return;
         try {
             Class<?> tempModifierClass = Class.forName("com.momosoftworks.coldsweat.api.temperature.modifier.TempModifier");
             Class<?> registerEventClass = Class.forName("com.momosoftworks.coldsweat.api.event.core.registry.TempModifierRegisterEvent");

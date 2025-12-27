@@ -1,27 +1,33 @@
 package com.sierravanguard.beyond_oxygen.client.model;
 
-import net.minecraft.client.resources.model.BakedModel;
+import com.sierravanguard.beyond_oxygen.BeyondOxygen;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = "beyond_oxygen", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class BubbleModel {
-    private static BakedModel bubbleModel;
-    @SubscribeEvent
-    public static void onModelRegistry(ModelEvent.RegisterAdditional event) {
-        event.register(new ResourceLocation("beyond_oxygen", "entity/bubble"));
-    }
+    private static ObjModel bubbleModel;
 
-    @SubscribeEvent
-    public static void onModelBake(ModelEvent.BakingCompleted event) {
-        bubbleModel = event.getModelManager().getModel(new ResourceLocation("beyond_oxygen", "entity/bubble"));
-    }
-
-    public static BakedModel getBubbleModel() {
+    public static ObjModel getBubbleModel() {
         return bubbleModel;
     }
 
+    @SubscribeEvent
+    public static void registerReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((ResourceManagerReloadListener) BubbleModel::reloadResources);
+    }
+
+    private static void reloadResources(ResourceManager resourceManager) {
+        try {
+            bubbleModel = ObjModel.load(resourceManager, new ResourceLocation(BeyondOxygen.MODID, "models/entity/bubble.obj"));
+        } catch (Throwable t) {
+            bubbleModel = null;
+            BeyondOxygen.LOGGER.error("Failed to load oxygen bubble model!", t);
+        }
+    }
 }

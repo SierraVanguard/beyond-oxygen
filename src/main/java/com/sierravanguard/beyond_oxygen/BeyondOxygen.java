@@ -2,13 +2,10 @@ package com.sierravanguard.beyond_oxygen;
 
 import com.sierravanguard.beyond_oxygen.capabilities.*;
 import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
-import com.sierravanguard.beyond_oxygen.items.OxygenTank;
-import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
 import com.sierravanguard.beyond_oxygen.network.NetworkHandler;
 import com.sierravanguard.beyond_oxygen.registry.*;
-import com.sierravanguard.beyond_oxygen.utils.VSCompat;
+import com.sierravanguard.beyond_oxygen.utils.HermeticAreaManager;
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,7 +13,6 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -32,22 +28,20 @@ public class BeyondOxygen {
 
     public BeyondOxygen() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
-        MinecraftForge.EVENT_BUS.register(VSCompat.class);
+        ModLoadingContext context = ModLoadingContext.get();
+        context.registerConfig(ModConfig.Type.COMMON, BOConfig.SPEC);
+        context.registerConfig(ModConfig.Type.SERVER, BOServerConfig.SPEC);
+        MinecraftForge.EVENT_BUS.register(HermeticAreaManager.class);
         BOBlocks.BLOCKS.register(modEventBus);
         BOBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         BOItems.ITEMS.register(modEventBus);
         BOEffects.EFFECTS.register(modEventBus);
         BOMenus.MENUS.register(modEventBus);
         BOCreativeTabs.TABS.register(modEventBus);
+        BOOxygenSources.register(modEventBus);
         BOCapabilities.init();
         NetworkHandler.register();
-        CompatLoader.init();
-    }
-
-    public static class ModsLoaded{
-        public static final boolean VS = ModList.get().isLoaded("valkyrienskies");
-        public static final boolean CS = ModList.get().isLoaded("coldsweat");
+        CompatLoader.init(context, modEventBus);
     }
 
     @SubscribeEvent

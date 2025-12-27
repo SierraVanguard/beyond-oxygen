@@ -126,5 +126,11 @@ public class BOItemTagsProvider extends TagsProvider<Item> {
                 .add(BOItems.SPACESUIT_BOOTS.getKey())
                 .add(BOItems.CRYO_SUIT_BOOTS.getKey())
                 .add(BOItems.THERMAL_BOOTS.getKey());
+
+        //curios compat
+        this.tag(BOItemTags.CURIOS_BACK_SLOT)
+                .add(BOItems.OXYGEN_TANK.getKey())
+                .addOptional(ModItems.GAS_TANK.getId())
+                .addOptional(ModItems.LARGE_GAS_TANK.getId());
     }
 }

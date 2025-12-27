@@ -1,86 +1,57 @@
 package com.sierravanguard.beyond_oxygen.utils;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
-import com.sierravanguard.beyond_oxygen.items.OxygenTank;
-import com.sierravanguard.beyond_oxygen.items.armor.OxygenStorageArmorItem;
+import com.sierravanguard.beyond_oxygen.BOServerConfig;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
-import com.sierravanguard.beyond_oxygen.tags.BOItemTags;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
+import com.sierravanguard.beyond_oxygen.registry.BOFluids;
+import com.sierravanguard.beyond_oxygen.registry.BOOxygenSources;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Mod.EventBusSubscriber(modid = "beyond_oxygen", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class OxygenManager {
+    private static Stream<OxygenSourcePair<?, ?>> getSourcePairs(LivingEntity entity) {
+        Set<Object> seenSourceObjects = new HashSet<>();
+        return Arrays
+                .stream(BOOxygenSources.getSources())
+                .flatMap(source -> processSource(entity, source, seenSourceObjects));
+    }
+
+    private static <T> Stream<OxygenSourcePair<T, ? extends OxygenSource<T>>> processSource(LivingEntity entity, OxygenSource<T> source, Set<Object> seenSourceObjects) {
+        return source
+                .getSourceObjects(entity)
+                .filter(sourceObject -> !seenSourceObjects.contains(sourceObject) && source.isSourceObjectValid(sourceObject, entity))
+                .map(sourceObject -> {
+                    seenSourceObjects.add(sourceObject);
+                    return new OxygenSourcePair<>(sourceObject, source);
+                });
+    }
     
     public static void consumeOxygen(LivingEntity entity) {
         if (!SpaceSuitHandler.isWearingFullSuit(entity)) return;
-        boolean hasOxygen = false;
         int mbToDrain = 1;
-
-
-
-        //we drain held items first
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (!slot.isArmor()) {
-                ItemStack held = entity.getItemBySlot(slot);
-                if (held.is(BOItemTags.BREATHABLES)) {
-                    if (drainFluid(held, mbToDrain)) {
-                        hasOxygen = true;
-                        break;
-                    }
-                }
+        IntReference needs = new IntReference(mbToDrain);
+        IntReference drained = new IntReference(0);
+        getSourcePairs(entity).takeWhile(oxygenSourcePair -> {
+            int thisDrained = oxygenSourcePair.consumeOxygen(entity, needs.value, IFluidHandler.FluidAction.EXECUTE);
+            if (thisDrained > 0) {
+                needs.value -= thisDrained;
+                drained.value += thisDrained;
+                return needs.value > 0;
             }
-        }
-
-        //then we drain inventory
-        if (!hasOxygen) if (entity instanceof Player player) {
-            Inventory inventory = player.getInventory();
-            List<ItemStack> items = inventory.items;
-            int selected = Inventory.isHotbarSlot(inventory.selected) ? inventory.selected : -1;
-            for (int i = 0; i < items.size(); ++i) {
-                if (i != selected) {
-                    ItemStack stack = items.get(i);
-                    if (stack.is(BOItemTags.BREATHABLES)) {
-                        if (drainFluid(stack, mbToDrain)) {
-                            hasOxygen = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        //then we drain armor
-        if (!hasOxygen) for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.isArmor()) {
-                ItemStack armor = entity.getItemBySlot(slot);
-                if (!(armor.getItem() instanceof OxygenStorageArmorItem)) continue;
-                if (drainFluid(armor, mbToDrain)) {
-                    hasOxygen = true;
-                    break;
-                }
-            }
-        }
+            return true;
+        }).findFirst(); //combined with takeWhile() allows us to terminate the stream early once we have consumed enough oxygen
 
 
-        if (hasOxygen) {
+        if (needs.value <= 0) { //TODO what to do if we got some but not enough?
             entity.addEffect(new MobEffectInstance(
                     BOEffects.OXYGEN_SATURATION.get(),
                     BOConfig.getTimeToImplode(),
@@ -93,55 +64,59 @@ public class OxygenManager {
 
     
     public static int getTotalOxygen(LivingEntity entity) {
-        int total = 0;
-
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.isArmor()) {
-                ItemStack armor = entity.getItemBySlot(slot);
-                if (!(armor.getItem() instanceof OxygenStorageArmorItem)) continue;
-                total += getFluidAmount(armor);
-            } else {
-                ItemStack held = entity.getItemBySlot(slot);
-                if (held.is(BOItemTags.BREATHABLES)) {
-                    total += getFluidAmount(held);
-                }
-            }
-        }
-
-
-        if (entity instanceof Player player) {
-            Inventory inventory = player.getInventory();
-            List<ItemStack> items = inventory.items;
-            int selected = Inventory.isHotbarSlot(inventory.selected) ? inventory.selected : -1;
-            for (int i = 0; i < items.size(); ++i) {
-                if (i != selected) {
-                    ItemStack stack = items.get(i);
-                    if (stack.is(BOItemTags.BREATHABLES)) {
-                        total += getFluidAmount(stack);
-                    }
-                }
-            }
-        }
-
-        return total;
+        return getSourcePairs(entity).mapToInt(oxygenSourcePair -> oxygenSourcePair.getStoredOxygen(entity)).sum();
     }
 
-    
-    private static int getFluidAmount(ItemStack stack) {
+
+    public static int getContainedOxygen(ItemStack stack) {
         if (stack.isEmpty()) return 0;
         return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
-                .map(handler -> handler.getTanks() > 0 ? handler.getFluidInTank(0).getAmount() : 0)
-                .orElse(0);
+                .lazyMap(handler -> {
+                    int tanks = handler.getTanks();
+                    if (tanks <= 0) return 0;
+                    int contained = 0;
+                    for (int i = 0; i < tanks; ++i) {
+                        FluidStack fluidStack = handler.getFluidInTank(i);
+                        if (BOFluids.isOxygen(fluidStack)) contained += fluidStack.getAmount();
+                    }
+                    return contained;
+                }).orElse(0);
     }
 
     
-    private static boolean drainFluid(ItemStack stack, int mb) {
-        if (stack.isEmpty()) return false;
+    public static int drainOxygen(ItemStack stack, int mb, IFluidHandler.FluidAction action) {
+        //TODO find better way to do this
+        if (stack.isEmpty()) return 0;
         return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
-                .map(handler -> {
-                    if (handler.getTanks() == 0) return false;
-                    return handler.drain(mb, IFluidHandler.FluidAction.EXECUTE).getAmount() > 0;
-                })
-                .orElse(false);
+                .lazyMap(handler -> {
+                    int toDrain = mb;
+                    int drained = 0;
+                    int tanks = handler.getTanks();
+                    if (handler.getTanks() <= 0) return 0;
+                    for (int i = 0; i < tanks; ++i) {
+                        FluidStack fluidStack = handler.getFluidInTank(i);
+                        if (BOFluids.isOxygen(fluidStack)) {
+                            int thisDrain = Math.min(fluidStack.getAmount(), toDrain);
+                            FluidStack drain = new FluidStack(fluidStack.getFluid(), thisDrain, fluidStack.getTag());
+                            int thisDrained = handler.drain(drain, action).getAmount();
+                            if (thisDrained > 0) {
+                                toDrain -= thisDrain;
+                                drained += thisDrained;
+                                if (toDrain <= 0) break;
+                            }
+                        }
+                    }
+                    return drained;
+                }).orElse(0);
+    }
+
+    record OxygenSourcePair<T, U extends OxygenSource<T>>(T sourceObject, U source) {
+        int getStoredOxygen(LivingEntity entity) {
+            return source.getStoredOxygen(sourceObject, entity);
+        }
+
+        int consumeOxygen(LivingEntity entity, int maxConsume, IFluidHandler.FluidAction action) {
+            return source.consumeOxygen(sourceObject, entity, maxConsume, action);
+        }
     }
 }

@@ -44,6 +44,10 @@ public class BOItemTags {
 
     public static final TagKey<Item> GLASS_BLOCK = ItemTags.create(new ResourceLocation("c", "glass_blocks"));
 
+
+    //curios compat
+    public static final TagKey<Item> CURIOS_BACK_SLOT = ItemTags.create(new ResourceLocation("curios", "back"));
+
     private static TagKey<Item> create(String path) {
         return ItemTags.create(new ResourceLocation(BeyondOxygen.MODID, path));
     }

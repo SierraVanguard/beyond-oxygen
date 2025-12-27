@@ -1,8 +1,8 @@
 package com.sierravanguard.beyond_oxygen.blocks.entity;
 
 import com.sierravanguard.beyond_oxygen.BOConfig;
-import com.sierravanguard.beyond_oxygen.compat.ColdSweatCompat;
-import com.sierravanguard.beyond_oxygen.compat.CompatLoader;
+import com.sierravanguard.beyond_oxygen.BOServerConfig;
+import com.sierravanguard.beyond_oxygen.compat.CompatUtils;
 import com.sierravanguard.beyond_oxygen.registry.BOBlockEntities;
 import com.sierravanguard.beyond_oxygen.registry.BOEffects;
 import com.sierravanguard.beyond_oxygen.registry.BOFluids;
@@ -10,27 +10,19 @@ import com.sierravanguard.beyond_oxygen.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class VentBlockEntity extends BlockEntity {
     private boolean pendingAreaClear = false;
@@ -70,7 +62,7 @@ public class VentBlockEntity extends BlockEntity {
         tankCap = LazyOptional.of(() -> tank);
     }
     public void refreshConfigValues() {
-        ventConsumption = Math.max(1, BOConfig.VENT_CONSUMPTION.get());
+        ventConsumption = Math.max(1, BOServerConfig.getVentConsumption());
     }
     private boolean consumeOxygen(int amount) {
         int available = tank.getFluidAmount();
@@ -80,7 +72,7 @@ public class VentBlockEntity extends BlockEntity {
     }
 
     private boolean isEntityInsideHermeticArea(LivingEntity entity) {
-        return hermeticArea != null && VSCompat.isEntityInHermeticArea(entity, hermeticArea);
+        return hermeticArea != null && HermeticAreaManager.updateIsEntityInHermeticArea(entity, hermeticArea);
     }
 
     @Override
@@ -132,7 +124,7 @@ public class VentBlockEntity extends BlockEntity {
 
 
     public float getCurrentOxygenRate() {
-        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOConfig.VENT_CONSUMPTION.get();
+        return hermeticArea == null ? 0f : hermeticArea.getBlocks().size() / (float) BOServerConfig.getVentConsumption();
     }
 
     public boolean isBlockInsideSealedArea(BlockPos pos) {
@@ -183,15 +175,12 @@ public class VentBlockEntity extends BlockEntity {
 
         vent.hermeticArea.setHasAir(hasAir);
         //System.out.println("Area has air? " + hasAir);
-        level.getEntities((Entity) null, vent.hermeticArea.getBounds(), e -> e instanceof LivingEntity).forEach(entity -> {
+        if (hasAir && vent.hermeticArea.getBounds() != null) level.getEntities((Entity) null, vent.hermeticArea.getBounds(), e -> e instanceof LivingEntity).forEach(entity -> {
             LivingEntity living = (LivingEntity) entity;
-            boolean inside = vent.isEntityInsideHermeticArea(living);
-            VSCompat.applySealedEffects(living, pos, vent.hermeticArea, vent);
-
-            if (inside && hasAir) {
+            if (vent.isEntityInsideHermeticArea(living)) {
                 living.addEffect(new MobEffectInstance(BOEffects.OXYGEN_SATURATION.get(), BOConfig.getTimeToImplode(), 0, false, false));
-                if (vent.temperatureRegulatorApplied)
-                    CompatLoader.setComfortableTemperature(living);
+                living.setAirSupply(living.getMaxAirSupply());
+                if (vent.temperatureRegulatorApplied) CompatUtils.setComfortableTemperature(living);
             }
         });
 
