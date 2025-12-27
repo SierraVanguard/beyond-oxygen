@@ -170,7 +170,7 @@ public class VentBlockEntity extends BlockEntity {
         if (vent.hermeticArea.isHermetic()) {
             int oxygenNeeded = Math.max(1, vent.hermeticArea.getBlocks().size() / vent.ventConsumption);
             if (vent.temperatureRegulatorApplied) oxygenNeeded /= 2;
-            hasAir = vent.consumeOxygen(oxygenNeeded);
+            hasAir = vent.consumeOxygen(oxygenNeeded) || BOConfig.getBabyMode();
         } else hasAir = false;
 
         vent.hermeticArea.setHasAir(hasAir);
